@@ -12,12 +12,10 @@ You can find the most recent version of this guide [here](https://github.com/fac
 After creation, your project should look like this:
 
 ```
-1-plus-2/
+one-plus-two/
   README.md
-  node_modules/
-  package.json
-  firebase.json
-  build/
+  functions/
+    index.js
   public/
     index.html
     favicon.ico

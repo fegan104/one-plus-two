@@ -1,0 +1,27 @@
+.Home{
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.Home-title-conatiner{
+  margin: 0 auto;
+}
+
+.Home-title{
+  margin: 0 auto;
+  float: left ;
+}
+
+img {
+  height: 50px;
+  float: left ;
+}
+
+.Home-button{
+  margin: 100% auto;
+}
+
+.Home-link{
+  margin: 0 auto;
+  display: block
+}
