@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import Home from './Home/Home.js'
-import CreateEvent from './CreateEvent/CreateEvent.js'
-import EventDetail from './EventDetail/EventDetail.js'
+import CreateEvent from './Event/CreateEvent.js'
+import EventDetail from './Event/EventDetail.js'
 import { Route, Switch } from 'react-router'
 
 

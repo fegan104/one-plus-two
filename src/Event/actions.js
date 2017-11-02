@@ -12,7 +12,7 @@ export const ADD_EVENT = "ADD_EVENT"
  * @param {boolean} isSelfEnrollable 
  */
 export const addEvent = (name, location, desc, date, time, guestLimit, owners, isSelfEnrollable) => {
-  let dateTime = date + time;
+  let dateTime = `${date} + ${time}`;
   return {
     type: ADD_EVENT,
     payload:{

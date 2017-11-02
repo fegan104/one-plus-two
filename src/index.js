@@ -9,7 +9,7 @@ import createHistory from 'history/createBrowserHistory'
 import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
 import registerServiceWorker from './registerServiceWorker';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import { mockSignIn } from './SignIn/signInActions.js'
+import { mockSignIn } from './SignIn/actions.js'
 import logger from 'redux-logger'
 import promise from 'redux-promise-middleware'
 

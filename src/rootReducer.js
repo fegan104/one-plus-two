@@ -1,35 +1,41 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-import { ADD_EVENT } from './CreateEvent/createEventActions.js'
-import { MOCK_SIGN_IN } from './SignIn/signInActions.js'
+import { ADD_EVENT } from './Event/actions.js'
+import { MOCK_SIGN_IN } from './SignIn/actions.js'
 
 //This is the initial state of our application before any data 
 //is loaded through actions
 const initialState = {
-  user: {},
   events: []
 }
 
 //Create the reducer for our application
-const appReducer = (state = initialState, action) => {
+const eventsReducer = (store = initialState, action) => {
   switch (action.type) {
     case ADD_EVENT: {
       return {
-        ...state,
+        ...store,
         events: [
-          ...state.events,
+          ...store.events,
           action.payload
         ]
       }
     }
-    case `${MOCK_SIGN_IN}_FULFILLED`:{
-      return{
-        ...state,
+    default:
+      return store;
+  }
+}
+
+const userReducer = (store = {}, action) => {
+  switch (action.type) {
+    case `${MOCK_SIGN_IN}_FULFILLED`: {
+      return {
+        ...store,
         user: action.payload
       }
     }
     default:
-      return state;
+      return store;
   }
 }
 
@@ -41,7 +47,8 @@ const appReducer = (state = initialState, action) => {
  * that was dispatched. They each return a new piece of the state.
  */
 const onePlusTwoReducer = combineReducers({
-  appReducer,
+  events: eventsReducer,
+  user: userReducer,
   router: routerReducer
 })
 
