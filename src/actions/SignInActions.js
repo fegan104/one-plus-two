@@ -1,18 +1,15 @@
-export const MOCK_SIGN_IN = 'MOCK_SIGN_IN';
+import actionType from '../constants';
 
 const MOCK_USER = {
   id: 'userId0',
   email: 'mock@user.com',
   name: 'Mock User',
-  profileData: { bio: "I'm not real" },
-  oath: { data: 'oath data' }
+  profileData: { bio: "I'm not real" }
 };
 
 export const mockSignIn = () => {
-  // return new Promise(resolve =>
-  //   setTimeout(resolve(MOCK_USER), 2000))
   return {
-    type: MOCK_SIGN_IN,
+    type: actionType.MOCK_SIGN_IN,
     payload: Promise.resolve(MOCK_USER)
   };
 };

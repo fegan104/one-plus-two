@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
 import { connect } from 'react-redux';
-//import { addEvent } from '../../actions/EventsActions.js';
+import { addEvent } from '../../actions/EventsActions';
 
 /**
  * This is a simple presentational component that shows some input fields. When the suer is done 
@@ -53,7 +53,24 @@ let CreateEvent = ({ dispatch, user }) => {
           node && (maxGuestsInput = node.input);
         }}
       />
-      <RaisedButton label="NEXT" />
+      <RaisedButton
+        label="NEXT"
+        onClick={_ => {
+          console.log('user:', user);
+          dispatch(
+            addEvent(
+              nameInput.value,
+              locationInput.value,
+              descInput.value,
+              dateInput.state.date,
+              timeInput.state.time,
+              maxGuestsInput.value,
+              user.id,
+              false
+            )
+          );
+        }}
+      />
     </div>
   );
 };
@@ -61,7 +78,7 @@ let CreateEvent = ({ dispatch, user }) => {
 //Get a user from our store
 const mapStoreToProps = store => {
   return {
-    user: store.user
+    user: store.user.user
   };
 };
 

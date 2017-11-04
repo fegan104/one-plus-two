@@ -1,5 +1,4 @@
 import * as firebase from 'firebase';
-import EventModel from '../models/EventModel';
 
 // eslint-disable-next-line
 let database;
@@ -20,4 +19,13 @@ export const init = () => {
 
 export const getEventsDB = () => {
   return database.ref('/events').once('value');
+};
+
+export const pushEventToDB = newEvent => {
+  const ownerId = newEvent.owner;
+  delete newEvent.owner;
+  return database
+    .ref('/events')
+    .push(newEvent)
+    .then(event => event.child('owners').push(ownerId));
 };
