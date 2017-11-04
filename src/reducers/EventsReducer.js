@@ -7,6 +7,9 @@ export default (store = initialStore, action) => {
     case actionType.LOAD_EVENTS_SUCCESS: {
       return { ...store, ...action.payload };
     }
+    case actionType.ADD_EVENT_FULFILLED: {
+      return { ...store, ...action.payload };
+    }
 
     default:
       return store;

@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
+import { mockSignIn } from './actions/SignInActions';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';
@@ -27,6 +28,7 @@ const middleware = applyMiddleware(
 //Finally make a store with reducers and all our middleware
 const store = createStore(reducers, middleware);
 
+store.dispatch(mockSignIn());
 //Wrap the application in a Provider so all our container components can access the redux store.
 //Wrap in connected router so we can dispatch routing events
 //Wrap in MuiThemProvider so our view components have MD styling
