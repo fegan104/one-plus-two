@@ -30,9 +30,12 @@
     "precommit": "lint-staged",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom --silent",
     "deploy": "npm run build && cd functions && npm install && cd .. && firebase deploy"
   },
   "devDependencies": {
+    "detect-port": "^1.2.1",
+    "firebase-server": "^0.11.0",
     "prettier": "^1.7.4"
   }
 }
