@@ -1,27 +1,27 @@
-.Home{
+.Home {
   margin: 0 auto;
   display: inline-block;
 }
 
-.Home-title-conatiner{
+.Home-title-conatiner {
   margin: 0 auto;
 }
 
-.Home-title{
+.Home-title {
   margin: 0 auto;
-  float: left ;
+  float: left;
 }
 
 img {
   height: 50px;
-  float: left ;
+  float: left;
 }
 
-.Home-button{
+.Home-button {
   margin: 100% auto;
 }
 
-.Home-link{
+.Home-link {
   margin: 0 auto;
-  display: block
+  display: block;
 }

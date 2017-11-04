@@ -1,13 +1,13 @@
-import { combineReducers } from 'redux'
-import { routerReducer } from 'react-router-redux'
-import { ADD_EVENT } from './Event/actions.js'
-import { MOCK_SIGN_IN } from './SignIn/actions.js'
+import { combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
+import { ADD_EVENT } from './actions/EventActions.js';
+import { MOCK_SIGN_IN } from './actions/SignInActions.js';
 
-//This is the initial state of our application before any data 
+//This is the initial state of our application before any data
 //is loaded through actions
 const initialState = {
   events: []
-}
+};
 
 //Create the reducer for our application
 const eventsReducer = (store = initialState, action) => {
@@ -15,16 +15,13 @@ const eventsReducer = (store = initialState, action) => {
     case ADD_EVENT: {
       return {
         ...store,
-        events: [
-          ...store.events,
-          action.payload
-        ]
-      }
+        events: [...store.events, action.payload]
+      };
     }
     default:
       return store;
   }
-}
+};
 
 const userReducer = (store = {}, action) => {
   switch (action.type) {
@@ -32,13 +29,12 @@ const userReducer = (store = {}, action) => {
       return {
         ...store,
         user: action.payload
-      }
+      };
     }
     default:
       return store;
   }
-}
-
+};
 
 /**
  * This is the combined reducer for our entire application. Any time an action is dispatched
@@ -50,6 +46,6 @@ const onePlusTwoReducer = combineReducers({
   events: eventsReducer,
   user: userReducer,
   router: routerReducer
-})
+});
 
-export default onePlusTwoReducer
+export default onePlusTwoReducer;

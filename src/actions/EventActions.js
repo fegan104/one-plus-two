@@ -1,4 +1,4 @@
-export const ADD_EVENT = "ADD_EVENT"
+export const ADD_EVENT = 'ADD_EVENT';
 
 /**
  * This action can be dispatched where the reducer will then
@@ -11,11 +11,20 @@ export const ADD_EVENT = "ADD_EVENT"
  * @param {User[]} owners 
  * @param {boolean} isSelfEnrollable 
  */
-export const addEvent = (name, location, desc, date, time, guestLimit, owners, isSelfEnrollable) => {
+export const addEvent = (
+  name,
+  location,
+  desc,
+  date,
+  time,
+  guestLimit,
+  owners,
+  isSelfEnrollable
+) => {
   let dateTime = `${date} + ${time}`;
   return {
     type: ADD_EVENT,
-    payload:{
+    payload: {
       name,
       location,
       desc,
@@ -24,5 +33,5 @@ export const addEvent = (name, location, desc, date, time, guestLimit, owners, i
       owners,
       isSelfEnrollable
     }
-  }
-}
+  };
+};
