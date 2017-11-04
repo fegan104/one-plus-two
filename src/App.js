@@ -4,8 +4,14 @@ import Home from './components/Home/Home.js';
 import CreateEvent from './components/Event/CreateEvent.js';
 import EventDetail from './components/Event/EventDetail.js';
 import { Route, Switch } from 'react-router';
+import { init as firebaseInit } from './services/FirebaseService';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    firebaseInit();
+  }
+
   render() {
     return (
       <div className="App">

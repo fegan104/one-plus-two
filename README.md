@@ -7,6 +7,20 @@ You can find the most recent version of this guide [here](https://github.com/fac
 * [Frank Egan](<mailto:fegan@wpi.edu>)
 * [Dimitar Vouldjeff](<mailto:dmvouldjeff@wpi.edu>)
 
+## Before Running
+
+Create a file .env.local with the following lines (get actual vars from Firebase CLI)
+
+
+```
+REACT_APP_FIREBASE_API_KEY=xxx
+REACT_APP_FIREBASE_AUTH_DOMAIN=xxx
+REACT_APP_FIREBASE_DB_URL=xxx
+REACT_APP_FIREBASE_PROJECT_ID=xxx
+REACT_APP_FIREBASE_STORAGE_BUCKET=xxx
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxx
+```
+
 ## Folder Structure
 
 After creation, your project should look like this:
