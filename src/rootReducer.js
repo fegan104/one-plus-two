@@ -9,7 +9,11 @@ const initialState = {
   events: []
 }
 
-//Create the reducer for our application
+/**
+ * Reducer for all events actions.
+ * @param store The redux store.
+ * @param action The action that was dispatched.
+ */
 const eventsReducer = (store = initialState, action) => {
   switch (action.type) {
     case ADD_EVENT: {
@@ -26,6 +30,11 @@ const eventsReducer = (store = initialState, action) => {
   }
 }
 
+/**
+ * When events related to user's are dispatched they're reduced functionally here.
+ * @param store The redux store.
+ * @param action The action that was dispatched.
+ */
 const userReducer = (store = {}, action) => {
   switch (action.type) {
     case `${MOCK_SIGN_IN}_FULFILLED`: {
