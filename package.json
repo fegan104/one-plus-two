@@ -30,7 +30,7 @@
     "precommit": "lint-staged",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "deploy": "npm run build && cd functions && npm install && cd .. && firebase deploy"
   },
   "devDependencies": {
     "prettier": "^1.7.4"
