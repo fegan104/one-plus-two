@@ -27,5 +27,11 @@ export const pushEventToDB = newEvent => {
   return database
     .ref('/events')
     .push(newEvent)
-    .then(event => event.child('owners').push(ownerId));
+    .then(event => event.child('owners').push(ownerId))
+    .then(event => event.parent.parent.once('value'))
+    .then(snap => {
+      let obj = {};
+      obj[snap.key] = snap.val();
+      return obj;
+    });
 };

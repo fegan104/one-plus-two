@@ -13,13 +13,18 @@ import { addEvent } from '../../actions/EventsActions';
  * @param {function} dispatch is passed in from `connect`. 
  */
 let CreateEvent = ({ dispatch, user }) => {
-  let nameInput, locationInput, descInput, dateInput, timeInput, maxGuestsInput;
+  let titleInput,
+    locationInput,
+    descInput,
+    dateInput,
+    timeInput,
+    maxGuestsInput;
   return (
     <div>
       <TextField
-        hintText="Event Name"
+        hintText="Event Title"
         ref={node => {
-          node && (nameInput = node.input);
+          node && (titleInput = node.input);
         }}
       />
       <TextField
@@ -55,11 +60,10 @@ let CreateEvent = ({ dispatch, user }) => {
       />
       <RaisedButton
         label="NEXT"
-        onClick={_ => {
-          console.log('user:', user);
+        onClick={_ =>
           dispatch(
             addEvent(
-              nameInput.value,
+              titleInput.value,
               locationInput.value,
               descInput.value,
               dateInput.state.date,
@@ -68,8 +72,7 @@ let CreateEvent = ({ dispatch, user }) => {
               user.id,
               false
             )
-          );
-        }}
+          )}
       />
     </div>
   );
@@ -78,7 +81,7 @@ let CreateEvent = ({ dispatch, user }) => {
 //Get a user from our store
 const mapStoreToProps = store => {
   return {
-    user: store.user.user
+    user: store.user
   };
 };
 

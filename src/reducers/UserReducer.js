@@ -5,7 +5,7 @@ export default (store = {}, action) => {
     case actionType.MOCK_SIGN_IN_FULFILLED: {
       return {
         ...store,
-        user: action.payload
+        ...action.payload
       };
     }
     default:

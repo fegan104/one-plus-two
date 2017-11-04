@@ -34,7 +34,7 @@ export const loadEvents = () => {
  * @param {boolean} isSelfEnrollable 
  */
 export const addEvent = (
-  name,
+  title,
   location,
   desc,
   date,
@@ -43,15 +43,21 @@ export const addEvent = (
   owner,
   isSelfEnrollable
 ) => {
-  //TODO actually combine these times properly
-  let dateTime = `${date} + ${time}`;
+  //We need to combine  the selected day and the
+  //selected time into one date time
+  const selectedTime = new Date(time);
+  const dateTime = new Date(date);
+  console.log('dateTime:', dateTime);
+  console.log('selectedTime:', selectedTime);
+  // dateTime.setHours(selectedTime.getHours)
+  // dateTime.setMinutes(selectedTime.getMinutes())
   return {
     type: actionType.ADD_EVENT,
     payload: pushEventToDB({
-      name,
+      title,
       location,
       desc,
-      dateTime,
+      dateTime: dateTime.toUTCString(),
       guestLimit,
       owner,
       isSelfEnrollable
