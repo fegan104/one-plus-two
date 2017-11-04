@@ -49,8 +49,8 @@ export const addEvent = (
   const dateTime = new Date(date);
   console.log('dateTime:', dateTime);
   console.log('selectedTime:', selectedTime);
-  // dateTime.setHours(selectedTime.getHours)
-  // dateTime.setMinutes(selectedTime.getMinutes())
+  dateTime.setHours(selectedTime.getHours());
+  dateTime.setMinutes(selectedTime.getMinutes());
   return {
     type: actionType.ADD_EVENT,
     payload: pushEventToDB({
