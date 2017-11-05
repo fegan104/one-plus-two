@@ -6,6 +6,7 @@ import FirebaseServer from 'firebase-server';
 import detect from 'detect-port';
 
 let mockDb = {};
+let server;
 
 export async function startFirebaseTestServer() {
   const port = await detect(5000);
@@ -16,7 +17,6 @@ export async function startFirebaseTestServer() {
   return server;
 }
 
-let server;
 beforeAll(async () => {
   server = await startFirebaseTestServer();
 });
@@ -25,6 +25,7 @@ afterAll(() => {
   if (server) {
     server.close();
     server = null;
+    console.log('closed');
   }
 });
 
