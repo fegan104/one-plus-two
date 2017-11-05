@@ -37,7 +37,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --forceExit",
-    "deploy": "npm run build && cd functions && npm install && cd .. && firebase deploy"
+    "deploy": "npm install -g firebase-tools && npm run build && cd functions && npm install && cd .. && firebase deploy --token $FIREBASE_DEPLOY_KEY"
   },
   "devDependencies": {
     "detect-port": "^1.2.1",
