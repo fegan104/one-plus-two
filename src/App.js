@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import Home from './components/Home/Home.js';
-import CreateEvent from './components/Event/CreateEvent.js';
-import EventDetail from './components/Event/EventDetail.js';
+import Home from './components/Home/Home';
+import CreateEvent from './components/Event/CreateEvent';
+import EventDetail from './components/Event/EventDetail';
+import ViewInvite from './components/Invite/ViewInvite';
+
 import { Route, Switch } from 'react-router';
 import { init as firebaseInit } from './services/FirebaseService';
 
@@ -53,6 +55,7 @@ class App extends Component {
                   <Route exact path="/" component={Home} />
                   <Route path="/detail" component={EventDetail} />
                   <Route path="/create" component={CreateEvent} />
+                  <Route path="/invite/:id" component={ViewInvite} />
                 </Switch>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import EventModel from '../models/EventModel';
+import InviteModel from '../models/InviteModel';
 
 // eslint-disable-next-line
 let database;
@@ -14,8 +15,10 @@ export const init = () => {
     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID
   };
 
-  firebase.initializeApp(config);
-  database = firebase.database();
+  if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+    database = firebase.database();
+  }
 };
 
 export const getEventsDB = () => {
@@ -27,12 +30,27 @@ export const getEventsDB = () => {
         let dbObj = req.val();
         let events = [];
 
-        Object.keys(dbObj).forEach(id => {
-          let obj = EventModel({ id, ...dbObj[id] });
-          events.push(obj);
+        events = Object.keys(dbObj).map(id => {
+          return EventModel({ id, ...dbObj[id] });
         });
 
         return resolve(events);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+export const getEventFromDB = eventId => {
+  return new Promise((resolve, reject) => {
+    database
+      .ref(`/events/${eventId}`)
+      .once('value')
+      .then(dbObj => {
+        let event = EventModel({ id: dbObj.key, ...dbObj.val() });
+
+        return resolve(event);
       })
       .catch(error => {
         reject(error);
@@ -53,4 +71,20 @@ export const pushEventToDB = newEvent => {
       obj[snap.key] = snap.val();
       return obj;
     });
+};
+
+export const getInviteFromDB = inviteId => {
+  return new Promise((resolve, reject) => {
+    database
+      .ref(`/invites/${inviteId}`)
+      .once('value')
+      .then(dbObj => {
+        let invite = InviteModel({ id: dbObj.key, ...dbObj.val() });
+
+        return resolve(invite);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 };

@@ -31,6 +31,9 @@ class Home extends Component {
         <Link to="/create" className="Home-link">
           I have an account
         </Link>
+        <Link to="/invite/inviteId1" className="jest-link-0">
+          check out invite
+        </Link>
       </div>
     );
   }
