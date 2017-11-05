@@ -25,7 +25,6 @@ afterAll(() => {
   if (server) {
     server.close();
     server = null;
-    console.log('closed');
   }
 });
 

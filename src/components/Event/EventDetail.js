@@ -13,9 +13,8 @@ class EventDetail extends Component {
   render() {
     let { events } = this.props;
 
-    let eventDivs = Object.keys(events).map(id => {
-      let event = events[id];
-      return <h1 key={id}>{event.title}</h1>;
+    let eventDivs = events.map(event => {
+      return <h1 key={event.id}>{event.title}</h1>;
     });
 
     return (

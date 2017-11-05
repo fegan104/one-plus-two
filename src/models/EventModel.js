@@ -1,4 +1,4 @@
-export default (
+export default ({
   id,
   desc,
   guestLimit,
@@ -7,17 +7,18 @@ export default (
   picture,
   stats,
   title,
+  dateTime,
+  ...rest
+}) => ({
+  id,
+  desc,
+  guestLimit,
+  isSelfEnrollable,
+  location,
+  newsFeed: [], // TODO
+  owners: [], // TODO
+  picture,
+  stats,
+  title,
   dateTime
-) => ({
-  id: id,
-  desc: desc,
-  guestLimit: guestLimit,
-  isSelfEnrollable: isSelfEnrollable,
-  location: location,
-  newsFeed: [],
-  owners: [],
-  picture: picture,
-  stats: stats,
-  title: title,
-  dateTime: dateTime
 });

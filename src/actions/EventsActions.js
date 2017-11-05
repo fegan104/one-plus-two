@@ -10,7 +10,7 @@ export const loadEvents = () => {
       .then(events => {
         dispatch({
           type: actionType.LOAD_EVENTS_SUCCESS,
-          payload: events.val()
+          payload: events
         });
       })
       .catch(error => {

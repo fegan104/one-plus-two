@@ -1,14 +1,14 @@
 import actionType from '../constants';
 
-let initialStore = {};
+let initialStore = [];
 
 export default (store = initialStore, action) => {
   switch (action.type) {
     case actionType.LOAD_EVENTS_SUCCESS: {
-      return { ...store, ...action.payload };
+      return action.payload;
     }
     case actionType.ADD_EVENT_FULFILLED: {
-      return { ...store, ...action.payload };
+      return [...store, action.payload];
     }
 
     default:
