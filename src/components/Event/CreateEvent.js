@@ -1,16 +1,22 @@
 import React from 'react';
+
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DatePicker from 'material-ui/DatePicker';
 import TimePicker from 'material-ui/TimePicker';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
+import Toggle from 'material-ui/Toggle';
+
 import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
 
 /**
- * This is a simple presentational component that shows some input fields. When the suer is done 
+ * This is a simple presentational component that shows some input fields. When the user is done 
  * inputting information we dispatch an addEvent to the reducer.
  * 
  * @param {function} dispatch is passed in from `connect`. 
+ * @param {UserModel} user is passed in from `mappStoreToProps`. 
  */
 let CreateEvent = ({ dispatch, user }) => {
   let titleInput,
@@ -58,8 +64,20 @@ let CreateEvent = ({ dispatch, user }) => {
           node && (maxGuestsInput = node.input);
         }}
       />
+
+      <div>
+        <div>Import guests from previous event</div>
+        <DropDownMenu label="Import guests from previous event" value={1}>
+          <MenuItem value={1} primaryText="Event 1" />
+          <MenuItem value={2} primaryText="Event 2" />
+          <MenuItem value={3} primaryText="Cool event" />
+        </DropDownMenu>
+      </div>
+      <div>
+        <Toggle label="Allow self enrollment" defaultToggled={true} />
+      </div>
       <RaisedButton
-        label="NEXT"
+        label="SAVE EVENT"
         onClick={_ =>
           dispatch(
             addEvent(

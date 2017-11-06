@@ -1,4 +1,8 @@
-import { getEventsDB, pushEventToDB } from '../services/FirebaseService';
+import {
+  getEventsDB,
+  pushEventToDB,
+  getEventFromDB
+} from '../services/FirebaseService';
 import actionType from '../constants';
 
 export const loadEvents = () => {
@@ -47,8 +51,6 @@ export const addEvent = (
   //selected time into one date time
   const selectedTime = new Date(time);
   const dateTime = new Date(date);
-  console.log('dateTime:', dateTime);
-  console.log('selectedTime:', selectedTime);
   dateTime.setHours(selectedTime.getHours());
   dateTime.setMinutes(selectedTime.getMinutes());
   return {
@@ -62,5 +64,12 @@ export const addEvent = (
       owner,
       isSelfEnrollable
     })
+  };
+};
+
+export const getEvent = eventId => {
+  return {
+    type: actionType.GET_EVENT,
+    payload: getEventFromDB(eventId)
   };
 };

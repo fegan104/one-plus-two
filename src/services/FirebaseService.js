@@ -5,6 +5,9 @@ import InviteModel from '../models/InviteModel';
 // eslint-disable-next-line
 let database;
 
+/**
+ * Initializes our firebase instance. Called in App contructor.
+ */
 export const init = () => {
   let config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -21,6 +24,9 @@ export const init = () => {
   }
 };
 
+/**
+ * Returns a Promise to an array of EventModels from firebase.
+ */
 export const getEventsDB = () => {
   return new Promise((resolve, reject) => {
     database
@@ -42,6 +48,10 @@ export const getEventsDB = () => {
   });
 };
 
+/**
+ * Returns a promise to the specified EventModel.
+ * @param {string} eventId is the pushId of the requested event.
+ */
 export const getEventFromDB = eventId => {
   return new Promise((resolve, reject) => {
     database
@@ -58,6 +68,11 @@ export const getEventFromDB = eventId => {
   });
 };
 
+/**
+ * Pushes a new event to firebase. Note owners will be pushed as a 
+ * pushId/userId key/value pair.
+ * @param {EventModel} newEvent the Event object to be pushed to firebase.
+ */
 export const pushEventToDB = newEvent => {
   const ownerId = newEvent.owner;
   delete newEvent.owner;
@@ -73,6 +88,10 @@ export const pushEventToDB = newEvent => {
     });
 };
 
+/**
+ * Returns a promise to an InvviteModel of the requested invite.
+ * @param {string} inviteId the pushId we want to request.
+ */
 export const getInviteFromDB = inviteId => {
   return new Promise((resolve, reject) => {
     database

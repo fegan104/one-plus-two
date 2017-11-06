@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Home from './components/Home/Home';
 import CreateEvent from './components/Event/CreateEvent';
+import EventList from './components/Event/EventList';
 import EventDetail from './components/Event/EventDetail';
 import ViewInvite from './components/Invite/ViewInvite';
 
@@ -10,7 +11,7 @@ import { init as firebaseInit } from './services/FirebaseService';
 
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import { mockSignIn } from './actions/SignInActions';
+import { mockSignIn } from './actions/UserActions';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';
@@ -34,13 +35,17 @@ class App extends Component {
       thunk
     );
 
-    //Finally make a store with reducers and all our middleware
+    //Make a store with reducers and all our middleware
     this.store = createStore(reducers, middleware);
+    //All firebase actions require a user even an anonymous one
     this.store.dispatch(mockSignIn());
-
+    //Initialize our app instance of firebase
     firebaseInit();
   }
 
+  //Wrap the application in a Provider so all our container components can access the redux store.
+  //Wrap in connected router so we can dispatch routing events
+  //Wrap in MuiThemProvider so our view components have MD styling
   render() {
     return (
       <Provider store={this.store}>
@@ -53,8 +58,9 @@ class App extends Component {
               <div className="App-intro">
                 <Switch>
                   <Route exact path="/" component={Home} />
-                  <Route path="/detail" component={EventDetail} />
+                  <Route path="/list" component={EventList} />
                   <Route path="/create" component={CreateEvent} />
+                  <Route path="/event/:id" component={EventDetail} />
                   <Route path="/invite/:id" component={ViewInvite} />
                 </Switch>
               </div>
