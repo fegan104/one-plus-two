@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 
 import { getEvent } from '../../actions/EventsActions';
 
+import RaisedButton from 'material-ui/RaisedButton';
+
 /**
  * Displays details about teh events specified in the route's id. 
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
@@ -14,13 +16,21 @@ class EventDetail extends React.Component {
   }
 
   render() {
-    let { event, id } = this.props;
+    let { event } = this.props;
     let view = null;
     if (event) {
       view = (
         <div>
           <h1>Event: {event.title}</h1>
-          <h1>ID: {id}</h1>
+          <div>
+            <RaisedButton label="Send Message" />
+          </div>
+          <div>
+            <RaisedButton label="Invite People" />
+          </div>
+          <div>
+            <RaisedButton label="Scan Pass" />
+          </div>
         </div>
       );
     } else {
@@ -43,8 +53,7 @@ const mapStateToProps = (state, ownProps) => {
   const filtered = state.events.filter(e => e.id === eventId);
   const event = filtered[0] ? filtered[0] : undefined;
   return {
-    event,
-    id: eventId
+    event
   };
 };
 
