@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 import EventModel from '../models/EventModel';
 import InviteModel from '../models/InviteModel';
+import PassModel from '../models/PassModel';
 
 // eslint-disable-next-line
 let database;
@@ -106,4 +107,22 @@ export const getInviteFromDB = inviteId => {
         reject(error);
       });
   });
+};
+
+/**
+ * Pushes a new PassModel to /passes.
+ * @param {PassModel} newPass a PassModel.
+ */
+export const pushPassToDB = newPass => {
+  delete newPass.id;
+  return database
+    .ref('passes')
+    .push(newPass)
+    .then(pass => pass.once('value'))
+    .then(snap =>
+      PassModel({
+        ...snap.val(),
+        id: snap.key
+      })
+    );
 };
