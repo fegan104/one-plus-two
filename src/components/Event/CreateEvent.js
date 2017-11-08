@@ -1,4 +1,5 @@
 import React from 'react';
+import './CreateEvent.css';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -7,6 +8,7 @@ import TimePicker from 'material-ui/TimePicker';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
+import AppBar from 'material-ui/AppBar';
 
 import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
@@ -27,20 +29,27 @@ let CreateEvent = ({ dispatch, user }) => {
     maxGuestsInput;
   return (
     <div>
+      <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
       <TextField
-        hintText="Event Title"
+        floatingLabelStyle={{ top: '16px' }}
+        style={{ maxHeight: '48px', marginTop: '24px' }}
+        floatingLabelText="Event Title"
         ref={node => {
           node && (titleInput = node.input);
         }}
       />
       <TextField
-        hintText="Location"
+        floatingLabelStyle={{ top: '16px' }}
+        style={{ maxHeight: '48px' }}
+        floatingLabelText="Location"
         ref={node => {
           node && (locationInput = node.input);
         }}
       />
       <TextField
-        hintText="Description"
+        floatingLabelStyle={{ top: '16px' }}
+        style={{ maxHeight: '48px' }}
+        floatingLabelText="Description"
         ref={node => {
           node && (descInput = node.input);
         }}
@@ -58,26 +67,39 @@ let CreateEvent = ({ dispatch, user }) => {
         }}
       />
       <TextField
-        hintText="Max guests"
+        floatingLabelStyle={{ top: '16px' }}
+        style={{ maxHeight: '48px' }}
+        floatingLabelText="Max guests"
         type="number"
         ref={node => {
           node && (maxGuestsInput = node.input);
         }}
       />
 
-      <div>
-        <div>Import guests from previous event</div>
-        <DropDownMenu label="Import guests from previous event" value={1}>
-          <MenuItem value={1} primaryText="Event 1" />
-          <MenuItem value={2} primaryText="Event 2" />
-          <MenuItem value={3} primaryText="Cool event" />
+      <div className="CreateEvent-menu">
+        <DropDownMenu value={1} className="CreateEvent-spinner">
+          <MenuItem
+            value={1}
+            label="Import guests from previous event"
+            primaryText="None"
+          />
+          <MenuItem value={2} primaryText="Bake Sale" />
+          <MenuItem value={3} primaryText="Ultimate Game" />
         </DropDownMenu>
       </div>
       <div>
-        <Toggle label="Allow self enrollment" defaultToggled={true} />
+        <Toggle
+          className="CreateEvent-switch"
+          label="Allow self enrollment:"
+          thumbSwitchedStyle={{ backgroundColor: '#76FF03' }}
+          trackSwitchedStyle={{ backgroundColor: '#CCFF90' }}
+          defaultToggled={true}
+        />
       </div>
       <RaisedButton
+        className="CreateEvent-button"
         label="SAVE EVENT"
+        primary={true}
         onClick={_ =>
           dispatch(
             addEvent(
