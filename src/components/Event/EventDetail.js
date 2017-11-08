@@ -53,7 +53,8 @@ const mapStateToProps = (state, ownProps) => {
   const filtered = state.events.filter(e => e.id === eventId);
   const event = filtered[0] ? filtered[0] : undefined;
   return {
-    event
+    event,
+    id: eventId
   };
 };
 
