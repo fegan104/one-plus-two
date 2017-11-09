@@ -1,7 +1,7 @@
 import actionType from '../constants';
 
 const MOCK_USER = {
-  id: 'userId0',
+  id: 'userId1',
   email: 'mock@user.com',
   name: 'Mock User',
   profileData: { bio: "I'm not real" }

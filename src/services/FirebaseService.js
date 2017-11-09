@@ -113,7 +113,7 @@ export const getInviteFromDB = inviteId => {
  * Pushes a new PassModel to /passes.
  * @param {PassModel} newPass a PassModel.
  */
-export const pushPassToDB = newPass => {
+const pushPassToDB = newPass => {
   delete newPass.id;
   return database
     .ref('passes')
@@ -125,4 +125,60 @@ export const pushPassToDB = newPass => {
         id: snap.key
       })
     );
+};
+
+//TODO change to be a firebase function
+/**
+ * This fucntion returns a promise to a valid pass (if the invite was valid).
+ * We check if the user already has a pass for the event if they do we get that one.
+ * If they don't we use the invite and push that new pass to the db
+ * 
+ * @param invite 
+ */
+export const exchangeInviteForPass = async (invite, user) => {
+  const { event } = invite;
+  //Lets check if the user already has a pass for the event
+  const usersPass = await database
+    .ref('/')
+    .child('passes')
+    .orderByChild('user')
+    .equalTo(`${user.id}`)
+    .once('value')
+    .then(snap => snap.val())
+    .then(passes =>
+      Object.keys(passes)
+        .map(k => {
+          passes[k]['id'] = k;
+          return passes[k];
+        })
+        .filter(p => p.event === event.id)
+    )
+    .then(f => f[0]);
+
+  //return the user's pass
+  if (usersPass) {
+    return Promise.resolve(usersPass);
+  }
+  //User doesn't have a pass lets check if we can even give them one
+  const isUsed = await database
+    .ref(`invites/${invite.id}/isUsed`)
+    .once('value')
+    .then(snap => snap.val());
+
+  //if invite is used reject
+  if (isUsed) {
+    return Promise.reject('Pass already used');
+  }
+  //use invite
+  await database.ref(`invites/${invite.id}`).update({ isUsed: true });
+  //The invite is valid lets get a new pass
+  return pushPassToDB(
+    PassModel({
+      desc: event.desc,
+      isActive: false,
+      isUsed: false,
+      user: user.id,
+      event: event.id
+    })
+  );
 };
