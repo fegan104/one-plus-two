@@ -9,6 +9,8 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 import AppBar from 'material-ui/AppBar';
+import Fab from 'material-ui/FloatingActionButton';
+import DoneIcon from 'material-ui/svg-icons/action/done';
 
 import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
@@ -31,27 +33,32 @@ let CreateEvent = ({ dispatch, user }) => {
     <div>
       <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
       <TextField
-        floatingLabelStyle={{ top: '16px' }}
-        style={{ maxHeight: '48px', marginTop: '24px' }}
         floatingLabelText="Event Title"
         ref={node => {
           node && (titleInput = node.input);
         }}
       />
       <TextField
-        floatingLabelStyle={{ top: '16px' }}
-        style={{ maxHeight: '48px' }}
+        style={{ textAlign: 'left' }}
+        floatingLabelText="Description"
+        multiLine={true}
+        rows={2}
+        ref={node => {
+          console.log('node:', node);
+          node && (descInput = node.input.refs.input);
+        }}
+      />
+      <TextField
         floatingLabelText="Location"
         ref={node => {
           node && (locationInput = node.input);
         }}
       />
       <TextField
-        floatingLabelStyle={{ top: '16px' }}
-        style={{ maxHeight: '48px' }}
-        floatingLabelText="Description"
+        floatingLabelText="Max guests"
+        type="number"
         ref={node => {
-          node && (descInput = node.input);
+          node && (maxGuestsInput = node.input);
         }}
       />
       <DatePicker
@@ -64,15 +71,6 @@ let CreateEvent = ({ dispatch, user }) => {
         hintText="Pick a time"
         ref={node => {
           node && (timeInput = node);
-        }}
-      />
-      <TextField
-        floatingLabelStyle={{ top: '16px' }}
-        style={{ maxHeight: '48px' }}
-        floatingLabelText="Max guests"
-        type="number"
-        ref={node => {
-          node && (maxGuestsInput = node.input);
         }}
       />
 
@@ -96,10 +94,8 @@ let CreateEvent = ({ dispatch, user }) => {
           defaultToggled={true}
         />
       </div>
-      <RaisedButton
-        className="CreateEvent-button"
-        label="SAVE EVENT"
-        primary={true}
+      <Fab
+        className="fab"
         onClick={_ =>
           dispatch(
             addEvent(
@@ -113,7 +109,9 @@ let CreateEvent = ({ dispatch, user }) => {
               false
             )
           )}
-      />
+      >
+        <DoneIcon />
+      </Fab>
     </div>
   );
 };

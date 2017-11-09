@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import _ from 'lodash';
 import QRCode from 'qrcode.react';
 import './ViewInvite.css';
 
@@ -8,6 +9,7 @@ import { getInvite } from '../../actions/InvitesActions';
 import { claimInvite } from '../../actions/PassActions';
 
 import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 import {
   Card,
   CardActions,
@@ -16,25 +18,42 @@ import {
   CardText
 } from 'material-ui/Card';
 
-import _ from 'lodash';
-
 /**
- * Lets a guest see their invitation to an event. If the invitation has already been 
- * redeemed for a pass then the pass will be displayed (TODO). Otherwise it will 
- * prompt the user to 'get a pass'.
+ * Lets a guest see their invitation to an event. TODO wen need to do error 
+ * handling with the pass reducer.
  */
 class ViewInvite extends Component {
+  state = {
+    open: false
+  };
+
+  handleOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
   componentDidMount() {
     this.props.getInvite(this.props.id);
   }
 
   renderQRCode = pass => {
     if (!_.isEmpty(pass)) {
+      let actions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.handleClose} />
+      ];
       return (
-        <div>
-          This is your pass to the event:
+        <Dialog
+          title="This is your pass to the event:"
+          actions={actions}
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+        >
           <QRCode value={pass.id} size={256} />
-        </div>
+        </Dialog>
       );
     }
     return <div />;
@@ -63,7 +82,10 @@ class ViewInvite extends Component {
           <CardActions>
             <FlatButton
               label="Show Pass"
-              onClick={_ => this.props.claimInvite(invite, user)}
+              onClick={_ => {
+                this.handleOpen();
+                this.props.claimInvite(invite, user);
+              }}
             />
           </CardActions>
         </Card>

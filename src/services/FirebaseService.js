@@ -75,6 +75,7 @@ export const getEventFromDB = eventId => {
  * @param {EventModel} newEvent the Event object to be pushed to firebase.
  */
 export const pushEventToDB = newEvent => {
+  console.log('newEvent:', newEvent);
   const ownerId = newEvent.owner;
   delete newEvent.owner;
   return database

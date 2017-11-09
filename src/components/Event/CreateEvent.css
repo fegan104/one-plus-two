@@ -1,3 +1,7 @@
+.CreateEvent {
+  text-align: left;
+}
+
 .CreateEvent-switch {
   max-width: 250px;
   text-align: left;
@@ -21,4 +25,11 @@
 
 .CreateEvent-input {
   max-height: 8vh !important;
+}
+
+.fab {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  margin: 16px;
 }
