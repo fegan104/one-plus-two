@@ -5,6 +5,7 @@ import CreateEvent from './components/Event/CreateEvent';
 import EventList from './components/Event/EventList';
 import EventDetail from './components/Event/EventDetail';
 import ViewInvite from './components/Invite/ViewInvite';
+import Scanner from './components/Scanner/Scanner';
 
 import { Route, Switch } from 'react-router';
 import { init as firebaseInit } from './services/FirebaseService';
@@ -17,8 +18,16 @@ import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';
 import { ConnectedRouter, routerMiddleware } from 'react-router-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import logger from 'redux-logger';
 import promise from 'redux-promise-middleware';
+
+const muiTheme = getMuiTheme({
+  palette: {
+    primary1Color: '#222',
+    accent1Color: '#76FF03'
+  }
+});
 
 class App extends Component {
   constructor(props) {
@@ -50,11 +59,8 @@ class App extends Component {
     return (
       <Provider store={this.store}>
         <ConnectedRouter history={this.history}>
-          <MuiThemeProvider>
+          <MuiThemeProvider muiTheme={muiTheme}>
             <div className="App">
-              <header className="App-header">
-                <h1 className="App-title">OnePlusTwo</h1>
-              </header>
               <div className="App-intro">
                 <Switch>
                   <Route exact path="/" component={Home} />
@@ -62,6 +68,7 @@ class App extends Component {
                   <Route path="/create" component={CreateEvent} />
                   <Route path="/event/:id" component={EventDetail} />
                   <Route path="/invite/:id" component={ViewInvite} />
+                  <Route path="/scanner" component={Scanner} />
                 </Switch>
               </div>
             </div>

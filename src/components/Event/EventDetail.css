@@ -1,0 +1,31 @@
+.EventDetail {
+  text-align: left;
+}
+
+.EventDetail-button {
+  margin: 8px !important;
+}
+
+.container {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.banner {
+  width: 100vw;
+  height: auto;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+.fab {
+  position: fixed;
+  margin: 16px;
+  bottom: 0px;
+  right: 0px;
+}

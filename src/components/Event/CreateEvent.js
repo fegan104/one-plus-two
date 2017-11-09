@@ -1,4 +1,5 @@
 import React from 'react';
+import './CreateEvent.css';
 
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -7,6 +8,9 @@ import TimePicker from 'material-ui/TimePicker';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
+import AppBar from 'material-ui/AppBar';
+import Fab from 'material-ui/FloatingActionButton';
+import DoneIcon from 'material-ui/svg-icons/action/done';
 
 import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
@@ -27,22 +31,34 @@ let CreateEvent = ({ dispatch, user }) => {
     maxGuestsInput;
   return (
     <div>
+      <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
       <TextField
-        hintText="Event Title"
+        floatingLabelText="Event Title"
         ref={node => {
           node && (titleInput = node.input);
         }}
       />
       <TextField
-        hintText="Location"
+        style={{ textAlign: 'left' }}
+        floatingLabelText="Description"
+        multiLine={true}
+        rows={2}
+        ref={node => {
+          console.log('node:', node);
+          node && (descInput = node.input.refs.input);
+        }}
+      />
+      <TextField
+        floatingLabelText="Location"
         ref={node => {
           node && (locationInput = node.input);
         }}
       />
       <TextField
-        hintText="Description"
+        floatingLabelText="Max guests"
+        type="number"
         ref={node => {
-          node && (descInput = node.input);
+          node && (maxGuestsInput = node.input);
         }}
       />
       <DatePicker
@@ -57,27 +73,29 @@ let CreateEvent = ({ dispatch, user }) => {
           node && (timeInput = node);
         }}
       />
-      <TextField
-        hintText="Max guests"
-        type="number"
-        ref={node => {
-          node && (maxGuestsInput = node.input);
-        }}
-      />
 
-      <div>
-        <div>Import guests from previous event</div>
-        <DropDownMenu label="Import guests from previous event" value={1}>
-          <MenuItem value={1} primaryText="Event 1" />
-          <MenuItem value={2} primaryText="Event 2" />
-          <MenuItem value={3} primaryText="Cool event" />
+      <div className="CreateEvent-menu">
+        <DropDownMenu value={1} className="CreateEvent-spinner">
+          <MenuItem
+            value={1}
+            label="Import guests from previous event"
+            primaryText="None"
+          />
+          <MenuItem value={2} primaryText="Bake Sale" />
+          <MenuItem value={3} primaryText="Ultimate Game" />
         </DropDownMenu>
       </div>
       <div>
-        <Toggle label="Allow self enrollment" defaultToggled={true} />
+        <Toggle
+          className="CreateEvent-switch"
+          label="Allow self enrollment:"
+          thumbSwitchedStyle={{ backgroundColor: '#76FF03' }}
+          trackSwitchedStyle={{ backgroundColor: '#CCFF90' }}
+          defaultToggled={true}
+        />
       </div>
-      <RaisedButton
-        label="SAVE EVENT"
+      <Fab
+        className="fab"
         onClick={_ =>
           dispatch(
             addEvent(
@@ -91,7 +109,9 @@ let CreateEvent = ({ dispatch, user }) => {
               false
             )
           )}
-      />
+      >
+        <DoneIcon />
+      </Fab>
     </div>
   );
 };

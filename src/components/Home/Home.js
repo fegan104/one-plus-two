@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './Home.css';
 import logo from './logo.svg';
 import RaisedButton from 'material-ui/RaisedButton';
+import AppBar from 'material-ui/AppBar';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
@@ -13,19 +14,21 @@ class Home extends Component {
   render() {
     return (
       <div className="Home">
-        {
-          <div className="Home-title-conatiner">
-            <img src={logo} alt="logo" />
-            <div className="Home-title">
-              <div>One</div>
-              <div>Plus</div>
-              <div>Two</div>
-            </div>
+        <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
+
+        <div className="Home-title-conatiner">
+          <img src={logo} alt="logo" />
+          <div className="Home-title">
+            <div>One</div>
+            <div>Plus</div>
+            <div>Two</div>
           </div>
-        }
+        </div>
+
         <RaisedButton
           className="Home-button"
           label="Host an event"
+          primary={true}
           onClick={_ => this.props.dispatch(push('/create'))}
         />
         <Link to="/create" className="Home-link">
