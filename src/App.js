@@ -5,6 +5,7 @@ import CreateEvent from './components/Event/CreateEvent';
 import EventList from './components/Event/EventList';
 import EventDetail from './components/Event/EventDetail';
 import ViewInvite from './components/Invite/ViewInvite';
+import Scanner from './components/Scanner/Scanner';
 
 import { Route, Switch } from 'react-router';
 import { init as firebaseInit } from './services/FirebaseService';
@@ -67,6 +68,7 @@ class App extends Component {
                   <Route path="/create" component={CreateEvent} />
                   <Route path="/event/:id" component={EventDetail} />
                   <Route path="/invite/:id" component={ViewInvite} />
+                  <Route path="/scanner" component={Scanner} />
                 </Switch>
               </div>
             </div>

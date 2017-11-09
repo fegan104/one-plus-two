@@ -1,10 +1,20 @@
 import React from 'react';
-
+import './EventDetail.css';
 import { connect } from 'react-redux';
 
 import { getEvent } from '../../actions/EventsActions';
 
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import Fab from 'material-ui/FloatingActionButton';
+import CropFree from 'material-ui/svg-icons/image/crop-free';
+import {
+  Card,
+  CardActions,
+  CardMedia,
+  CardTitle,
+  CardText
+} from 'material-ui/Card';
+import { push } from 'react-router-redux';
 
 /**
  * Displays details about teh events specified in the route's id. 
@@ -21,31 +31,42 @@ class EventDetail extends React.Component {
     if (event) {
       view = (
         <div>
-          <h1>Event: {event.title}</h1>
-          <div>
-            <RaisedButton label="Send Message" />
-          </div>
-          <div>
-            <RaisedButton label="Invite People" />
-          </div>
-          <div>
-            <RaisedButton label="Scan Pass" />
-          </div>
+          {/* Card of the event. */}
+          <Card>
+            <CardMedia
+              overlay={<CardTitle title={event.title.toUpperCase()} />}
+            >
+              <img src={event.picture} alt="banner" className="banner" />
+            </CardMedia>
+            <CardText>{event.desc}</CardText>
+            <CardActions>
+              <FlatButton label="Send Message" />
+              <FlatButton label="Invite People" />
+            </CardActions>
+          </Card>
+          {/* The FAB */}
+          <Fab
+            className="fab"
+            secondary={true}
+            onClick={_ => this.props.push('/scanner')}
+          >
+            <CropFree style={{ fill: '#000' }} />
+          </Fab>
         </div>
       );
     } else {
       view = <h1>loading...</h1>;
     }
 
-    return view;
+    return <div className="EventDetail">{view}</div>;
   }
 }
 
 /**
  * This function filters the redux store's evnts to find the
  * specific event to display on this page.
- * @param {*} state The redux store.
- * @param {*} ownProps The rect components props.
+ * @param state The redux store.
+ * @param ownProps The rect components props.
  * @returns an event model with the specified id and an id specified in the route.
  */
 const mapStateToProps = (state, ownProps) => {
@@ -58,4 +79,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getEvent })(EventDetail);
+export default connect(mapStateToProps, { getEvent, push })(EventDetail);
