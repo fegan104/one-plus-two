@@ -3,17 +3,14 @@ import './EventDetail.css';
 import { connect } from 'react-redux';
 
 import { getEvent } from '../../actions/EventsActions';
+import { addInvite } from '../../actions/InvitesActions';
+import InviteModel from '../../models/InviteModel';
 
-import FlatButton from 'material-ui/FlatButton';
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
-import {
-  Card,
-  CardActions,
-  CardMedia,
-  CardTitle,
-  CardText
-} from 'material-ui/Card';
+import Dialog from 'material-ui/Dialog';
+import EventCard from './EventCard';
+import FlatButton from 'material-ui/FlatButton';
 import { push } from 'react-router-redux';
 
 /**
@@ -21,30 +18,52 @@ import { push } from 'react-router-redux';
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
+  state = {
+    open: false
+  };
+
+  handleOpen = () => {
+    this.setState({ open: true });
+    let { event, id } = this.props;
+    let invite = InviteModel({
+      additionalInvitesLeft: 2,
+      isUsed: false,
+      event: id
+    });
+    invite = invite.setEvent(event);
+    this.props.addInvite(invite);
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
   componentDidMount() {
     this.props.getEvent(this.props.id);
   }
 
   render() {
-    let { event } = this.props;
+    const actions = [
+      <FlatButton label="Cancel" primary={true} onClick={this.handleClose} />,
+      <FlatButton label="Copy" primary={true} onClick={this.handleClose} />
+    ];
+    let { event, invite } = this.props;
     let view = null;
     if (event) {
       view = (
         <div>
-          {/* Card of the event. */}
-          <Card>
-            <CardMedia
-              overlay={<CardTitle title={event.title.toUpperCase()} />}
-            >
-              <img src={event.picture} alt="banner" className="banner" />
-            </CardMedia>
-            <CardText>{event.desc}</CardText>
-            <CardActions>
-              <FlatButton label="Send Message" />
-              <FlatButton label="Invite People" />
-            </CardActions>
-          </Card>
-          {/* The FAB */}
+          <EventCard event={event} openInvite={this.handleOpen} />
+
+          <Dialog
+            title="Your invite link"
+            actions={actions}
+            modal={false}
+            open={this.state.open}
+            onRequestClose={this.handleClose}
+          >
+            {`https://www.one-plus-two.com/invite/${invite.id}`}
+          </Dialog>
+
           <Fab
             className="fab"
             secondary={true}
@@ -72,11 +91,14 @@ class EventDetail extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
   const filtered = state.events.filter(e => e.id === eventId);
-  const event = filtered[0] ? filtered[0] : undefined;
+  const event = filtered[0];
   return {
     event,
+    invite: state.invite,
     id: eventId
   };
 };
 
-export default connect(mapStateToProps, { getEvent, push })(EventDetail);
+export default connect(mapStateToProps, { getEvent, push, addInvite })(
+  EventDetail
+);

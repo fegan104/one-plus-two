@@ -1,4 +1,8 @@
-import { getInviteFromDB, getEventFromDB } from '../services/FirebaseService';
+import {
+  getInviteFromDB,
+  getEventFromDB,
+  pushInviteToDB
+} from '../services/FirebaseService';
 import actionType from '../constants';
 
 export const getInvite = id => {
@@ -34,5 +38,12 @@ export const getInvite = id => {
           payload: error
         });
       });
+  };
+};
+
+export const addInvite = (newInvite, yourInvite) => {
+  return {
+    type: actionType.ADD_INVITE,
+    payload: pushInviteToDB(newInvite, yourInvite)
   };
 };

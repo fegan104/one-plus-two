@@ -113,6 +113,53 @@ export const getInviteFromDB = inviteId => {
 };
 
 /**
+ * When you push an invite to firebase you use up one of your 
+ * invites left (unless you're an owner or the guest limit is reached),
+ * and you get a link to the invite that can then be shared to anyone. This is also where
+ * self enrollment can be done. TODO maybe make this a cloud function.
+ * @param {InviteModel} newInvite 
+ * @param {InviteModel} yourInvite If this is null we assume you're an owner. TODO make this explicit.
+ */
+export const pushInviteToDB = async (newInvite, yourInvite) => {
+  //a little data  formatting
+  newInvite.event = newInvite.eventId;
+  delete newInvite.id;
+  delete newInvite.eventId;
+  delete newInvite.setEvent;
+  //If you aren't an owner and don't have invites left reject
+  if (yourInvite && !(yourInvite.additionalInvitesLeft > 0)) {
+    return Promise.reject("You don't have invites left.");
+  }
+  //Check if tehre have already been to many passes given out for the event
+  const numberOfEventPasses = await database
+    .ref('passes')
+    .orderByChild('event')
+    .equalTo(`${newInvite.event.id}`)
+    .once('value')
+    .then(snap => {
+      if (snap.val()) {
+        return Object.keys(snap.val()).length;
+      }
+      return 0;
+    });
+  if (numberOfEventPasses >= newInvite.event.guestLimit) {
+    return Promise.reject('Event is full.');
+  }
+  //We are good to go.
+  delete newInvite.id;
+  return database
+    .ref('/invites')
+    .push(newInvite)
+    .then(push => push.once('value'))
+    .then(snap => {
+      let invite = InviteModel({ id: snap.key, ...snap.val() });
+      invite.eventId = snap.val().event;
+      invite = invite.setEvent(newInvite);
+      return invite;
+    });
+};
+
+/**
  * Pushes a new PassModel to /passes.
  * @param {PassModel} newPass a PassModel.
  */
