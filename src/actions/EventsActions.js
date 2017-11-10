@@ -37,17 +37,19 @@ export const loadEvents = () => {
  * @param {string} owner 
  * @param {boolean} isSelfEnrollable 
  */
-export const addEvent = (
+export const addEvent = ({
   title,
   location,
   desc,
   date,
   time,
   guestLimit,
+  picture,
   owner,
-  isSelfEnrollable
-) => {
-  //We need to combine  the selected day and the
+  isSelfEnrollable,
+  ...rest
+}) => {
+  //We need to combine the selected day and the
   //selected time into one date time
   const selectedTime = new Date(time);
   const dateTime = new Date(date);
@@ -61,6 +63,7 @@ export const addEvent = (
       desc,
       dateTime: dateTime.toUTCString(),
       guestLimit,
+      picture,
       owner,
       isSelfEnrollable
     })

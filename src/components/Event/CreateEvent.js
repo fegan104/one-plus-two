@@ -10,6 +10,16 @@ import Toggle from 'material-ui/Toggle';
 import AppBar from 'material-ui/AppBar';
 import Fab from 'material-ui/FloatingActionButton';
 import DoneIcon from 'material-ui/svg-icons/action/done';
+import { List, ListItem } from 'material-ui/List';
+import Title from 'material-ui/svg-icons/editor/title';
+import Subject from 'material-ui/svg-icons/action/subject';
+import Location from 'material-ui/svg-icons/communication/location-on';
+import People from 'material-ui/svg-icons/social/people';
+import Today from 'material-ui/svg-icons/action/today';
+import Time from 'material-ui/svg-icons/device/access-time';
+import ImportContacts from 'material-ui/svg-icons/communication/import-export';
+import PlusOne from 'material-ui/svg-icons/social/plus-one';
+import InsertPhoto from 'material-ui/svg-icons/editor/insert-photo';
 
 import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
@@ -21,93 +31,148 @@ import { addEvent } from '../../actions/EventsActions';
  * @param {function} dispatch is passed in from `connect`. 
  * @param {UserModel} user is passed in from `mappStoreToProps`. 
  */
-let CreateEvent = ({ dispatch, user }) => {
+let CreateEvent = ({ addEvent, user }) => {
   let titleInput,
     locationInput,
     descInput,
     dateInput,
     timeInput,
-    maxGuestsInput;
+    maxGuestsInput,
+    photoInput;
   return (
     <div>
       <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
-      <TextField
-        floatingLabelText="Event Title"
-        ref={node => {
-          node && (titleInput = node.input);
-        }}
-      />
-      <TextField
-        style={{ textAlign: 'left' }}
-        floatingLabelText="Description"
-        multiLine={true}
-        rows={2}
-        ref={node => {
-          console.log('node:', node);
-          node && (descInput = node.input.refs.input);
-        }}
-      />
-      <TextField
-        floatingLabelText="Location"
-        ref={node => {
-          node && (locationInput = node.input);
-        }}
-      />
-      <TextField
-        floatingLabelText="Max guests"
-        type="number"
-        ref={node => {
-          node && (maxGuestsInput = node.input);
-        }}
-      />
-      <DatePicker
-        hintText="Pick a day"
-        ref={node => {
-          node && (dateInput = node);
-        }}
-      />
-      <TimePicker
-        hintText="Pick a time"
-        ref={node => {
-          node && (timeInput = node);
-        }}
-      />
-
-      <div className="CreateEvent-menu">
-        <DropDownMenu value={1} className="CreateEvent-spinner">
-          <MenuItem
-            value={1}
-            label="Import guests from previous event"
-            primaryText="None"
-          />
-          <MenuItem value={2} primaryText="Bake Sale" />
-          <MenuItem value={3} primaryText="Ultimate Game" />
-        </DropDownMenu>
-      </div>
-      <div>
-        <Toggle
-          className="CreateEvent-switch"
-          label="Allow self enrollment:"
-          thumbSwitchedStyle={{ backgroundColor: '#76FF03' }}
-          trackSwitchedStyle={{ backgroundColor: '#CCFF90' }}
-          defaultToggled={true}
+      <List className="CreateEvent-list">
+        <ListItem
+          leftIcon={<Title />}
+          children={
+            <TextField
+              floatingLabelText="Event Title"
+              fullWidth={true}
+              ref={node => {
+                node && (titleInput = node.input);
+              }}
+            />
+          }
         />
-      </div>
+
+        <ListItem
+          leftIcon={<Subject />}
+          children={
+            <TextField
+              style={{ textAlign: 'left' }}
+              floatingLabelText="Description"
+              fullWidth={true}
+              multiLine={true}
+              rows={2}
+              ref={node => {
+                node && (descInput = node.input.refs.input);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<Location />}
+          children={
+            <TextField
+              fullWidth={true}
+              floatingLabelText="Location"
+              ref={node => {
+                node && (locationInput = node.input);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<People />}
+          children={
+            <TextField
+              floatingLabelText="Max guests"
+              fullWidth={true}
+              type="number"
+              ref={node => {
+                node && (maxGuestsInput = node.input);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<Today />}
+          children={
+            <DatePicker
+              fullWidth={true}
+              hintText="Pick a day"
+              ref={node => {
+                node && (dateInput = node);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<Time />}
+          children={
+            <TimePicker
+              fullWidth={true}
+              hintText="Pick a time"
+              ref={node => {
+                node && (timeInput = node);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<InsertPhoto />}
+          children={
+            <TextField
+              floatingLabelText="Link to event banner image"
+              fullWidth={true}
+              ref={node => {
+                node && (photoInput = node.input);
+              }}
+            />
+          }
+        />
+        <ListItem
+          leftIcon={<ImportContacts />}
+          children={
+            <DropDownMenu value={1}>
+              <MenuItem
+                value={1}
+                label="Import guests from previous event"
+                primaryText="None"
+              />
+              <MenuItem value={2} primaryText="Bake Sale" />
+              <MenuItem value={3} primaryText="Ultimate Game" />
+            </DropDownMenu>
+          }
+        />
+        <ListItem
+          leftIcon={<PlusOne />}
+          children={
+            <Toggle
+              label="Allow self enrollment:"
+              thumbSwitchedStyle={{ backgroundColor: '#76FF03' }}
+              trackSwitchedStyle={{ backgroundColor: '#CCFF90' }}
+              defaultToggled={true}
+            />
+          }
+        />
+      </List>
+
       <Fab
         className="fab"
         onClick={_ =>
-          dispatch(
-            addEvent(
-              titleInput.value,
-              locationInput.value,
-              descInput.value,
-              dateInput.state.date,
-              timeInput.state.time,
-              maxGuestsInput.value,
-              user.id,
-              false
-            )
-          )}
+          addEvent({
+            title: titleInput.value,
+            location: locationInput.value,
+            desc: descInput.value,
+            date: dateInput.state.date,
+            time: timeInput.state.time,
+            guestLimit: maxGuestsInput.value,
+            picture: photoInput.value,
+            owner: user.id,
+            isSelfEnrollable: false
+          })}
       >
         <DoneIcon />
       </Fab>
@@ -123,5 +188,5 @@ const mapStoreToProps = store => {
 };
 
 // subscribe to updates in teh store with `connect`
-CreateEvent = connect(mapStoreToProps)(CreateEvent);
+CreateEvent = connect(mapStoreToProps, { addEvent })(CreateEvent);
 export default CreateEvent;

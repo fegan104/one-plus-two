@@ -2,29 +2,15 @@
   text-align: left;
 }
 
+.CreateEvent-list {
+  margin-bottom: 72px;
+}
+
 .CreateEvent-switch {
   max-width: 250px;
   text-align: left;
   margin: 8px;
   margin-left: 32px;
-}
-
-.CreateEvent-menu {
-  max-width: 400px;
-  text-align: left;
-  margin: 8px;
-}
-
-.CreateEvent-spinner {
-  width: 85vw !important;
-}
-
-.CreateEvent-button {
-  margin-top: 8px;
-}
-
-.CreateEvent-input {
-  max-height: 8vh !important;
 }
 
 .fab {
