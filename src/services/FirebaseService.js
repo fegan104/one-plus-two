@@ -71,8 +71,10 @@ export const getEventFromDB = eventId => {
 
 /**
  * Pushes a new event to firebase. Note owners will be pushed as a 
- * pushId/userId key/value pair.
+ * pushId/userId key/value pair. This will also redirect to the event detail
+ * screen of the new event.
  * @param {EventModel} newEvent the Event object to be pushed to firebase.
+ * @returns a promise to an event model.
  */
 export const pushEventToDB = newEvent => {
   console.log('newEvent:', newEvent);
@@ -84,8 +86,8 @@ export const pushEventToDB = newEvent => {
     .then(event => event.child('owners').push(ownerId))
     .then(event => event.parent.parent.once('value'))
     .then(snap => {
-      let obj = {};
-      obj[snap.key] = snap.val();
+      let obj = snap.val();
+      obj['id'] = snap.key;
       return obj;
     });
 };

@@ -4,6 +4,7 @@ import {
   getEventFromDB
 } from '../services/FirebaseService';
 import actionType from '../constants';
+import { push } from 'react-router-redux';
 
 export const loadEvents = () => {
   return dispatch => {
@@ -55,18 +56,23 @@ export const addEvent = ({
   const dateTime = new Date(date);
   dateTime.setHours(selectedTime.getHours());
   dateTime.setMinutes(selectedTime.getMinutes());
-  return {
-    type: actionType.ADD_EVENT,
-    payload: pushEventToDB({
-      title,
-      location,
-      desc,
-      dateTime: dateTime.toUTCString(),
-      guestLimit,
-      picture,
-      owner,
-      isSelfEnrollable
-    })
+  return dispatch => {
+    return {
+      type: actionType.ADD_EVENT,
+      payload: pushEventToDB({
+        title,
+        location,
+        desc,
+        dateTime: dateTime.toUTCString(),
+        guestLimit,
+        picture,
+        owner,
+        isSelfEnrollable
+      }).then(newEvent => {
+        dispatch(push(`/event/${newEvent.id}`));
+        return newEvent;
+      })
+    };
   };
 };
 
