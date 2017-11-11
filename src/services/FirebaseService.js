@@ -121,6 +121,7 @@ export const getInviteFromDB = inviteId => {
  * @param {InviteModel} yourInvite If this is null we assume you're an owner. TODO make this explicit.
  */
 export const pushInviteToDB = async (newInvite, guestLimit, yourInvite) => {
+  //TODO check if owner
   //If you aren't an owner and don't have invites left reject
   if (yourInvite && !(yourInvite.additionalInvitesLeft > 0)) {
     return Promise.reject("You don't have invites left.");
