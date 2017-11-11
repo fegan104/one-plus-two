@@ -4,14 +4,15 @@ import { connect } from 'react-redux';
 
 import { getEvent } from '../../actions/EventsActions';
 import { addInvite } from '../../actions/InvitesActions';
-import InviteModel from '../../models/InviteModel';
 
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
 import Dialog from 'material-ui/Dialog';
 import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 import { push } from 'react-router-redux';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 /**
  * Displays details about teh events specified in the route's id. 
@@ -19,23 +20,33 @@ import { push } from 'react-router-redux';
  */
 class EventDetail extends React.Component {
   state = {
-    open: false
+    shareOpen: false,
+    sendOpen: false
   };
 
-  handleOpen = () => {
-    this.setState({ open: true });
-    let { event, id } = this.props;
-    let invite = InviteModel({
-      additionalInvitesLeft: 2,
-      isUsed: false,
-      event: id
-    });
-    invite = invite.setEvent(event);
-    this.props.addInvite(invite);
+  openShare = () => {
+    this.setState({ shareOpen: true });
+    let { event } = this.props;
+    this.props.addInvite(
+      {
+        event: event.id,
+        isUsed: false,
+        additionalInvitesLeft: 2
+      },
+      event.guestLimit
+    );
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
+  closeShare = () => {
+    this.setState({ shareOpen: false });
+  };
+
+  openSend = () => {
+    this.setState({ sendOpen: true });
+  };
+
+  closeSend = () => {
+    this.setState({ sendOpen: false });
   };
 
   componentDidMount() {
@@ -43,25 +54,50 @@ class EventDetail extends React.Component {
   }
 
   render() {
-    const actions = [
-      <FlatButton label="Cancel" primary={true} onClick={this.handleClose} />,
-      <FlatButton label="Copy" primary={true} onClick={this.handleClose} />
-    ];
     let { event, invite } = this.props;
     let view = null;
     if (event) {
+      let inviteLink = `https://www.one-plus-two.com/invite/${invite.id}`;
+      const shareActions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.closeShare} />,
+        <CopyToClipboard text={inviteLink}>
+          <FlatButton label="Copy" primary={true} onClick={this.closeShare} />
+        </CopyToClipboard>
+      ];
+      const sendActions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
+        <FlatButton label="Send" primary={true} onClick={this.closeSend} />
+      ];
       view = (
         <div>
-          <EventCard event={event} openInvite={this.handleOpen} />
+          <EventCard
+            event={event}
+            openInvite={this.openShare}
+            openSend={this.openSend}
+          />
 
           <Dialog
             title="Your invite link"
-            actions={actions}
+            actions={shareActions}
             modal={false}
-            open={this.state.open}
-            onRequestClose={this.handleClose}
+            open={this.state.shareOpen}
+            onRequestClose={this.closeShare}
           >
-            {`https://www.one-plus-two.com/invite/${invite.id}`}
+            {inviteLink}
+          </Dialog>
+
+          <Dialog
+            title="Compose message"
+            actions={sendActions}
+            modal={false}
+            open={this.state.sendOpen}
+            onRequestClose={this.closeSend}
+          >
+            <TextField
+              name="message-field"
+              label="Message Text"
+              multiLine={true}
+            />
           </Dialog>
 
           <Fab

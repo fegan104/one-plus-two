@@ -120,12 +120,7 @@ export const getInviteFromDB = inviteId => {
  * @param {InviteModel} newInvite 
  * @param {InviteModel} yourInvite If this is null we assume you're an owner. TODO make this explicit.
  */
-export const pushInviteToDB = async (newInvite, yourInvite) => {
-  //a little data  formatting
-  newInvite.event = newInvite.eventId;
-  delete newInvite.id;
-  delete newInvite.eventId;
-  delete newInvite.setEvent;
+export const pushInviteToDB = async (newInvite, guestLimit, yourInvite) => {
   //If you aren't an owner and don't have invites left reject
   if (yourInvite && !(yourInvite.additionalInvitesLeft > 0)) {
     return Promise.reject("You don't have invites left.");
@@ -134,7 +129,7 @@ export const pushInviteToDB = async (newInvite, yourInvite) => {
   const numberOfEventPasses = await database
     .ref('passes')
     .orderByChild('event')
-    .equalTo(`${newInvite.event.id}`)
+    .equalTo(`${newInvite.event}`)
     .once('value')
     .then(snap => {
       if (snap.val()) {
@@ -142,11 +137,10 @@ export const pushInviteToDB = async (newInvite, yourInvite) => {
       }
       return 0;
     });
-  if (numberOfEventPasses >= newInvite.event.guestLimit) {
+  if (numberOfEventPasses >= guestLimit) {
     return Promise.reject('Event is full.');
   }
   //We are good to go.
-  delete newInvite.id;
   return database
     .ref('/invites')
     .push(newInvite)
