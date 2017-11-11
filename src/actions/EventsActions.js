@@ -77,7 +77,6 @@ export const addEvent = ({
 };
 
 export const getEvent = eventId => {
-  console.log('eventId:', eventId);
   return {
     type: actionType.GET_EVENT,
     payload: getEventFromDB(eventId)

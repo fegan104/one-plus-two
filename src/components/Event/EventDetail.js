@@ -1,9 +1,14 @@
 import React from 'react';
 import './EventDetail.css';
 import { connect } from 'react-redux';
+import queryString from 'query-string';
 
 import { getEvent } from '../../actions/EventsActions';
-import { addInvite } from '../../actions/InvitesActions';
+import { addInvite, getInvite } from '../../actions/InvitesActions';
+import { claimInvite } from '../../actions/PassActions';
+
+import _ from 'lodash';
+import QRCode from 'qrcode.react';
 
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
@@ -15,25 +20,29 @@ import { push } from 'react-router-redux';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 /**
- * Displays details about teh events specified in the route's id. 
+ * Displays details about the events specified in the route's id. 
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
+  //store just a little state to open 2 dialogs
   state = {
     shareOpen: false,
-    sendOpen: false
+    sendOpen: false,
+    passOpen: false
   };
 
+  //Open share dialog and generate an invitation link
   openShare = () => {
     this.setState({ shareOpen: true });
-    let { event } = this.props;
+    let { event, invite } = this.props;
     this.props.addInvite(
       {
         event: event.id,
         isUsed: false,
         additionalInvitesLeft: 2
       },
-      event.guestLimit
+      event.guestLimit,
+      invite
     );
   };
 
@@ -49,17 +58,45 @@ class EventDetail extends React.Component {
     this.setState({ sendOpen: false });
   };
 
+  openPass = () => {
+    this.setState({ passOpen: true });
+  };
+
+  closePass = () => {
+    this.setState({ passOpen: false });
+  };
+
   componentDidMount() {
-    this.props.getEvent(this.props.id);
+    this.props.getEvent(this.props.eventId);
+    this.props.getInvite(this.props.inviteId);
   }
 
+  renderQRCode = pass => {
+    if (!_.isEmpty(pass)) {
+      let actions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.closePass} />
+      ];
+      return (
+        <Dialog
+          title="This is your pass to the event:"
+          actions={actions}
+          modal={false}
+          open={this.state.passOpen}
+          onRequestClose={this.closePass}
+        >
+          <QRCode value={pass.id} size={256} />
+        </Dialog>
+      );
+    }
+    return <div />;
+  };
+
   render() {
-    let { event, invite } = this.props;
+    let { event, inviteLink, user, invite, pass } = this.props;
     let view = null;
     if (event) {
-      let inviteLink = `https://www.one-plus-two.com/invite/${invite.id}`;
       const shareActions = [
-        <FlatButton label="Cancel" primary={true} onClick={this.closeShare} />,
+        <FlatButton label="Close" primary={true} onClick={this.closeShare} />,
         <CopyToClipboard text={inviteLink}>
           <FlatButton label="Copy" primary={true} onClick={this.closeShare} />
         </CopyToClipboard>
@@ -74,6 +111,10 @@ class EventDetail extends React.Component {
             event={event}
             openInvite={this.openShare}
             openSend={this.openSend}
+            showPass={_ => {
+              this.openPass();
+              this.props.claimInvite(invite, user);
+            }}
           />
 
           <Dialog
@@ -99,6 +140,8 @@ class EventDetail extends React.Component {
               multiLine={true}
             />
           </Dialog>
+
+          {this.renderQRCode(pass)}
 
           <Fab
             className="fab"
@@ -128,13 +171,23 @@ const mapStateToProps = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
   const filtered = state.events.filter(e => e.id === eventId);
   const event = filtered[0];
+  // console.log("mapped")
+  console.log('pass:', state.pass);
   return {
     event,
+    inviteLink: state.inviteLink,
     invite: state.invite,
-    id: eventId
+    inviteId: queryString.parse(ownProps.location.search).invite,
+    eventId,
+    user: state.user,
+    pass: state.pass
   };
 };
 
-export default connect(mapStateToProps, { getEvent, push, addInvite })(
-  EventDetail
-);
+export default connect(mapStateToProps, {
+  getEvent,
+  push,
+  addInvite,
+  getInvite,
+  claimInvite
+})(EventDetail);

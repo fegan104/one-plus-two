@@ -8,9 +8,6 @@ export default (store = {}, action) => {
     case actionType.GET_INVITE_SUCCESS: {
       return action.payload;
     }
-    case actionType.ADD_INVITE_FULFILLED: {
-      return action.payload;
-    }
 
     default:
       return store;

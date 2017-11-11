@@ -41,9 +41,12 @@ export const getInvite = id => {
   };
 };
 
-export const addInvite = (newInvite, yourInvite) => {
+export const addInvite = (newInvite, guestLimit, yourInvite) => {
   return {
     type: actionType.ADD_INVITE,
-    payload: pushInviteToDB(newInvite, yourInvite)
+    payload: pushInviteToDB(newInvite, guestLimit, yourInvite).then(val => {
+      let inviteLink = `https://www.one-plus-two.com/event/${val.eventId}?invite=${val.id}`;
+      return inviteLink;
+    })
   };
 };

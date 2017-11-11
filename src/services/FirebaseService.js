@@ -158,15 +158,14 @@ export const pushInviteToDB = async (newInvite, guestLimit, yourInvite) => {
  * @param {PassModel} newPass a PassModel.
  */
 const pushPassToDB = newPass => {
-  delete newPass.id;
   return database
     .ref('passes')
     .push(newPass)
     .then(pass => pass.once('value'))
     .then(snap =>
       PassModel({
-        ...snap.val(),
-        id: snap.key
+        id: snap.key,
+        ...snap.val()
       })
     );
 };
@@ -216,13 +215,11 @@ export const exchangeInviteForPass = async (invite, user) => {
   //use invite
   await database.ref(`invites/${invite.id}`).update({ isUsed: true });
   //The invite is valid lets get a new pass
-  return pushPassToDB(
-    PassModel({
-      desc: event.desc,
-      isActive: false,
-      isUsed: false,
-      user: user.id,
-      event: event.id
-    })
-  );
+  return pushPassToDB({
+    desc: event.desc,
+    isActive: false,
+    isUsed: false,
+    user: user.id,
+    event: event.id
+  });
 };

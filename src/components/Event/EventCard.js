@@ -9,7 +9,7 @@ import {
   CardText
 } from 'material-ui/Card';
 
-const EventCard = ({ event, openInvite, openSend }) => {
+const EventCard = ({ event, openInvite, openSend, showPass }) => {
   return (
     <Card>
       <CardMedia overlay={<CardTitle title={event.title.toUpperCase()} />}>
@@ -19,6 +19,7 @@ const EventCard = ({ event, openInvite, openSend }) => {
       <CardActions>
         <FlatButton label="Send Message" onClick={openSend} />
         <FlatButton label="Invite People" onClick={openInvite} />
+        <FlatButton label="Show Pass" onClick={showPass} />
       </CardActions>
     </Card>
   );
