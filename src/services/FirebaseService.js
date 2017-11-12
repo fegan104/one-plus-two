@@ -2,14 +2,16 @@ import * as firebase from 'firebase';
 import EventModel from '../models/EventModel';
 import InviteModel from '../models/InviteModel';
 import PassModel from '../models/PassModel';
+import constants from '../constants';
 
 // eslint-disable-next-line
 let database;
+let auth;
 
 /**
  * Initializes our firebase instance. Called in App contructor.
  */
-export const init = () => {
+export const init = authCallback => {
   let config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -22,6 +24,11 @@ export const init = () => {
   if (!firebase.apps.length) {
     firebase.initializeApp(config);
     database = firebase.database();
+    auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      authCallback(user);
+    });
   }
 };
 
@@ -184,4 +191,18 @@ export const exchangeInviteForPass = async (invite, user) => {
       event: event.id
     })
   );
+};
+
+export const loginViaFirebase = loginMethod => {
+  let provider;
+
+  if (loginMethod === constants.GOOGLE_AUTH) {
+    provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/user.birthday.read');
+  } else {
+    provider = new firebase.auth.FacebookAuthProvider();
+    provider.addScope('user_birthday');
+  }
+
+  auth.signInWithRedirect(provider);
 };

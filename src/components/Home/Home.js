@@ -14,8 +14,6 @@ class Home extends Component {
   render() {
     return (
       <div className="Home">
-        <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
-
         <div className="Home-title-conatiner">
           <img src={logo} alt="logo" />
           <div className="Home-title">
@@ -36,6 +34,9 @@ class Home extends Component {
         </Link>
         <Link to="/invite/inviteId1" className="jest-link-0">
           check out invite
+        </Link>
+        <Link to="/event/eventId1" className="jest-link-1">
+          check out event
         </Link>
       </div>
     );

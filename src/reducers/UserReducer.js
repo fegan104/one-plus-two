@@ -1,17 +1,31 @@
 import actionType from '../constants';
 
+const initialState = {
+  loggedIn: false,
+  inProgress: false,
+  userObject: null,
+  errors: null
+};
+
 /**
- * Reduces the action payload to a single User object in the store.
+ * Reduces the action payload to a single User object in the state.
  */
-export default (store = {}, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
-    case actionType.MOCK_SIGN_IN_FULFILLED: {
+    case actionType.LOGIN_REQUEST: {
+      return { ...state, inProgress: true };
+    }
+
+    case actionType.AUTH_STATE_CHANGE: {
       return {
-        ...store,
-        ...action.payload
+        loggedIn: true,
+        inProgress: false,
+        errors: null,
+        userObject: action.payload
       };
     }
+
     default:
-      return store;
+      return state;
   }
 };

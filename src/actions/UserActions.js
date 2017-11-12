@@ -1,15 +1,19 @@
 import actionType from '../constants';
+import { loginViaFirebase } from '../services/FirebaseService';
 
-const MOCK_USER = {
-  id: 'userId1',
-  email: 'mock@user.com',
-  name: 'Mock User',
-  profileData: { bio: "I'm not real" }
+export const authStateChange = user => {
+  return {
+    type: actionType.AUTH_STATE_CHANGE,
+    payload: user
+  };
 };
 
-export const mockSignIn = () => {
-  return {
-    type: actionType.MOCK_SIGN_IN,
-    payload: Promise.resolve(MOCK_USER)
+export const login = provider => {
+  return dispatch => {
+    dispatch({
+      type: actionType.LOGIN_REQUEST
+    });
+
+    loginViaFirebase(provider);
   };
 };

@@ -1,6 +1,14 @@
-export default ({ id, email, name, profileData, ...rest }) => ({
-  id,
+export default ({
+  uid,
   email,
-  name,
-  profileData
+  displayName,
+  photoURL,
+  providerData,
+  ...rest
+}) => ({
+  id: uid,
+  email,
+  name: displayName,
+  photoURL,
+  providerData
 });
