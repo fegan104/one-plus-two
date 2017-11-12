@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import AppBar from 'material-ui/AppBar';
 import Dialog from 'material-ui/Dialog';
 
 import constants from '../../constants';

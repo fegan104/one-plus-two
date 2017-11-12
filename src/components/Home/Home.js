@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './Home.css';
 import logo from './logo.svg';
 import RaisedButton from 'material-ui/RaisedButton';
-import AppBar from 'material-ui/AppBar';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
