@@ -1,16 +1,22 @@
 {
   "rules": {
+    ".indexOn": ["owners"],
+    ".validate": "newData.hasChildren(['desc', 'guestLimit', 'isSelfEnrollable', 'location', 'owners', 'picture', 'title', 'dateTime'])",
     "events": {
       "$event": {
-        ".read": "auth != null && (data.child('owners').child(auth.uid).val() === true)",
+        ".read": "auth != null && data.child('owners').child(auth.uid).val() === true",
         ".write": "auth != null && (!data.exists() || (data.child('owners').child(auth.uid).val() === true))"
       }
     },
     "passes": {
-      ".read": true,
-      ".write": true
+      ".indexOn": ["user", "event"],
+      "$pass": {
+        ".read": "auth != null && data.child('user').val() === auth.uid",
+        ".write": "auth != null && newData.child('user').val() == auth.uid && (data.exists() && data.child('user').val() == auth.uid)"
+      }
     },
     "invites": {
+      ".indexOn": ["event"],
       ".read": true,
       ".write": true
     }
