@@ -9,7 +9,7 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 import LoginDialog from '../Dialogs/LoginDialog';
 
-import { signOut } from '../../actions/UserActions';
+import { signOut } from '../../actions/AuthActions';
 
 const Logged = props => (
   <IconMenu
@@ -65,7 +65,7 @@ class Header extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    loggedIn: state.user.loggedIn
+    loggedIn: state.auth.loggedIn
   };
 };
 

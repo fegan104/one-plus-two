@@ -181,7 +181,7 @@ let CreateEvent = ({ addEvent, user }) => {
 //Get a user from our store
 const mapStoreToProps = store => {
   return {
-    user: store.user
+    user: store.auth.userObject
   };
 };
 

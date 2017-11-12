@@ -15,7 +15,7 @@ import UserModel from './models/UserModel';
 
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import { authStateChange } from './actions/UserActions';
+import { authStateChange } from './actions/AuthActions';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';

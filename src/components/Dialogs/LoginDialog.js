@@ -7,7 +7,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 
 import constants from '../../constants';
-import { login as loginAction } from '../../actions/UserActions';
+import { login as loginAction } from '../../actions/AuthActions';
 
 class LoginDialog extends Component {
   loginViaFb = () => {
