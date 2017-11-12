@@ -1,6 +1,18 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "events": {
+      "$event": {
+        ".read": "auth != null && (data.child('owners').child(auth.uid).val() === true)",
+        ".write": "auth != null && (!data.exists() || (data.child('owners').child(auth.uid).val() === true))"
+      }
+    },
+    "passes": {
+      ".read": true,
+      ".write": true
+    },
+    "invites": {
+      ".read": true,
+      ".write": true
+    }
   }
 }

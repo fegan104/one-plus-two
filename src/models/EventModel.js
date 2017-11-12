@@ -4,6 +4,7 @@ export default ({
   guestLimit,
   isSelfEnrollable,
   location,
+  owners,
   picture,
   stats,
   title,
@@ -16,7 +17,7 @@ export default ({
   isSelfEnrollable,
   location,
   newsFeed: [], // TODO
-  owners: [], // TODO
+  owners,
   picture,
   stats,
   title,
