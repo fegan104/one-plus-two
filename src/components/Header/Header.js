@@ -9,6 +9,8 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 import LoginDialog from '../Dialogs/LoginDialog';
 
+import { signOut } from '../../actions/UserActions';
+
 const Logged = props => (
   <IconMenu
     {...props}
@@ -20,7 +22,7 @@ const Logged = props => (
     targetOrigin={{ horizontal: 'right', vertical: 'top' }}
     anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
   >
-    <MenuItem primaryText="Sign out" />
+    <MenuItem primaryText="Sign out" onClick={props.signOut} />
   </IconMenu>
 );
 
@@ -44,7 +46,7 @@ class Header extends Component {
 
   render() {
     let rightButton = this.props.loggedIn ? (
-      <Logged />
+      <Logged signOut={this.props.signOut} />
     ) : (
       <FlatButton label="Login" onClick={this.handleLogin} />
     );
@@ -67,4 +69,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, {})(Header);
+export default connect(mapStateToProps, { signOut })(Header);

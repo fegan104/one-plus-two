@@ -1,5 +1,8 @@
 import actionType from '../constants';
-import { loginViaFirebase } from '../services/FirebaseService';
+import {
+  loginViaFirebase,
+  signOutViaFirebase
+} from '../services/FirebaseService';
 
 export const authStateChange = user => {
   return {
@@ -15,5 +18,26 @@ export const login = provider => {
     });
 
     loginViaFirebase(provider);
+  };
+};
+
+export const signOut = () => {
+  return dispatch => {
+    dispatch({
+      type: actionType.SIGNOUT_REQUEST
+    });
+
+    signOutViaFirebase()
+      .then(user => {
+        dispatch({
+          type: actionType.SIGNOUT_SUCCESS
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionType.SIGNOUT_REJECTED,
+          payload: error
+        });
+      });
   };
 };

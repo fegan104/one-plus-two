@@ -206,3 +206,7 @@ export const loginViaFirebase = loginMethod => {
 
   auth.signInWithRedirect(provider);
 };
+
+export const signOutViaFirebase = () => {
+  return auth.signOut();
+};

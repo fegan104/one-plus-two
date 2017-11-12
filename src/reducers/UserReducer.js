@@ -25,6 +25,14 @@ export default (state = initialState, action) => {
       };
     }
 
+    case actionType.SIGNOUT_SUCCESS: {
+      return { ...initialState };
+    }
+
+    case actionType.SIGNOUT_REJECTED: {
+      return { ...state, errors: action.payload };
+    }
+
     default:
       return state;
   }
