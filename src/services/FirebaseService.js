@@ -44,9 +44,11 @@ export const getEventsDB = () => {
         let dbObj = req.val();
         let events = [];
 
-        events = Object.keys(dbObj).map(id => {
-          return EventModel({ id, ...dbObj[id] });
-        });
+        if (dbObj) {
+          events = Object.keys(dbObj).map(id => {
+            return EventModel({ id, ...dbObj[id] });
+          });
+        }
 
         return resolve(events);
       })
@@ -66,6 +68,10 @@ export const getEventFromDB = eventId => {
       .ref(`/events/${eventId}`)
       .once('value')
       .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
         let event = EventModel({ id: dbObj.key, ...dbObj.val() });
 
         return resolve(event);
@@ -109,6 +115,10 @@ export const getInviteFromDB = inviteId => {
       .ref(`/invites/${inviteId}`)
       .once('value')
       .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
         let invite = InviteModel({ id: dbObj.key, ...dbObj.val() });
 
         return resolve(invite);
@@ -155,15 +165,19 @@ export const exchangeInviteForPass = async (invite, user) => {
     .equalTo(`${user.id}`)
     .once('value')
     .then(snap => snap.val())
-    .then(passes =>
+    .then(passes => {
+      if (!passes) {
+        return null;
+      }
+
       Object.keys(passes)
         .map(k => {
           passes[k]['id'] = k;
           return passes[k];
         })
-        .filter(p => p.event === event.id)
-    )
-    .then(f => f[0]);
+        .filter(p => p.event === event.id);
+    })
+    .then(f => f && f[0]);
 
   //return the user's pass
   if (usersPass) {
