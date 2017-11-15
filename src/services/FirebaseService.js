@@ -135,15 +135,43 @@ export const getInviteFromDB = inviteId => {
  * and you get a link to the invite that can then be shared to anyone. This is also where
  * self enrollment can be done. TODO maybe make this a cloud function.
  * @param {InviteModel} newInvite 
- * @param {InviteModel} yourInvite If this is null we assume you're an owner. TODO make this explicit.
+ * @param userId of the inviter
  */
-export const pushInviteToDB = async (newInvite, guestLimit, yourInvite) => {
+export const pushInviteToDB = async (newInvite, event, userId) => {
   //TODO check if owner
+  const isOwnerPromise = database
+    .ref(`/events/${event.id}/owners`)
+    .once('value')
+    .then(snap => snap.val())
+    .then(owners => owners[userId])
+    .catch(err => {
+      console.error(err);
+      return false;
+    });
+
+  const userPassPromise = database
+    .ref('/')
+    .child('passes')
+    .orderByChild('user')
+    .equalTo(userId)
+    .once('value')
+    .then(snap => snap.val())
+    .then(owners => owners[userId])
+    .catch(err => {
+      console.error(err);
+      return null;
+    });
+
+  let [isOwner, userPass] = await Promise.all([
+    isOwnerPromise,
+    userPassPromise
+  ]);
+
   //If you aren't an owner and don't have invites left reject
-  if (yourInvite && !(yourInvite.additionalInvitesLeft > 0)) {
+  if (!isOwner || !(userPass && userPass.additionalInvitesLeft > 0)) {
     return Promise.reject("You don't have invites left.");
   }
-  //Check if tehre have already been to many passes given out for the event
+  //Check if there have already been to many passes given out for the event
   const numberOfEventPasses = await database
     .ref('passes')
     .orderByChild('event')
@@ -155,13 +183,17 @@ export const pushInviteToDB = async (newInvite, guestLimit, yourInvite) => {
       }
       return 0;
     });
-  if (numberOfEventPasses >= guestLimit) {
+  //guest limit reached
+  if (numberOfEventPasses >= event.guestLimit) {
     return Promise.reject('Event is full.');
   }
   //We are good to go.
   return database
     .ref('/invites')
-    .push(newInvite)
+    .push({
+      id: newInvite.event.id,
+      ...newInvite
+    })
     .then(push => push.once('value'))
     .then(snap => {
       let invite = InviteModel({ id: snap.key, ...snap.val() });
@@ -194,16 +226,18 @@ const pushPassToDB = newPass => {
  * We check if the user already has a pass for the event if they do we get that one.
  * If they don't we use the invite and push that new pass to the db
  * 
- * @param invite 
+ * @param invite The invite that we want to exchange for a pass.
+ * @returns PassModel
  */
-export const exchangeInviteForPass = async (invite, user) => {
+export const exchangeInviteForPass = async (invite, userId) => {
   const { event } = invite;
+  console.log('given invite:', invite);
   //Lets check if the user already has a pass for the event
   const usersPass = await database
     .ref('/')
     .child('passes')
     .orderByChild('user')
-    .equalTo(`${user.id}`)
+    .equalTo(`${userId}`)
     .once('value')
     .then(snap => snap.val())
     .then(passes => {
@@ -232,7 +266,7 @@ export const exchangeInviteForPass = async (invite, user) => {
 
   //if invite is used reject
   if (isUsed) {
-    return Promise.reject('Pass already used');
+    return Promise.reject('Invite already used');
   }
   //use invite
   await database.ref(`invites/${invite.id}`).update({ isUsed: true });
@@ -241,7 +275,8 @@ export const exchangeInviteForPass = async (invite, user) => {
     desc: event.desc,
     isActive: false,
     isUsed: false,
-    user: user.id,
+    additionalInvitesLeft: 2,
+    user: userId,
     event: event.id
   });
 };

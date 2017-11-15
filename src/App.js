@@ -4,7 +4,6 @@ import Home from './components/Home/Home';
 import CreateEvent from './components/Event/CreateEvent';
 import EventList from './components/Event/EventList';
 import EventDetail from './components/Event/EventDetail';
-import ViewInvite from './components/Invite/ViewInvite';
 import Scanner from './components/Scanner/Scanner';
 
 import Header from './components/Header/Header';
@@ -74,7 +73,6 @@ class App extends Component {
                   <Route path="/list" component={EventList} />
                   <Route path="/create" component={CreateEvent} />
                   <Route path="/event/:id" component={EventDetail} />
-                  {/* <Route path="/invite/:id" component={ViewInvite} /> */}
                   <Route path="/scanner" component={Scanner} />
                 </Switch>
               </div>

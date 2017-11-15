@@ -41,10 +41,16 @@ export const getInvite = id => {
   };
 };
 
-export const addInvite = (newInvite, guestLimit, yourInvite) => {
+/**
+ * 
+ * @param newInvite The new invite we're adding
+ * @param event We use this for convenience
+ * @param userId The user id of the inviter
+ */
+export const addInvite = (newInvite, event, userId) => {
   return {
     type: actionType.ADD_INVITE,
-    payload: pushInviteToDB(newInvite, guestLimit, yourInvite).then(val => {
+    payload: pushInviteToDB(newInvite, event, userId).then(val => {
       let inviteLink = `https://www.one-plus-two.com/event/${val.eventId}?invite=${val.id}`;
       return inviteLink;
     })
