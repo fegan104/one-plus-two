@@ -7,7 +7,6 @@ import TimePicker from 'material-ui/TimePicker';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
-import AppBar from 'material-ui/AppBar';
 import Fab from 'material-ui/FloatingActionButton';
 import DoneIcon from 'material-ui/svg-icons/action/done';
 import { List, ListItem } from 'material-ui/List';
@@ -41,7 +40,6 @@ let CreateEvent = ({ addEvent, user }) => {
     photoInput;
   return (
     <div>
-      <AppBar title="OnePlusTwo" iconElementLeft={<div />} />
       <List className="CreateEvent-list">
         <ListItem
           leftIcon={<Title />}
@@ -183,7 +181,7 @@ let CreateEvent = ({ addEvent, user }) => {
 //Get a user from our store
 const mapStoreToProps = store => {
   return {
-    user: store.user
+    user: store.auth.userObject
   };
 };
 

@@ -57,6 +57,9 @@ export const addEvent = ({
   dateTime.setHours(selectedTime.getHours());
   dateTime.setMinutes(selectedTime.getMinutes());
   return dispatch => {
+    let owners = {};
+    owners[owner] = true;
+
     return {
       type: actionType.ADD_EVENT,
       payload: pushEventToDB({
@@ -66,7 +69,7 @@ export const addEvent = ({
         dateTime: dateTime.toUTCString(),
         guestLimit,
         picture,
-        owner,
+        owners,
         isSelfEnrollable
       }).then(newEvent => {
         dispatch(push(`/event/${newEvent.id}`));

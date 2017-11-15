@@ -7,12 +7,15 @@ import EventDetail from './components/Event/EventDetail';
 import ViewInvite from './components/Invite/ViewInvite';
 import Scanner from './components/Scanner/Scanner';
 
+import Header from './components/Header/Header';
+
 import { Route, Switch } from 'react-router';
 import { init as firebaseInit } from './services/FirebaseService';
+import UserModel from './models/UserModel';
 
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import { mockSignIn } from './actions/UserActions';
+import { authStateChange } from './actions/AuthActions';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';
@@ -44,12 +47,14 @@ class App extends Component {
       thunk
     );
 
-    //Make a store with reducers and all our middleware
     this.store = createStore(reducers, middleware);
-    //All firebase actions require a user even an anonymous one
-    this.store.dispatch(mockSignIn());
-    //Initialize our app instance of firebase
-    firebaseInit();
+
+    firebaseInit(user => {
+      if (user) {
+        let userObj = UserModel({ ...user });
+        this.store.dispatch(authStateChange(userObj));
+      }
+    });
   }
 
   //Wrap the application in a Provider so all our container components can access the redux store.
@@ -62,6 +67,8 @@ class App extends Component {
           <MuiThemeProvider muiTheme={muiTheme}>
             <div className="App">
               <div className="App-intro">
+                <Header />
+
                 <Switch>
                   <Route exact path="/" component={Home} />
                   <Route path="/list" component={EventList} />

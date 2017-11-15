@@ -2,14 +2,16 @@ import * as firebase from 'firebase';
 import EventModel from '../models/EventModel';
 import InviteModel from '../models/InviteModel';
 import PassModel from '../models/PassModel';
+import constants from '../constants';
 
 // eslint-disable-next-line
 let database;
+let auth;
 
 /**
  * Initializes our firebase instance. Called in App contructor.
  */
-export const init = () => {
+export const init = authCallback => {
   let config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -22,6 +24,11 @@ export const init = () => {
   if (!firebase.apps.length) {
     firebase.initializeApp(config);
     database = firebase.database();
+    auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      authCallback(user);
+    });
   }
 };
 
@@ -37,9 +44,11 @@ export const getEventsDB = () => {
         let dbObj = req.val();
         let events = [];
 
-        events = Object.keys(dbObj).map(id => {
-          return EventModel({ id, ...dbObj[id] });
-        });
+        if (dbObj) {
+          events = Object.keys(dbObj).map(id => {
+            return EventModel({ id, ...dbObj[id] });
+          });
+        }
 
         return resolve(events);
       })
@@ -59,6 +68,10 @@ export const getEventFromDB = eventId => {
       .ref(`/events/${eventId}`)
       .once('value')
       .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
         let event = EventModel({ id: dbObj.key, ...dbObj.val() });
 
         return resolve(event);
@@ -102,6 +115,10 @@ export const getInviteFromDB = inviteId => {
       .ref(`/invites/${inviteId}`)
       .once('value')
       .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
         let invite = InviteModel({ id: dbObj.key, ...dbObj.val() });
 
         return resolve(invite);
@@ -189,15 +206,19 @@ export const exchangeInviteForPass = async (invite, user) => {
     .equalTo(`${user.id}`)
     .once('value')
     .then(snap => snap.val())
-    .then(passes =>
+    .then(passes => {
+      if (!passes) {
+        return null;
+      }
+
       Object.keys(passes)
         .map(k => {
           passes[k]['id'] = k;
           return passes[k];
         })
-        .filter(p => p.event === event.id)
-    )
-    .then(f => f[0]);
+        .filter(p => p.event === event.id);
+    })
+    .then(f => f && f[0]);
 
   //return the user's pass
   if (usersPass) {
@@ -223,4 +244,22 @@ export const exchangeInviteForPass = async (invite, user) => {
     user: user.id,
     event: event.id
   });
+};
+
+export const loginViaFirebase = loginMethod => {
+  let provider;
+
+  if (loginMethod === constants.GOOGLE_AUTH) {
+    provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/user.birthday.read');
+  } else {
+    provider = new firebase.auth.FacebookAuthProvider();
+    provider.addScope('user_birthday');
+  }
+
+  auth.signInWithRedirect(provider);
+};
+
+export const signOutViaFirebase = () => {
+  return auth.signOut();
 };

@@ -101,7 +101,7 @@ const mapStateToProps = (state, ownProps) => {
     invite: state.invite,
     pass: state.pass,
     id: ownProps.match.params.id,
-    user: state.user
+    user: state.auth.userObject
   };
 };
 
