@@ -68,11 +68,11 @@ class EventDetail extends React.Component {
   };
 
   componentDidMount() {
-    const { invite, eventId, inviteId, user } = this.props;
+    const { invite, eventId, inviteId, user, event } = this.props;
     this.props.getEvent(eventId);
     this.props.getInvite(inviteId);
-    if (invite && user) {
-      this.props.claimInvite(invite, user.id);
+    if (invite && user && event) {
+      this.props.claimInvite(invite, event, user.id);
     }
   }
 

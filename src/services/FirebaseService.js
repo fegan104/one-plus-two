@@ -250,8 +250,7 @@ const pushPassToDB = newPass => {
  * @param invite The invite that we want to exchange for a pass.
  * @returns PassModel
  */
-export const exchangeInviteForPass = async (invite, userId) => {
-  const { event } = invite;
+export const exchangeInviteForPass = async (invite, event, userId) => {
   //Lets check if the user already has a pass for the event
   const usersPass = await database
     .ref('/')
