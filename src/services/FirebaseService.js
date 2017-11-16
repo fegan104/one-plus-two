@@ -168,7 +168,7 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
   ]);
 
   //If you aren't an owner and don't have invites left reject
-  if (!isOwner || !(userPass && userPass.additionalInvitesLeft > 0)) {
+  if (!isOwner && !(userPass && userPass.additionalInvitesLeft > 0)) {
     return Promise.reject("You don't have invites left.");
   }
   //Check if there have already been to many passes given out for the event
@@ -191,7 +191,7 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
   return database
     .ref('/invites')
     .push({
-      id: newInvite.event.id,
+      event: newInvite.event.id,
       ...newInvite
     })
     .then(push => push.once('value'))
@@ -231,7 +231,6 @@ const pushPassToDB = newPass => {
  */
 export const exchangeInviteForPass = async (invite, userId) => {
   const { event } = invite;
-  console.log('given invite:', invite);
   //Lets check if the user already has a pass for the event
   const usersPass = await database
     .ref('/')
@@ -245,7 +244,7 @@ export const exchangeInviteForPass = async (invite, userId) => {
         return null;
       }
 
-      Object.keys(passes)
+      return Object.keys(passes)
         .map(k => {
           passes[k]['id'] = k;
           return passes[k];

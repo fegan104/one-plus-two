@@ -68,32 +68,17 @@ class EventDetail extends React.Component {
   };
 
   componentDidMount() {
-    this.props.getEvent(this.props.eventId);
-    this.props.getInvite(this.props.inviteId);
+    const { invite, eventId, inviteId, user } = this.props;
+    this.props.getEvent(eventId);
+    this.props.getInvite(inviteId);
+    if (invite && user) {
+      this.props.claimInvite(invite, user.id);
+    }
   }
 
-  // renderQRCode = pass => {
-  //   if (!_.isEmpty(pass)) {
-  //     let actions = [
-  //       <FlatButton label="Cancel" primary={true} onClick={this.closePass} />
-  //     ];
-  //     return (
-  //       <Dialog
-  //         title="This is your pass to the event:"
-  //         actions={actions}
-  //         modal={false}
-  //         open={this.state.passOpen}
-  //         onRequestClose={this.closePass}
-  //       >
-  //         <QRCode value={pass.id} size={256} />
-  //       </Dialog>
-  //     );
-  //   }
-  //   return <div />;
-  // };
-
   render() {
-    let { event, inviteLink, user, invite, pass } = this.props;
+    let { event, inviteLink, pass } = this.props;
+    console.log('link', inviteLink);
     let view = null;
     if (event) {
       const shareActions = [
@@ -116,10 +101,7 @@ class EventDetail extends React.Component {
             event={event}
             openInvite={this.openShare}
             openSend={this.openSend}
-            showPass={_ => {
-              this.openPass();
-              this.props.claimInvite(invite, user);
-            }}
+            showPass={this.openPass}
           />
 
           {/* invite share dialog */}
@@ -130,7 +112,7 @@ class EventDetail extends React.Component {
             open={this.state.shareOpen}
             onRequestClose={this.closeShare}
           >
-            {inviteLink}
+            <div>{inviteLink}</div>
           </Dialog>
 
           {/* Messaging dialog */}
@@ -157,7 +139,7 @@ class EventDetail extends React.Component {
             open={this.state.passOpen}
             onRequestClose={this.closePass}
           >
-            <QRCode value={pass.id} size={256} />
+            <QRCode value={pass.id || ''} size={256} />
           </Dialog>
 
           <Fab
