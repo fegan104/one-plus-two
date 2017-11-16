@@ -57,7 +57,11 @@ class Header extends Component {
           show={this.state.showLoginModal}
           onClose={this.handleCloseLoginModal}
         />
-        <AppBar title="OnePlusTwo" iconElementRight={rightButton} />
+        <AppBar
+          title="OnePlusTwo"
+          iconElementRight={rightButton}
+          iconElementLeft={<div />}
+        />
       </div>
     );
   }

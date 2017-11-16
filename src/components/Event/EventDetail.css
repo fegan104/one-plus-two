@@ -12,11 +12,6 @@
   color: white;
 }
 
-.banner {
-  width: 100vw;
-  height: auto;
-}
-
 .bottom-left {
   position: absolute;
   bottom: 8px;

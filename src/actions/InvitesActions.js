@@ -1,4 +1,8 @@
-import { getInviteFromDB, getEventFromDB } from '../services/FirebaseService';
+import {
+  getInviteFromDB,
+  getEventFromDB,
+  pushInviteToDB
+} from '../services/FirebaseService';
 import actionType from '../constants';
 
 export const getInvite = id => {
@@ -34,5 +38,21 @@ export const getInvite = id => {
           payload: error
         });
       });
+  };
+};
+
+/**
+ * 
+ * @param newInvite The new invite we're adding
+ * @param event We use this for convenience
+ * @param userId The user id of the inviter
+ */
+export const addInvite = (newInvite, event, userId) => {
+  return {
+    type: actionType.ADD_INVITE,
+    payload: pushInviteToDB(newInvite, event, userId).then(val => {
+      let inviteLink = `https://www.one-plus-two.com/event/${val.eventId}?invite=${val.id}`;
+      return inviteLink;
+    })
   };
 };

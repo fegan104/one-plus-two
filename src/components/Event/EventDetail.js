@@ -1,50 +1,149 @@
 import React from 'react';
 import './EventDetail.css';
 import { connect } from 'react-redux';
+import queryString from 'query-string';
 
 import { getEvent } from '../../actions/EventsActions';
+import { addInvite, getInvite } from '../../actions/InvitesActions';
+import { claimInvite } from '../../actions/PassActions';
 
-import FlatButton from 'material-ui/FlatButton';
+// import _ from 'lodash';
+import QRCode from 'qrcode.react';
+
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
-import {
-  Card,
-  CardActions,
-  CardMedia,
-  CardTitle,
-  CardText
-} from 'material-ui/Card';
+import Dialog from 'material-ui/Dialog';
+import EventCard from './EventCard';
+import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 import { push } from 'react-router-redux';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 /**
- * Displays details about teh events specified in the route's id. 
+ * Displays details about the events specified in the route's id. 
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
+  //store just a little state to open 2 dialogs
+  state = {
+    shareOpen: false,
+    sendOpen: false,
+    passOpen: false
+  };
+
+  /**
+   * Open share dialog and generate an invitation link.
+   */
+  openShare = () => {
+    this.setState({ shareOpen: true });
+    let { event, user } = this.props;
+    if (event && user) {
+      this.props.addInvite(
+        {
+          event: event.id,
+          isUsed: false
+        },
+        event,
+        user.id
+      );
+    }
+  };
+
+  closeShare = () => {
+    this.setState({ shareOpen: false });
+  };
+
+  openSend = () => {
+    this.setState({ sendOpen: true });
+  };
+
+  closeSend = () => {
+    this.setState({ sendOpen: false });
+  };
+
+  openPass = () => {
+    this.setState({ passOpen: true });
+  };
+
+  closePass = () => {
+    this.setState({ passOpen: false });
+  };
+
   componentDidMount() {
-    this.props.getEvent(this.props.id);
+    const { invite, eventId, inviteId, user, event } = this.props;
+    this.props.getEvent(eventId);
+    this.props.getInvite(inviteId);
+    if (invite && user && event) {
+      this.props.claimInvite(invite, event, user.id);
+    }
   }
 
   render() {
-    let { event } = this.props;
+    let { event, inviteLink, pass } = this.props;
+    console.log('link', inviteLink);
     let view = null;
     if (event) {
+      const shareActions = [
+        <FlatButton label="Close" primary={true} onClick={this.closeShare} />,
+        <CopyToClipboard text={inviteLink}>
+          <FlatButton label="Copy" primary={true} onClick={this.closeShare} />
+        </CopyToClipboard>
+      ];
+      const sendActions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
+        <FlatButton label="Send" primary={true} onClick={this.closeSend} />
+      ];
+      const showPassActions = [
+        <FlatButton label="Cancel" primary={true} onClick={this.closePass} />
+      ];
       view = (
         <div>
-          {/* Card of the event. */}
-          <Card>
-            <CardMedia
-              overlay={<CardTitle title={event.title.toUpperCase()} />}
-            >
-              <img src={event.picture} alt="banner" className="banner" />
-            </CardMedia>
-            <CardText>{event.desc}</CardText>
-            <CardActions>
-              <FlatButton label="Send Message" />
-              <FlatButton label="Invite People" />
-            </CardActions>
-          </Card>
-          {/* The FAB */}
+          {/* The event info card */}
+          <EventCard
+            event={event}
+            openInvite={this.openShare}
+            openSend={this.openSend}
+            showPass={this.openPass}
+          />
+
+          {/* invite share dialog */}
+          <Dialog
+            title="Your invite link"
+            actions={shareActions}
+            modal={false}
+            open={this.state.shareOpen}
+            onRequestClose={this.closeShare}
+          >
+            <div>{inviteLink}</div>
+          </Dialog>
+
+          {/* Messaging dialog */}
+          <Dialog
+            title="Compose message"
+            actions={sendActions}
+            modal={false}
+            open={this.state.sendOpen}
+            onRequestClose={this.closeSend}
+          >
+            <TextField
+              name="message-field"
+              label="Message Text"
+              multiLine={true}
+            />
+          </Dialog>
+
+          {/* {this.renderQRCode(pass)} */}
+          {/* Pass dialog */}
+          <Dialog
+            title="This is your pass to the event:"
+            actions={showPassActions}
+            modal={false}
+            open={this.state.passOpen}
+            onRequestClose={this.closePass}
+          >
+            <QRCode value={pass.id || ''} size={256} />
+          </Dialog>
+
           <Fab
             className="fab"
             secondary={true}
@@ -72,11 +171,23 @@ class EventDetail extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
   const filtered = state.events.filter(e => e.id === eventId);
-  const event = filtered[0] ? filtered[0] : undefined;
+  const event = filtered[0];
+  console.log('event:', event);
   return {
     event,
-    id: eventId
+    inviteLink: state.inviteLink,
+    invite: state.invite,
+    inviteId: queryString.parse(ownProps.location.search).invite,
+    eventId,
+    user: state.auth.userObject,
+    pass: state.pass
   };
 };
 
-export default connect(mapStateToProps, { getEvent, push })(EventDetail);
+export default connect(mapStateToProps, {
+  getEvent,
+  push,
+  addInvite,
+  getInvite,
+  claimInvite
+})(EventDetail);

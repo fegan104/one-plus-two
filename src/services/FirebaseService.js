@@ -130,19 +130,113 @@ export const getInviteFromDB = inviteId => {
 };
 
 /**
+ * When you push an invite to firebase you use up one of your 
+ * invites left (unless you're an owner or the guest limit is reached),
+ * and you get a link to the invite that can then be shared to anyone. This is also where
+ * self enrollment can be done. TODO maybe make this a cloud function.
+ * @param {InviteModel} newInvite 
+ * @param userId of the inviter
+ */
+export const pushInviteToDB = async (newInvite, event, userId) => {
+  // check if owner
+  const isOwnerPromise = database
+    .ref(`/events/${event.id}/owners`)
+    .once('value')
+    .then(snap => snap.val())
+    .then(owners => owners[userId])
+    .catch(err => {
+      console.error(err);
+      return false;
+    });
+
+  //Get a promise to the user's pass for the event
+  const userPassPromise = database
+    .ref('/')
+    .child('passes')
+    .orderByChild('user')
+    .equalTo(userId)
+    .once('value')
+    .then(snap => snap.val())
+    .then(passes => {
+      if (!passes) {
+        return null;
+      }
+
+      return Object.keys(passes)
+        .map(k => {
+          passes[k]['id'] = k;
+          return passes[k];
+        })
+        .filter(p => p.event === event.id);
+    })
+    .then(f => f && f[0])
+    .catch(err => {
+      console.error(err);
+      return null;
+    });
+
+  let [isOwner, userPass] = await Promise.all([
+    isOwnerPromise,
+    userPassPromise
+  ]);
+  console.log('userPass:', userPass);
+
+  //If you aren't an owner and don't have invites left reject
+  if (!isOwner && !(userPass && userPass.additionalInvitesLeft > 0)) {
+    return Promise.reject("You don't have invites left.");
+  }
+  //Check if there have already been to many passes given out for the event
+  const numberOfEventPasses = await database
+    .ref('passes')
+    .orderByChild('event')
+    .equalTo(`${newInvite.event}`)
+    .once('value')
+    .then(snap => {
+      if (snap.val()) {
+        return Object.keys(snap.val()).length;
+      }
+      return 0;
+    });
+  //guest limit reached
+  if (numberOfEventPasses >= event.guestLimit) {
+    return Promise.reject('Event is full.');
+  }
+  //We are good to add the invite and decrement the sharer's additionInvitesLeft
+  if (!isOwner) {
+    await database
+      .ref(`/passes/${userPass.id}/additionalInvitesLeft`)
+      .transaction(left => {
+        return (left || 0) - 1;
+      });
+  }
+
+  return database
+    .ref('/invites')
+    .push({
+      ...newInvite
+    })
+    .then(push => push.once('value'))
+    .then(snap => {
+      let invite = InviteModel({ id: snap.key, ...snap.val() });
+      invite.eventId = snap.val().event;
+      invite = invite.setEvent(newInvite);
+      return invite;
+    });
+};
+
+/**
  * Pushes a new PassModel to /passes.
  * @param {PassModel} newPass a PassModel.
  */
 const pushPassToDB = newPass => {
-  delete newPass.id;
   return database
     .ref('passes')
     .push(newPass)
     .then(pass => pass.once('value'))
     .then(snap =>
       PassModel({
-        ...snap.val(),
-        id: snap.key
+        id: snap.key,
+        ...snap.val()
       })
     );
 };
@@ -153,16 +247,16 @@ const pushPassToDB = newPass => {
  * We check if the user already has a pass for the event if they do we get that one.
  * If they don't we use the invite and push that new pass to the db
  * 
- * @param invite 
+ * @param invite The invite that we want to exchange for a pass.
+ * @returns PassModel
  */
-export const exchangeInviteForPass = async (invite, user) => {
-  const { event } = invite;
+export const exchangeInviteForPass = async (invite, event, userId) => {
   //Lets check if the user already has a pass for the event
   const usersPass = await database
     .ref('/')
     .child('passes')
     .orderByChild('user')
-    .equalTo(`${user.id}`)
+    .equalTo(`${userId}`)
     .once('value')
     .then(snap => snap.val())
     .then(passes => {
@@ -170,7 +264,7 @@ export const exchangeInviteForPass = async (invite, user) => {
         return null;
       }
 
-      Object.keys(passes)
+      return Object.keys(passes)
         .map(k => {
           passes[k]['id'] = k;
           return passes[k];
@@ -191,20 +285,19 @@ export const exchangeInviteForPass = async (invite, user) => {
 
   //if invite is used reject
   if (isUsed) {
-    return Promise.reject('Pass already used');
+    return Promise.reject('Invite already used');
   }
   //use invite
   await database.ref(`invites/${invite.id}`).update({ isUsed: true });
   //The invite is valid lets get a new pass
-  return pushPassToDB(
-    PassModel({
-      desc: event.desc,
-      isActive: false,
-      isUsed: false,
-      user: user.id,
-      event: event.id
-    })
-  );
+  return pushPassToDB({
+    desc: event.desc,
+    isActive: false,
+    isUsed: false,
+    additionalInvitesLeft: 2,
+    user: userId,
+    event: event.id
+  });
 };
 
 export const loginViaFirebase = loginMethod => {
