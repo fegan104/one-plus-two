@@ -138,7 +138,7 @@ export const getInviteFromDB = inviteId => {
  * @param userId of the inviter
  */
 export const pushInviteToDB = async (newInvite, event, userId) => {
-  //TODO check if owner
+  // check if owner
   const isOwnerPromise = database
     .ref(`/events/${event.id}/owners`)
     .once('value')
@@ -149,6 +149,7 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
       return false;
     });
 
+  //Get a promise to the user's pass for the event
   const userPassPromise = database
     .ref('/')
     .child('passes')
@@ -156,7 +157,19 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
     .equalTo(userId)
     .once('value')
     .then(snap => snap.val())
-    .then(owners => owners[userId])
+    .then(passes => {
+      if (!passes) {
+        return null;
+      }
+
+      return Object.keys(passes)
+        .map(k => {
+          passes[k]['id'] = k;
+          return passes[k];
+        })
+        .filter(p => p.event === event.id);
+    })
+    .then(f => f && f[0])
     .catch(err => {
       console.error(err);
       return null;
@@ -166,6 +179,7 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
     isOwnerPromise,
     userPassPromise
   ]);
+  console.log('userPass:', userPass);
 
   //If you aren't an owner and don't have invites left reject
   if (!isOwner && !(userPass && userPass.additionalInvitesLeft > 0)) {
@@ -187,11 +201,18 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
   if (numberOfEventPasses >= event.guestLimit) {
     return Promise.reject('Event is full.');
   }
-  //We are good to go.
+  //We are good to add the invite and decrement the sharer's additionInvitesLeft
+  if (!isOwner) {
+    await database
+      .ref(`/passes/${userPass.id}/additionalInvitesLeft`)
+      .transaction(left => {
+        return (left || 0) - 1;
+      });
+  }
+
   return database
     .ref('/invites')
     .push({
-      event: newInvite.event.id,
       ...newInvite
     })
     .then(push => push.once('value'))
