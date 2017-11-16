@@ -37,14 +37,16 @@ class EventDetail extends React.Component {
   openShare = () => {
     this.setState({ shareOpen: true });
     let { event, user } = this.props;
-    this.props.addInvite(
-      {
-        event: event.id,
-        isUsed: false
-      },
-      event,
-      user.id
-    );
+    if (event && user) {
+      this.props.addInvite(
+        {
+          event: event.id,
+          isUsed: false
+        },
+        event,
+        user.id
+      );
+    }
   };
 
   closeShare = () => {
@@ -170,7 +172,7 @@ const mapStateToProps = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
   const filtered = state.events.filter(e => e.id === eventId);
   const event = filtered[0];
-  console.log('auth:', state.auth);
+  console.log('event:', event);
   return {
     event,
     inviteLink: state.inviteLink,
