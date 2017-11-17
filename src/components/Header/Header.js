@@ -13,10 +13,9 @@ import { signOut } from '../../actions/AuthActions';
 
 const Logged = props => (
   <IconMenu
-    {...props}
     iconButtonElement={
       <IconButton>
-        <MoreVertIcon />
+        <MoreVertIcon color="#fff" />
       </IconButton>
     }
     targetOrigin={{ horizontal: 'right', vertical: 'top' }}

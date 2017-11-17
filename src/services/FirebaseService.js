@@ -134,7 +134,7 @@ export const getInviteFromDB = inviteId => {
  * invites left (unless you're an owner or the guest limit is reached),
  * and you get a link to the invite that can then be shared to anyone. This is also where
  * self enrollment can be done. TODO maybe make this a cloud function.
- * @param {InviteModel} newInvite 
+ * @param {Invite} newInvite 
  * @param userId of the inviter
  */
 export const pushInviteToDB = async (newInvite, event, userId) => {
@@ -271,11 +271,15 @@ export const exchangeInviteForPass = async (invite, event, userId) => {
         })
         .filter(p => p.event === event.id);
     })
-    .then(f => f && f[0]);
+    .then(f => (f ? f[0] : null));
+  console.log('userPass:', usersPass);
 
   //return the user's pass
   if (usersPass) {
     return Promise.resolve(usersPass);
+  }
+  if (!invite) {
+    return Promise.reject('Invite needed.');
   }
   //User doesn't have a pass lets check if we can even give them one
   const isUsed = await database
@@ -316,4 +320,15 @@ export const loginViaFirebase = loginMethod => {
 
 export const signOutViaFirebase = () => {
   return auth.signOut();
+};
+
+export const claimPassInDB = passId => {
+  console.log('claiming pass:', passId);
+  if (!passId) {
+    return Promise.reject(console.error);
+  }
+  return database
+    .ref(`/passes/${passId}`)
+    .update({ isUsed: true })
+    .catch(console.error);
 };
