@@ -88,7 +88,6 @@ class EventDetail extends React.Component {
     const { invite, user, event, pass } = nextProps;
     const valid = pass && Object.keys(pass).length > 0;
     if (user && event && !valid) {
-      console.log('getting a pass...');
       this.props.claimInvite(invite, event, user.id);
     }
   }
