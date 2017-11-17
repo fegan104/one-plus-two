@@ -24,12 +24,16 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
-  //store just a little state to open 2 dialogs
-  state = {
-    shareOpen: false,
-    sendOpen: false,
-    passOpen: false
-  };
+  //store just a little state to open 3 dialogs
+  state = {};
+  constructor(props) {
+    super(props);
+    this.state = {
+      shareOpen: false,
+      sendOpen: false,
+      passOpen: false
+    };
+  }
 
   /**
    * Open share dialog and generate an invitation link.
@@ -70,19 +74,28 @@ class EventDetail extends React.Component {
   };
 
   componentDidMount() {
-    const { invite, eventId, inviteId, user, event } = this.props;
+    const { eventId, inviteId } = this.props;
+    console.log('props', this.props);
+    //we always have an event
     this.props.getEvent(eventId);
-    this.props.getInvite(inviteId);
-    if (invite && user && event) {
+    //We may not have an invite
+    if (inviteId) {
+      this.props.getInvite(inviteId);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { invite, user, event, pass } = nextProps;
+    const valid = pass && Object.keys(pass).length > 0;
+    if (user && event && !valid) {
       this.props.claimInvite(invite, event, user.id);
     }
   }
 
   render() {
     let { event, inviteLink, pass } = this.props;
-    console.log('link', inviteLink);
     let view = null;
-    if (event) {
+    if (event && pass) {
       const shareActions = [
         <FlatButton label="Close" primary={true} onClick={this.closeShare} />,
         <CopyToClipboard text={inviteLink}>
@@ -141,13 +154,13 @@ class EventDetail extends React.Component {
             open={this.state.passOpen}
             onRequestClose={this.closePass}
           >
-            <QRCode value={pass.id || ''} size={256} />
+            <QRCode value={pass.id || 'error'} size={256} />
           </Dialog>
 
           <Fab
             className="fab"
             secondary={true}
-            onClick={_ => this.props.push('/scanner')}
+            onClick={_ => this.props.push(`/scanner/${event.id}`)}
           >
             <CropFree style={{ fill: '#000' }} />
           </Fab>
@@ -172,7 +185,7 @@ const mapStateToProps = (state, ownProps) => {
   const eventId = ownProps.match.params.id;
   const filtered = state.events.filter(e => e.id === eventId);
   const event = filtered[0];
-  console.log('event:', event);
+
   return {
     event,
     inviteLink: state.inviteLink,

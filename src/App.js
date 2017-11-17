@@ -73,7 +73,7 @@ class App extends Component {
                   <Route path="/list" component={EventList} />
                   <Route path="/create" component={CreateEvent} />
                   <Route path="/event/:id" component={EventDetail} />
-                  <Route path="/scanner" component={Scanner} />
+                  <Route path="/scanner/:id" component={Scanner} />
                 </Switch>
               </div>
             </div>
