@@ -6,6 +6,7 @@ import queryString from 'query-string';
 import { getEvent } from '../../actions/EventsActions';
 import { addInvite, getInvite } from '../../actions/InvitesActions';
 import { claimInvite } from '../../actions/PassActions';
+import { setHeader } from '../../actions/HeaderActions';
 
 // import _ from 'lodash';
 import QRCode from 'qrcode.react';
@@ -82,15 +83,32 @@ class EventDetail extends React.Component {
     if (inviteId) {
       this.props.getInvite(inviteId);
     }
+
+    this.configureAppHeader();
+  }
+
+  componentDidUpdate() {
+    this.configureAppHeader();
   }
 
   componentWillReceiveProps(nextProps) {
     const { invite, user, event, pass } = nextProps;
     const valid = pass && Object.keys(pass).length > 0;
+
     if (user && event && !valid) {
       this.props.claimInvite(invite, event, user.id);
     }
   }
+
+  configureAppHeader = () => {
+    let { event } = this.props;
+
+    this.props.setHeader({
+      pageTitle: event && event.title,
+      headerTitle: event && event.title,
+      backButton: '/list'
+    });
+  };
 
   render() {
     let { event, inviteLink, pass } = this.props;
@@ -202,5 +220,6 @@ export default connect(mapStateToProps, {
   push,
   addInvite,
   getInvite,
-  claimInvite
+  claimInvite,
+  setHeader
 })(EventDetail);

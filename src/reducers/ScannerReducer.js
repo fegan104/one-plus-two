@@ -2,7 +2,7 @@ import actionType from '../constants';
 /**
   * reduces the scan result to true or false
   */
-export default (store = false, action) => {
+export default (state = false, action) => {
   switch (action.type) {
     case actionType.CLAIM_PASS_FULFILLED: {
       return true;
@@ -11,6 +11,6 @@ export default (store = false, action) => {
       return false;
     }
     default:
-      return store;
+      return state;
   }
 };

@@ -4,12 +4,24 @@ import logo from './logo.svg';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
+import { setHeader } from '../../actions/HeaderActions';
 
 /**
  * This is the container component for the home screen.
  */
 class Home extends Component {
+  componentDidMount() {
+    this.configureAppHeader();
+  }
+
+  componentDidUpdate() {
+    this.configureAppHeader();
+  }
+
+  configureAppHeader = () => {
+    this.props.setHeader({});
+  };
+
   render() {
     return (
       <div className="Home">
@@ -22,22 +34,23 @@ class Home extends Component {
           </div>
         </div>
 
-        <RaisedButton
-          className="Home-button"
-          label="Host an event"
-          primary={true}
-          onClick={_ => this.props.dispatch(push('/create'))}
-        />
-        <Link to="/create" className="Home-link">
-          I have an account
+        <Link to="/create">
+          <RaisedButton
+            className="Home-button"
+            label="Host an event"
+            primary={true}
+          />
         </Link>
-        <Link to="/event/eventId1" className="jest-link-1">
-          check out event
-        </Link>
+        <br />
+        <Link to="/list">All Events</Link>
       </div>
     );
   }
 }
 
+const mapStateToProps = state => {
+  return {};
+};
+
 //Connect makes dispatch() avalable though props
-export default connect()(Home);
+export default connect(mapStateToProps, { setHeader })(Home);

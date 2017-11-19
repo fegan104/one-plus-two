@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import FlatButton from 'material-ui/FlatButton';
 import AppBar from 'material-ui/AppBar';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import BackIcon from 'material-ui/svg-icons/navigation/chevron-left';
 
 import LoginDialog from '../Dialogs/LoginDialog';
 
@@ -31,9 +34,24 @@ class Header extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showLoginModal: false
+      showLoginModal: false,
+      navigate: false
     };
   }
+
+  componentDidMount = () => {
+    this.updateDocumentTitle();
+  };
+
+  componentDidUpdate = () => {
+    this.updateDocumentTitle();
+  };
+
+  updateDocumentTitle = () => {
+    let { pageTitle } = this.props.header;
+
+    document.title = pageTitle;
+  };
 
   handleLogin = () => {
     this.setState({ showLoginModal: true });
@@ -44,10 +62,24 @@ class Header extends Component {
   };
 
   render() {
+    let { headerTitle, backButton } = this.props.header;
+
     let rightButton = this.props.loggedIn ? (
       <Logged signOut={this.props.signOut} />
     ) : (
       <FlatButton label="Login" onClick={this.handleLogin} />
+    );
+
+    let leftButton = backButton ? (
+      <IconButton>
+        <Link to={backButton}>
+          <BackIcon color="#fff" />
+        </Link>
+      </IconButton>
+    ) : (
+      <IconButton>
+        <MenuIcon />
+      </IconButton>
     );
 
     return (
@@ -57,9 +89,9 @@ class Header extends Component {
           onClose={this.handleCloseLoginModal}
         />
         <AppBar
-          title="OnePlusTwo"
+          title={headerTitle}
           iconElementRight={rightButton}
-          iconElementLeft={<div />}
+          iconElementLeft={leftButton}
         />
       </div>
     );
@@ -68,7 +100,8 @@ class Header extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    loggedIn: state.auth.loggedIn
+    loggedIn: state.auth.loggedIn,
+    header: state.header
   };
 };
 

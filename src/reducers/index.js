@@ -4,6 +4,7 @@ import PassReducer from './PassReducer';
 import InviteLinkReducer from './InviteLinkReducer';
 import AuthReducer from './AuthReducer';
 import ScannerReducer from './ScannerReducer';
+import HeaderReducer from './HeaderReducer';
 import { routerReducer } from 'react-router-redux';
 
 import { combineReducers } from 'redux';
@@ -15,5 +16,6 @@ export default combineReducers({
   pass: PassReducer,
   auth: AuthReducer,
   router: routerReducer,
-  scanned: ScannerReducer
+  scanned: ScannerReducer,
+  header: HeaderReducer
 });

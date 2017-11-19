@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { loadEvents } from '../../actions/EventsActions';
+import { setHeader } from '../../actions/HeaderActions';
+
+import { Link } from 'react-router-dom';
 
 /**
  * This is the container component for the event creation screen.
@@ -8,13 +11,30 @@ import { loadEvents } from '../../actions/EventsActions';
 class EventList extends Component {
   componentDidMount() {
     this.props.loadEvents();
+    this.configureAppHeader();
   }
+
+  componentDidUpdate() {
+    this.configureAppHeader();
+  }
+
+  configureAppHeader = () => {
+    this.props.setHeader({
+      pageTitle: 'Events List',
+      headerTitle: 'Events',
+      backButton: '/'
+    });
+  };
 
   render() {
     let { events } = this.props;
 
     let eventDivs = events.map(event => {
-      return <h1 key={event.id}>{event.title}</h1>;
+      return (
+        <Link to={`/event/${event.id}`} className="Home-link">
+          {event.title}
+        </Link>
+      );
     });
 
     return (
@@ -33,4 +53,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, { loadEvents })(EventList);
+export default connect(mapStateToProps, { loadEvents, setHeader })(EventList);
