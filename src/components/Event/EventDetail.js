@@ -92,12 +92,11 @@ class EventDetail extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { invite, user, event, pass } = nextProps;
-    const valid = pass && Object.keys(pass).length > 0;
-
-    if (user && event && !valid) {
-      //this.props.claimInvite(invite, event, user.id); // Don't claim this here
-    }
+    //const { invite, user, event, pass } = nextProps;
+    //const valid = pass && Object.keys(pass).length > 0;
+    //if (user && event && !valid) {
+    //this.props.claimInvite(invite, event, user.id); // Don't claim this here
+    //}
   }
 
   configureAppHeader = () => {
