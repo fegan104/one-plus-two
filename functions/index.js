@@ -6,9 +6,10 @@ admin.initializeApp(functions.config().firebase);
 exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(event => {
   const userId = event.data.child('claimedByUser').val();
   const eventId = event.data.child('event').val();
+  const isUsed = event.data.child('isUsed').val();
   const rootDb = admin.database().ref()
 
-  if (!userId || !eventId) {
+  if (!userId || !eventId || isUsed) {
   	return;
   }
 
