@@ -10,12 +10,15 @@ import { Link } from 'react-router-dom';
  */
 class EventList extends Component {
   componentDidMount() {
-    this.props.loadEvents();
     this.configureAppHeader();
   }
 
-  componentDidUpdate() {
-    this.configureAppHeader();
+  componentWillReceiveProps(newProps) {
+    let userId = newProps.user && newProps.user.id;
+
+    if (userId && !this.props.user) {
+      this.props.loadEvents(userId);
+    }
   }
 
   configureAppHeader = () => {
@@ -49,7 +52,8 @@ class EventList extends Component {
 
 const mapStateToProps = state => {
   return {
-    events: state.events
+    events: state.events,
+    user: state.auth.userObject
   };
 };
 

@@ -12,7 +12,7 @@ export default (state = [], action) => {
       return [...state, action.payload];
     }
     case actionType.GET_EVENT_FULFILLED: {
-      return [...state, action.payload];
+      return [action.payload];
     }
 
     default:

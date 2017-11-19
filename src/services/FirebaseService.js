@@ -35,10 +35,14 @@ export const init = authCallback => {
 /**
  * Returns a Promise to an array of EventModels from firebase.
  */
-export const getEventsDB = () => {
+export const getEventsDB = userId => {
   return new Promise((resolve, reject) => {
+    if (!userId) {
+      reject('No user');
+    }
+
     database
-      .ref('/events')
+      .ref(`/users/${userId}/events`)
       .once('value')
       .then(req => {
         let dbObj = req.val();
@@ -46,11 +50,11 @@ export const getEventsDB = () => {
 
         if (dbObj) {
           events = Object.keys(dbObj).map(id => {
-            return EventModel({ id, ...dbObj[id] });
+            return getEventFromDB(id);
           });
         }
 
-        return resolve(events);
+        return resolve(Promise.all(events));
       })
       .catch(error => {
         reject(error);
