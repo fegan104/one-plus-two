@@ -90,14 +90,9 @@ export const getEventFromDB = eventId => {
  * @returns a promise to an event model.
  */
 export const pushEventToDB = newEvent => {
-  console.log('newEvent:', newEvent);
-  const ownerId = newEvent.owner;
-  delete newEvent.owner;
   return database
     .ref('/events')
     .push(newEvent)
-    .then(event => event.child('owners').push(ownerId))
-    .then(event => event.parent.parent.once('value'))
     .then(snap => {
       let obj = snap.val();
       obj['id'] = snap.key;

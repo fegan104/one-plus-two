@@ -6,6 +6,7 @@ export default ({
   isActive,
   isUsed,
   user,
+  checkedInAt,
   ...rest
 }) => ({
   id,
@@ -14,5 +15,6 @@ export default ({
   additionalInvitesLeft,
   isActive,
   isUsed,
-  user
+  user,
+  checkedInAt
 });
