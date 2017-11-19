@@ -94,14 +94,21 @@ export const getEventFromDB = eventId => {
  * @returns a promise to an event model.
  */
 export const pushEventToDB = newEvent => {
-  return database
-    .ref('/events')
-    .push(newEvent)
-    .then(snap => {
-      let obj = snap.val();
-      obj['id'] = snap.key;
-      return obj;
-    });
+  return new Promise((resolve, reject) => {
+    database
+      .ref('/events')
+      .push(newEvent)
+      .then(push => push.once('value'))
+      .then(snap => {
+        console.log('qqq', snap);
+        let obj = snap.val();
+        obj['id'] = snap.key;
+        return resolve(obj);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -137,6 +144,8 @@ export const getInviteFromDB = inviteId => {
  * @param userId of the inviter
  */
 export const pushInviteToDB = async (newInvite, event, userId) => {
+  /*
+
   // check if owner
   const isOwnerPromise = database
     .ref(`/events/${event.id}/owners`)
@@ -208,6 +217,10 @@ export const pushInviteToDB = async (newInvite, event, userId) => {
         return (left || 0) - 1;
       });
   }
+
+
+
+  */
 
   return database
     .ref('/invites')
@@ -295,7 +308,6 @@ export const exchangeInviteForPass = async (invite, event, userId) => {
   //The invite is valid lets get a new pass
   return pushPassToDB({
     desc: event.desc,
-    isActive: false,
     isUsed: false,
     additionalInvitesLeft: 2,
     user: userId,

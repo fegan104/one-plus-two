@@ -71,10 +71,14 @@ export const addEvent = ({
         picture,
         owners,
         isSelfEnrollable
-      }).then(newEvent => {
-        dispatch(push(`/event/${newEvent.id}`));
-        return newEvent;
       })
+        .then(newEvent => {
+          dispatch(push(`/event/${newEvent.id}`));
+          return newEvent;
+        })
+        .catch(error => {
+          console.log(error);
+        })
     };
   };
 };

@@ -4,10 +4,8 @@
       ".indexOn": ["owners"],
       "$event": {
         ".validate": "newData.hasChildren(['desc', 'guestLimit', 'isSelfEnrollable', 'location', 'owners', 'picture', 'title', 'dateTime'])",
-        ".read": "auth != null && (data.child('owners').child(auth.uid).val() === true || root.child('users').child(auth.uid).child('events').child($event).child('invite').val() === true)",
-        ".write": "auth != null && ((data.exists() && data.child('owners').child(auth.uid).val() === true) || (!data.exists() && newData.child('owners').child(auth.uid).val() === true))",
-
-        "$other": { ".validate": false }
+        ".read": "auth != null && (data.child('owners').child(auth.uid).val() === true || root.child('users').child(auth.uid).child('events').child($event).child('invite').val() !== false)",
+        ".write": "auth != null && ((data.exists() && data.child('owners').child(auth.uid).val() === true) || (!data.exists() && newData.child('owners').child(auth.uid).val() === true))"
       }
     },
     "passes": {
@@ -15,23 +13,32 @@
       "$pass": {
         ".validate": "newData.hasChildren(['user', 'event', 'isUsed', 'checkedInAt'])",
         ".read": "auth != null && (data.child('user').val() === auth.uid || root.child('events').child(data.child('event').val()).child('owners').child(auth.uid).val() === true)",
-        ".write": "auth != null && ((!data.exists() && newData.child('user').val() == auth.uid && root.child('users').child(auth.uid).child('events').child(newData.child('event').val()).child('invite').val() === true) || (data.exists() && root.child('events').child(data.child('event').val()).child('owners').child(auth.uid).val() === true))"
+        "isUsed": {
+          ".write": "auth != null && root.child('events').child(data.parent().child('event').val()).child('owners').child(auth.uid).val() === true"
+        },
+        "checkedInAt": {
+          ".write": "auth != null && root.child('events').child(data.parent().child('event').val()).child('owners').child(auth.uid).val() === true"
+        }
       }
     },
     "invites": {
       ".indexOn": ["event", "claimedByUser", "isUsed"],
       "$invite": {
         ".read": "auth != null && (data.child('isUsed').val() === false || data.child('claimedByUser').val() === auth.uid)",
-        ".write": "auth != null && ((data.child('isUsed').val() === false && newData.child('isUsed').val() === true && newData.child('claimedByUser').val() === auth.uid) || (!data.exists() && root.child('events').child(newData.child('event').val()).child('owners').child(auth.uid).val() === true))"
+        ".write": "auth != null && ((data.child('isUsed').val() === false && newData.child('isUsed').val() === true && newData.child('claimedByUser').val() === auth.uid) || (!data.exists() && newData.child('isUsed').val() === false && root.child('events').child(newData.child('event').val()).child('owners').child(auth.uid).val() === true))"
       }
     },
     "users": {
       "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
         "events": {
           "$event": {
             "invite": {
-              ".write": "auth != null && auth.uid === $uid && root.child('invites').child(newData.val()).child('claimedByUser').val() === $uid"
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": false
+            },
+            "pass": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": false
             }
           }
         }

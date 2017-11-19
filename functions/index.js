@@ -1,8 +1,56 @@
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+admin.initializeApp(functions.config().firebase);
+
+exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(event => {
+  const userId = event.data.child('claimedByUser').val();
+  const eventId = event.data.child('event').val();
+  const rootDb = admin.database().ref()
+
+  if (!userId || !eventId) {
+  	return;
+  }
+
+  let passObj = {
+  	user: userId,
+  	event: eventId,
+  	isUsed: false
+  };
+
+  let otherTablesPromise = new Promise((resolve, reject) => {
+    rootDb
+    	.child(`/users/${userId}/events/${eventId}/invite`)
+    	.set(event.params.inviteId)
+    	.then(req => {
+    	  rootDb
+    	    .child('passes')
+    	    .push(passObj)
+    	    .then(pass => pass.once('value'))
+        	.then(snap => {
+        	  rootDb
+        	    .child(`/users/${userId}/events/${eventId}/pass`)
+        	    .set(snap.key)
+        	    .then(final => {
+        	      resolve(final);
+        	    })
+        	    .catch(error => {
+        	      reject(error);
+        	    });
+        	})
+        	.catch(error => {
+        	  reject(error);
+        	});
+    	})
+    	.catch(error => {
+    	  reject(error);
+    	});
+  });
+
+  let updateInvitePromise = event.data.ref.child('isUsed').set(true);
+
+  return Promise.all([
+    otherTablesPromise,
+    updateInvitePromise
+  ]);
+});

@@ -3,7 +3,6 @@ export default ({
   desc,
   event,
   additionalInvitesLeft,
-  isActive,
   isUsed,
   user,
   checkedInAt,
@@ -13,7 +12,6 @@ export default ({
   desc,
   event,
   additionalInvitesLeft,
-  isActive,
   isUsed,
   user,
   checkedInAt
