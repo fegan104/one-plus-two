@@ -12,6 +12,8 @@ import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
 import { push } from 'react-router-redux';
 
+import Loader from '../Common/Loader';
+
 class InviteForEvent extends React.Component {
   componentDidMount() {
     const { inviteId } = this.props;
@@ -62,7 +64,7 @@ class InviteForEvent extends React.Component {
     let event = invite && invite.event;
 
     if (!event) {
-      return <div>loading data...</div>;
+      return <Loader />;
     }
 
     const acceptButton =

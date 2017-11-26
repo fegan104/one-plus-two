@@ -3,7 +3,7 @@
     "events": {
       ".indexOn": ["owners"],
       "$event": {
-        ".validate": "newData.hasChildren(['desc', 'guestLimit', 'isSelfEnrollable', 'location', 'owners', 'picture', 'title', 'dateTime'])",
+        ".validate": "newData.hasChildren(['desc', 'guestLimit', 'isSelfEnrollable', 'canBringXPeople', 'spotsLeft', 'location', 'owners', 'picture', 'title', 'dateTime'])",
         ".read": "auth != null && (data.child('owners').child(auth.uid).val() === true || root.child('users').child(auth.uid).child('events').child($event).child('invite').val() !== false)",
         ".write": "auth != null && ((data.exists() && data.child('owners').child(auth.uid).val() === true) || (!data.exists() && newData.child('owners').child(auth.uid).val() === true))"
       }

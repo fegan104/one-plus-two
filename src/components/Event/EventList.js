@@ -11,13 +11,21 @@ import { Link } from 'react-router-dom';
 class EventList extends Component {
   componentDidMount() {
     this.configureAppHeader();
+
+    if (this.props.user && this.props.user.events) {
+      this.props.loadEvents(Object.keys(this.props.user.events));
+    }
   }
 
   componentWillReceiveProps(newProps) {
     let user = newProps.user;
     let userId = user && user.id;
 
-    if (userId && user.events && !(this.props.user && this.props.user.events)) {
+    if (
+      userId &&
+      user.events &&
+      !(this.props.user && this.props.user.events === user.events)
+    ) {
       this.props.loadEvents(Object.keys(user.events));
     }
   }
@@ -35,19 +43,13 @@ class EventList extends Component {
 
     let eventDivs = events.map(event => {
       return (
-        <Link to={`/event/${event.id}`} className="Home-link">
+        <Link to={`/event/${event.id}`} key={event.id} className="Home-link">
           {event.title}
         </Link>
       );
     });
 
-    return (
-      <div>
-        Hello from list
-        <br />
-        {eventDivs}
-      </div>
-    );
+    return <div>{eventDivs}</div>;
   }
 }
 
