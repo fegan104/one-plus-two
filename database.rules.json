@@ -22,8 +22,9 @@
       }
     },
     "invites": {
-      ".indexOn": ["event", "claimedByUser", "isUsed"],
+      ".indexOn": ["event", "claimedByUser"],
       "$invite": {
+        ".validate": "newData.hasChildren(['event', 'isUsed', 'claimedByUser'])",
         ".read": "auth != null && (data.child('isUsed').val() === false || data.child('claimedByUser').val() === auth.uid)",
         ".write": "auth != null && ((data.child('isUsed').val() === false && newData.child('claimedByUser').val() === auth.uid) || (!data.exists() && newData.child('isUsed').val() === false && root.child('events').child(newData.child('event').val()).child('owners').child(auth.uid).val() === true))"
       }

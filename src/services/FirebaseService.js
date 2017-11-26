@@ -94,16 +94,20 @@ export const getEventFromDB = eventId => {
  * @returns a promise to an event model.
  */
 export const pushEventToDB = newEvent => {
+  console.log(newEvent);
   return new Promise((resolve, reject) => {
     database
       .ref('/events')
       .push(newEvent)
       .then(push => push.once('value'))
-      .then(snap => {
-        console.log('qqq', snap);
-        let obj = snap.val();
-        obj['id'] = snap.key;
-        return resolve(obj);
+      .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
+        let event = EventModel({ id: dbObj.key, ...dbObj.val() });
+
+        return resolve(event);
       })
       .catch(error => {
         reject(error);
