@@ -5,7 +5,6 @@ import queryString from 'query-string';
 
 import { getEvent } from '../../actions/EventsActions';
 import { addInvite, getInvite } from '../../actions/InvitesActions';
-import { claimInvite } from '../../actions/PassActions';
 import { setHeader } from '../../actions/HeaderActions';
 
 // import _ from 'lodash';
@@ -91,21 +90,13 @@ class EventDetail extends React.Component {
     this.configureAppHeader();
   }
 
-  componentWillReceiveProps(nextProps) {
-    //const { invite, user, event, pass } = nextProps;
-    //const valid = pass && Object.keys(pass).length > 0;
-    //if (user && event && !valid) {
-    //this.props.claimInvite(invite, event, user.id); // Don't claim this here
-    //}
-  }
-
   configureAppHeader = () => {
     let { event } = this.props;
 
     this.props.setHeader({
       pageTitle: event && event.title,
       headerTitle: event && event.title,
-      backButton: '/list'
+      backButton: '/events'
     });
   };
 
@@ -128,13 +119,11 @@ class EventDetail extends React.Component {
       ];
       view = (
         <div>
-          {/* The event info card */}
-          <EventCard
-            event={event}
-            openInvite={this.openShare}
-            openSend={this.openSend}
-            showPass={this.openPass}
-          />
+          <EventCard event={event}>
+            <FlatButton label="Send Message" onClick={this.openShare} />
+            <FlatButton label="Invite People" onClick={this.openInvite} />
+            <FlatButton label="Show Pass" onClick={this.showPass} />
+          </EventCard>
 
           {/* invite share dialog */}
           <Dialog
@@ -177,7 +166,7 @@ class EventDetail extends React.Component {
           <Fab
             className="fab"
             secondary={true}
-            onClick={_ => this.props.push(`/scanner/${event.id}`)}
+            onClick={_ => this.props.push(`/event/${event.id}/scanner`)}
           >
             <CropFree style={{ fill: '#000' }} />
           </Fab>
@@ -219,6 +208,5 @@ export default connect(mapStateToProps, {
   push,
   addInvite,
   getInvite,
-  claimInvite,
   setHeader
 })(EventDetail);

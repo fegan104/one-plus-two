@@ -42,7 +42,7 @@ class EventList extends Component {
 
     return (
       <div>
-        Hello from Event Detail
+        Hello from list
         <br />
         {eventDivs}
       </div>

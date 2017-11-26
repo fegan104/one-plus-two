@@ -51,7 +51,7 @@ export const addInvite = (newInvite, event, userId) => {
   return {
     type: actionType.ADD_INVITE,
     payload: pushInviteToDB(newInvite, event, userId).then(val => {
-      let inviteLink = `https://www.one-plus-two.com/event/${val.eventId}?invite=${val.id}`;
+      let inviteLink = `https://www.one-plus-two.com/invite/${val.id}`;
       return inviteLink;
     })
   };

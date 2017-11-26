@@ -1,6 +1,5 @@
 import React from 'react';
 import './EventCard.css';
-import FlatButton from 'material-ui/FlatButton';
 import {
   Card,
   CardActions,
@@ -9,18 +8,14 @@ import {
   CardText
 } from 'material-ui/Card';
 
-const EventCard = ({ event, openInvite, openSend, showPass }) => {
+const EventCard = ({ event, children }) => {
   return (
     <Card>
       <CardMedia overlay={<CardTitle title={event.title.toUpperCase()} />}>
         <img src={event.picture} alt="banner" className="banner" />
       </CardMedia>
       <CardText>{event.desc}</CardText>
-      <CardActions>
-        <FlatButton label="Send Message" onClick={openSend} />
-        <FlatButton label="Invite People" onClick={openInvite} />
-        <FlatButton label="Show Pass" onClick={showPass} />
-      </CardActions>
+      <CardActions>{children}</CardActions>
     </Card>
   );
 };
