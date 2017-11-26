@@ -39,6 +39,9 @@
             },
             "pass": {
               ".write": false
+            },
+            "isOwner": {
+              ".write": false
             }
           }
         }

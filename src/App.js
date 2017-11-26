@@ -51,6 +51,7 @@ class App extends Component {
 
     firebaseInit(user => {
       if (user) {
+        console.log('qqq', user);
         let userObj = UserModel({ ...user });
         this.store.dispatch(authStateChange(userObj));
       }

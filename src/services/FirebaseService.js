@@ -32,34 +32,33 @@ export const init = authCallback => {
   }
 };
 
-/**
- * Returns a Promise to an array of EventModels from firebase.
- */
-export const getEventsDB = userId => {
+export const getUserData = userId => {
   return new Promise((resolve, reject) => {
-    if (!userId) {
-      reject('No user');
-    }
-
     database
-      .ref(`/users/${userId}/events`)
+      .ref(`/users/${userId}`)
       .once('value')
-      .then(req => {
-        let dbObj = req.val();
-        let events = [];
-
-        if (dbObj) {
-          events = Object.keys(dbObj).map(id => {
-            return getEventFromDB(id);
-          });
+      .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
         }
 
-        return resolve(Promise.all(events));
+        return resolve(dbObj.val());
       })
       .catch(error => {
         reject(error);
       });
   });
+};
+
+/**
+ * Returns a Promise to an array of EventModels from firebase.
+ */
+export const getEventsDB = eventIds => {
+  return Promise.all(
+    eventIds.map(id => {
+      return getEventFromDB(id);
+    })
+  );
 };
 
 /**

@@ -6,12 +6,12 @@ import {
 import actionType from '../constants';
 import { push } from 'react-router-redux';
 
-export const loadEvents = userId => {
+export const loadEvents = eventIds => {
   return dispatch => {
     dispatch({
       type: actionType.LOAD_EVENTS_REQUEST
     });
-    getEventsDB(userId)
+    getEventsDB(eventIds)
       .then(events => {
         dispatch({
           type: actionType.LOAD_EVENTS_SUCCESS,

@@ -14,10 +14,11 @@ class EventList extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    let userId = newProps.user && newProps.user.id;
+    let user = newProps.user;
+    let userId = user && user.id;
 
-    if (userId && !this.props.user) {
-      this.props.loadEvents(userId);
+    if (userId && user.events && !(this.props.user && this.props.user.events)) {
+      this.props.loadEvents(Object.keys(user.events));
     }
   }
 

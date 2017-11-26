@@ -10,5 +10,9 @@ export default ({
   email,
   name: displayName,
   photoURL,
-  providerData
+  providerData,
+  events: null,
+  setEvents(e) {
+    return { ...this, events: e || {} };
+  }
 });

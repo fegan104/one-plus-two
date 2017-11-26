@@ -25,6 +25,10 @@ export default (state = initialState, action) => {
       };
     }
 
+    case actionType.GET_USER_DATA_SUCCESS: {
+      return { ...state, userObject: action.payload };
+    }
+
     case actionType.SIGNOUT_SUCCESS: {
       return { ...initialState };
     }
