@@ -5,6 +5,18 @@ import {
   getUserData
 } from '../services/FirebaseService';
 
+export const showLoginModal = () => {
+  return {
+    type: actionType.SHOW_LOGIN_MODAL
+  };
+};
+
+export const hideLoginModal = () => {
+  return {
+    type: actionType.HIDE_LOGIN_MODAL
+  };
+};
+
 export const authStateChange = user => {
   return dispatch => {
     dispatch({

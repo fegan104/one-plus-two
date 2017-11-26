@@ -3,9 +3,10 @@ import './EventDetail.css';
 import { connect } from 'react-redux';
 
 import { getEvent } from '../../actions/EventsActions';
-import { getInvite } from '../../actions/InvitesActions';
+import { getInviteInfoWithoutPermissions } from '../../actions/InvitesActions';
 import { acceptInvite } from '../../actions/PassActions';
 import { setHeader } from '../../actions/HeaderActions';
+import { showLoginModal } from '../../actions/AuthActions';
 
 import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
@@ -16,7 +17,7 @@ class InviteForEvent extends React.Component {
     const { inviteId } = this.props;
 
     if (inviteId) {
-      this.props.getInvite(inviteId);
+      this.props.getInviteInfoWithoutPermissions(inviteId);
     }
 
     this.configureAppHeader();
@@ -44,7 +45,12 @@ class InviteForEvent extends React.Component {
   handleAcceptInvite = () => {
     let { invite, user } = this.props;
 
-    if (!invite || !invite.event || !user) {
+    if (!user) {
+      this.props.showLoginModal();
+      return;
+    }
+
+    if (!invite || !invite.event) {
       return;
     }
 
@@ -54,23 +60,32 @@ class InviteForEvent extends React.Component {
   render() {
     let { invite } = this.props;
     let event = invite && invite.event;
-    let view = null;
-    if (invite && event) {
-      view = (
-        <div>
-          <EventCard event={event}>
-            <FlatButton
-              label="Accept Invite Now!!!"
-              onClick={this.handleAcceptInvite}
-            />
-          </EventCard>
-        </div>
-      );
-    } else {
-      view = <h1>loading...</h1>;
+
+    if (!event) {
+      return <div>loading data...</div>;
     }
 
-    return <div className="EventDetail">{view}</div>;
+    const acceptButton =
+      event &&
+      this.props.user &&
+      this.props.user.events &&
+      this.props.user.events[event.id] &&
+      this.props.user.events[event.id].invite ? null : (
+        <FlatButton
+          label={
+            this.props.user
+              ? 'Accept Invite Now!!!'
+              : 'Register to accept invite'
+          }
+          onClick={this.handleAcceptInvite}
+        />
+      );
+
+    return (
+      <div className="EventDetail">
+        <EventCard event={event}>{acceptButton}</EventCard>
+      </div>
+    );
   }
 }
 
@@ -87,7 +102,8 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {
   getEvent,
   push,
-  getInvite,
+  getInviteInfoWithoutPermissions,
   acceptInvite,
-  setHeader
+  setHeader,
+  showLoginModal
 })(InviteForEvent);

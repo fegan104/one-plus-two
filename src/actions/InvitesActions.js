@@ -1,7 +1,8 @@
 import {
   getInviteFromDB,
   getEventFromDB,
-  pushInviteToDB
+  pushInviteToDB,
+  getInviteInfoFromCloudFunction
 } from '../services/FirebaseService';
 import actionType from '../constants';
 
@@ -31,6 +32,28 @@ export const getInvite = id => {
               payload: error
             });
           });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionType.GET_INVITE_FAILED,
+          payload: error
+        });
+      });
+  };
+};
+
+export const getInviteInfoWithoutPermissions = id => {
+  return dispatch => {
+    dispatch({
+      type: actionType.GET_INVITE_REQUEST
+    });
+
+    getInviteInfoFromCloudFunction(id)
+      .then(invite => {
+        dispatch({
+          type: actionType.GET_INVITE_SUCCESS,
+          payload: invite
+        });
       })
       .catch(error => {
         dispatch({

@@ -4,7 +4,8 @@ const initialState = {
   loggedIn: false,
   inProgress: false,
   userObject: null,
-  errors: null
+  errors: null,
+  showLoginModal: false
 };
 
 /**
@@ -18,9 +19,8 @@ export default (state = initialState, action) => {
 
     case actionType.AUTH_STATE_CHANGE: {
       return {
+        ...initialState,
         loggedIn: true,
-        inProgress: false,
-        errors: null,
         userObject: action.payload
       };
     }
@@ -35,6 +35,14 @@ export default (state = initialState, action) => {
 
     case actionType.SIGNOUT_REJECTED: {
       return { ...state, errors: action.payload };
+    }
+
+    case actionType.SHOW_LOGIN_MODAL: {
+      return { ...initialState, showLoginModal: true };
+    }
+
+    case actionType.HIDE_LOGIN_MODAL: {
+      return { ...initialState, showLoginModal: false };
     }
 
     default:

@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const cors = require('cors')({origin: true});
 
 admin.initializeApp(functions.config().firebase);
 
@@ -99,4 +100,68 @@ exports.updateEventOwners = functions.database.ref('/events/{eventId}/owners').o
     removeOwnershipPromise,
     addOwnershipPromise
   ]);
+});
+
+exports.getInviteInfo = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {    
+    const rootDb = admin.database().ref();
+
+    console.log('inviteid - ' + req.query.inviteId);
+
+    rootDb
+      .child(`/invites/${req.query.inviteId}`)
+      .once('value')
+      .then(dbObj => {
+        if (!dbObj) {
+          res.status(200).end();
+          return;
+        } 
+
+        console.log('qqq', dbObj);
+        console.log(dbObj.val());
+
+        let invite = dbObj.val();
+        invite.id = dbObj.key;
+
+        rootDb
+          .child(`/events/${invite.event}`)
+          .once('value')
+          .then(obj => {
+            if (!obj) {
+              res.status(200).end();
+              return;
+            }
+
+            let newInvite = invite;
+            let fullEvent = obj.val();
+            let event = {
+              id: obj.key,
+              title: fullEvent.title,
+              desc: fullEvent.desc,
+              picture: fullEvent.picture,
+              location: fullEvent.location,
+              dateTime: fullEvent.dateTime
+            };
+
+            newInvite.event = event;
+            res.status(200).json(newInvite);
+        })
+    });
+  });
+});
+
+exports.whatever = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    const tokenId = req.get('Authorization').split('Bearer ')[1];
+
+    return admin.auth().verifyIdToken(tokenId)
+      .then((decoded) => {
+        const rootDb = admin.database().ref();
+
+        res.status(200).end();
+      })
+      .catch((err) => {
+        res.status(401).send(err); 
+      });
+  });
 });

@@ -138,6 +138,49 @@ export const getInviteFromDB = inviteId => {
   });
 };
 
+export const getInviteInfoFromCloudFunction = inviteId => {
+  return new Promise((resolve, reject) => {
+    let endpoint = `${process.env
+      .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
+
+    fetch(endpoint, { headers: { 'Content-Type': 'application/json' } })
+      .then(res => res.json())
+      .then(json => {
+        let invite = InviteModel({ ...json, event: json.event.id });
+        resolve(invite.setEvent(json.event));
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+export const whateverUseForNewInvite = inviteId => {
+  return new Promise((resolve, reject) => {
+    auth.currentUser.getToken().then(token => {
+      let endpoint = `${process.env
+        .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
+
+      fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(json => {
+          let invite = InviteModel({ ...json });
+          invite.setEvent(json.event);
+
+          resolve(invite);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  });
+};
+
 /**
  * When you push an invite to firebase you use up one of your 
  * invites left (unless you're an owner or the guest limit is reached),
