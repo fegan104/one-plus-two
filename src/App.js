@@ -72,8 +72,8 @@ class App extends Component {
 
                 <Switch>
                   <Route exact path="/" component={Home} />
-                  <Route path="/events" component={EventList} />
                   <Route path="/events/new" component={CreateEvent} />
+                  <Route path="/events" component={EventList} />
                   <Route path="/event/:id/scanner" component={Scanner} />
                   <Route path="/event/:id" component={EventDetail} />
                   <Route path="/invite/:id" component={InviteForEvent} />
