@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import '@firebase/messaging';
 import EventModel from '../models/EventModel';
 import InviteModel from '../models/InviteModel';
 import PassModel from '../models/PassModel';
