@@ -4,6 +4,7 @@ export default ({
   displayName,
   photoURL,
   providerData,
+  fcmToken,
   ...rest
 }) => ({
   id: uid,
@@ -12,6 +13,7 @@ export default ({
   photoURL,
   providerData,
   events: null,
+  fcmToken: fcmToken || '',
   setEvents(e) {
     return { ...this, events: e || {} };
   }

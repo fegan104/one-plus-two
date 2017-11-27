@@ -30,15 +30,7 @@ class CreateEvent extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      title: '',
-      desc: '',
-      location: '',
-      guestLimit: 0,
-      date: '',
-      time: '',
-      picture: ''
-    };
+    this.state = {};
   }
 
   handleTextChange = (field, event) => {

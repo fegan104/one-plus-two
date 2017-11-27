@@ -15,7 +15,7 @@ import UserModel from './models/UserModel';
 
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
-import { authStateChange } from './actions/AuthActions';
+import { authStateChange, refreshToken } from './actions/AuthActions';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
 import createHistory from 'history/createBrowserHistory';
@@ -54,6 +54,7 @@ class App extends Component {
         console.log('qqq', user);
         let userObj = UserModel({ ...user });
         this.store.dispatch(authStateChange(userObj));
+        this.store.dispatch(refreshToken(userObj));
       }
     });
   }

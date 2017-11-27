@@ -2,7 +2,8 @@ import actionType from '../constants';
 import {
   loginViaFirebase,
   signOutViaFirebase,
-  getUserData
+  getUserData,
+  getFCMToken
 } from '../services/FirebaseService';
 
 export const showLoginModal = () => {
@@ -38,6 +39,10 @@ export const authStateChange = user => {
         });
       });
   };
+};
+
+export const refreshToken = user => {
+  return getFCMToken(user);
 };
 
 export const login = provider => {

@@ -7,6 +7,7 @@ import constants from '../constants';
 // eslint-disable-next-line
 let database;
 let auth;
+let messaging;
 
 /**
  * Initializes our firebase instance. Called in App contructor.
@@ -25,6 +26,7 @@ export const init = authCallback => {
     firebase.initializeApp(config);
     database = firebase.database();
     auth = firebase.auth();
+    messaging = firebase.messaging();
 
     auth.onAuthStateChanged(user => {
       authCallback(user);
@@ -229,4 +231,39 @@ export const claimPassInDB = passId => {
     .ref(`/passes/${passId}`)
     .update({ isUsed: true })
     .catch(console.error);
+};
+
+export const getFCMToken = user => {
+  // Get Instance ID token. Initially this makes a network call, once retrieved
+  // subsequent calls to getToken will return from cache.
+  messaging
+    .getToken()
+    .then(currentToken => {
+      if (currentToken) {
+        console.log('successfully registered fcm token.');
+        database.ref(`/users/${user.id}`).update({ fcmToken: currentToken });
+        return { ...user, fcmToken: currentToken };
+      } else {
+        // Show permission request.
+        console.log(
+          'No Instance ID token available. Request permission to generate one.'
+        );
+        // Show permission UI.
+        return messaging
+          .requestPermission()
+          .then(_ => {
+            console.log('Notification permission granted.');
+            // TODO(developer): Retrieve an Instance ID token for use with FCM.
+            return getFCMToken(user.id); //this could not possibly leed to an infinite loop.
+          })
+          .catch(err => {
+            console.log('Unable to get permission to notify.', err);
+            return user;
+          });
+      }
+    })
+    .catch(err => {
+      console.log('An error occurred while retrieving token. ', err);
+      return user;
+    });
 };
