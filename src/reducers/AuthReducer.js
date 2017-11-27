@@ -45,6 +45,10 @@ export default (state = initialState, action) => {
       return { ...initialState, showLoginModal: false };
     }
 
+    case actionType.REFRESH_TOKEN_FULFILLED: {
+      return { ...initialState, userObject: action.payload };
+    }
+
     default:
       return state;
   }

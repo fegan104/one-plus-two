@@ -40,6 +40,18 @@ class CreateEvent extends Component {
     this.setState(delta);
   };
 
+  handleDateChange = (event, date) => {
+    this.setState({
+      date: date
+    });
+  };
+
+  handleTimeChange = (event, time) => {
+    this.setState({
+      time: time
+    });
+  };
+
   handleCreateEvent = () => {
     let { user, addEvent } = this.props;
 
@@ -133,7 +145,7 @@ class CreateEvent extends Component {
                 fullWidth={true}
                 hintText="Pick a day"
                 value={this.state.date}
-                onChange={this.handleTextChange.bind(null, 'date')}
+                onChange={this.handleDateChange}
               />
             }
           />
@@ -144,7 +156,7 @@ class CreateEvent extends Component {
                 fullWidth={true}
                 hintText="Pick a time"
                 value={this.state.time}
-                onChange={this.handleTextChange.bind(null, 'time')}
+                onChange={this.handleTimeChange}
               />
             }
           />

@@ -14,16 +14,16 @@ export default ({
   ...rest
 }) => ({
   id: id || null,
-  desc: desc || null,
-  guestLimit: guestLimit || null,
-  spotsLeft: spotsLeft || null,
+  desc: desc || '',
+  guestLimit: guestLimit || 1,
+  spotsLeft: spotsLeft || 1,
   isSelfEnrollable: isSelfEnrollable || false,
   canBringXPeople: canBringXPeople || 1,
-  location: location || null,
+  location: location || '',
   newsFeed: [], // TODO
-  owners: owners || [],
-  picture: picture || null,
-  stats: stats || null,
-  title: title || null,
-  dateTime: dateTime || null
+  owners: owners || {},
+  picture: picture || '',
+  stats: stats || {},
+  title: title || '',
+  dateTime: dateTime || ''
 });
