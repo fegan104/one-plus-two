@@ -30,7 +30,15 @@ class CreateEvent extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      title: '',
+      desc: '',
+      location: '',
+      guestLimit: 0,
+      date: '',
+      time: '',
+      picture: ''
+    };
   }
 
   handleTextChange = (field, event) => {
@@ -38,6 +46,18 @@ class CreateEvent extends Component {
     delta[field] = event.target.value;
 
     this.setState(delta);
+  };
+
+  handleDateChange = (event, date) => {
+    this.setState({
+      date: date
+    });
+  };
+
+  handleTimeChange = (event, time) => {
+    this.setState({
+      time: time
+    });
   };
 
   handleCreateEvent = () => {
@@ -133,7 +153,7 @@ class CreateEvent extends Component {
                 fullWidth={true}
                 hintText="Pick a day"
                 value={this.state.date}
-                onChange={this.handleTextChange.bind(null, 'date')}
+                onChange={this.handleDateChange}
               />
             }
           />
@@ -144,7 +164,7 @@ class CreateEvent extends Component {
                 fullWidth={true}
                 hintText="Pick a time"
                 value={this.state.time}
-                onChange={this.handleTextChange.bind(null, 'time')}
+                onChange={this.handleTimeChange}
               />
             }
           />

@@ -28,6 +28,7 @@ export const loadEvents = eventIds => {
 };
 
 export const addEvent = event => {
+  console.log('event:', event);
   return dispatch => {
     return {
       type: actionType.ADD_EVENT,
