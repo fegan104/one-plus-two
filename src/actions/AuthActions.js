@@ -42,7 +42,10 @@ export const authStateChange = user => {
 };
 
 export const refreshToken = user => {
-  return getFCMToken(user);
+  return {
+    type: actionType.REFRESH_TOKEN,
+    payload: getFCMToken(user)
+  };
 };
 
 export const login = provider => {
