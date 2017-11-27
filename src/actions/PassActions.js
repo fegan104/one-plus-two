@@ -1,10 +1,20 @@
 import actionType from '../constants';
+import { push } from 'react-router-redux';
 
-import { exchangeInviteForPass } from '../services/FirebaseService';
+import { acceptInviteInDB } from '../services/FirebaseService';
 
-export const claimInvite = (invite, event, userId) => {
-  return {
-    type: actionType.EXCHANGE_INVITE,
-    payload: exchangeInviteForPass(invite, event, userId)
+export const acceptInvite = (inviteId, eventId, userId) => {
+  return dispatch => {
+    return {
+      type: actionType.ACCEPT_INVITE,
+      payload: acceptInviteInDB(inviteId, eventId, userId)
+        .then(passObj => {
+          dispatch(push(`/event/${eventId}`));
+          return passObj;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    };
   };
 };

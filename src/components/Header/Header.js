@@ -12,7 +12,11 @@ import BackIcon from 'material-ui/svg-icons/navigation/chevron-left';
 
 import LoginDialog from '../Dialogs/LoginDialog';
 
-import { signOut } from '../../actions/AuthActions';
+import {
+  signOut,
+  showLoginModal,
+  hideLoginModal
+} from '../../actions/AuthActions';
 
 const Logged = props => (
   <IconMenu
@@ -31,14 +35,6 @@ const Logged = props => (
 Logged.muiName = 'IconMenu';
 
 class Header extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showLoginModal: false,
-      navigate: false
-    };
-  }
-
   componentDidMount = () => {
     this.updateDocumentTitle();
   };
@@ -54,15 +50,16 @@ class Header extends Component {
   };
 
   handleLogin = () => {
-    this.setState({ showLoginModal: true });
+    this.props.showLoginModal();
   };
 
   handleCloseLoginModal = () => {
-    this.setState({ showLoginModal: false });
+    this.props.hideLoginModal();
   };
 
   render() {
     let { headerTitle, backButton } = this.props.header;
+    let { isModalOpened } = this.props;
 
     let rightButton = this.props.loggedIn ? (
       <Logged signOut={this.props.signOut} />
@@ -85,7 +82,7 @@ class Header extends Component {
     return (
       <div>
         <LoginDialog
-          show={this.state.showLoginModal}
+          show={isModalOpened}
           onClose={this.handleCloseLoginModal}
         />
         <AppBar
@@ -101,8 +98,13 @@ class Header extends Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     loggedIn: state.auth.loggedIn,
-    header: state.header
+    header: state.header,
+    isModalOpened: state.auth.showLoginModal
   };
 };
 
-export default connect(mapStateToProps, { signOut })(Header);
+export default connect(mapStateToProps, {
+  signOut,
+  showLoginModal,
+  hideLoginModal
+})(Header);

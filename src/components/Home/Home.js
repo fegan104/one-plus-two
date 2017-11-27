@@ -34,7 +34,7 @@ class Home extends Component {
           </div>
         </div>
 
-        <Link to="/create">
+        <Link to="/events/new">
           <RaisedButton
             className="Home-button"
             label="Host an event"
@@ -42,7 +42,7 @@ class Home extends Component {
           />
         </Link>
         <br />
-        <Link to="/list">All Events</Link>
+        <Link to="/events">All Events</Link>
       </div>
     );
   }

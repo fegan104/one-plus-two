@@ -32,34 +32,33 @@ export const init = authCallback => {
   }
 };
 
-/**
- * Returns a Promise to an array of EventModels from firebase.
- */
-export const getEventsDB = userId => {
+export const getUserData = userId => {
   return new Promise((resolve, reject) => {
-    if (!userId) {
-      reject('No user');
-    }
-
     database
-      .ref(`/users/${userId}/events`)
+      .ref(`/users/${userId}`)
       .once('value')
-      .then(req => {
-        let dbObj = req.val();
-        let events = [];
-
-        if (dbObj) {
-          events = Object.keys(dbObj).map(id => {
-            return getEventFromDB(id);
-          });
+      .then(dbObj => {
+        if (!dbObj) {
+          return resolve({});
         }
 
-        return resolve(Promise.all(events));
+        return resolve(dbObj.val());
       })
       .catch(error => {
         reject(error);
       });
   });
+};
+
+/**
+ * Returns a Promise to an array of EventModels from firebase.
+ */
+export const getEventsDB = eventIds => {
+  return Promise.all(
+    eventIds.map(id => {
+      return getEventFromDB(id);
+    })
+  );
 };
 
 /**
@@ -94,16 +93,20 @@ export const getEventFromDB = eventId => {
  * @returns a promise to an event model.
  */
 export const pushEventToDB = newEvent => {
+  console.log(newEvent);
   return new Promise((resolve, reject) => {
     database
       .ref('/events')
       .push(newEvent)
       .then(push => push.once('value'))
-      .then(snap => {
-        console.log('qqq', snap);
-        let obj = snap.val();
-        obj['id'] = snap.key;
-        return resolve(obj);
+      .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
+
+        let event = EventModel({ id: dbObj.key, ...dbObj.val() });
+
+        return resolve(event);
       })
       .catch(error => {
         reject(error);
@@ -111,10 +114,6 @@ export const pushEventToDB = newEvent => {
   });
 };
 
-/**
- * Returns a promise to an InvviteModel of the requested invite.
- * @param {string} inviteId the pushId we want to request.
- */
 export const getInviteFromDB = inviteId => {
   return new Promise((resolve, reject) => {
     database
@@ -135,183 +134,71 @@ export const getInviteFromDB = inviteId => {
   });
 };
 
-/**
- * When you push an invite to firebase you use up one of your 
- * invites left (unless you're an owner or the guest limit is reached),
- * and you get a link to the invite that can then be shared to anyone. This is also where
- * self enrollment can be done. TODO maybe make this a cloud function.
- * @param {Invite} newInvite 
- * @param userId of the inviter
- */
-export const pushInviteToDB = async (newInvite, event, userId) => {
-  /*
+export const getInviteInfoFromCloudFunction = inviteId => {
+  return new Promise((resolve, reject) => {
+    let endpoint = `${process.env
+      .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
 
-  // check if owner
-  const isOwnerPromise = database
-    .ref(`/events/${event.id}/owners`)
-    .once('value')
-    .then(snap => snap.val())
-    .then(owners => owners[userId])
-    .catch(err => {
-      console.error(err);
-      return false;
-    });
-
-  //Get a promise to the user's pass for the event
-  const userPassPromise = database
-    .ref('/')
-    .child('passes')
-    .orderByChild('user')
-    .equalTo(userId)
-    .once('value')
-    .then(snap => snap.val())
-    .then(passes => {
-      if (!passes) {
-        return null;
-      }
-
-      return Object.keys(passes)
-        .map(k => {
-          passes[k]['id'] = k;
-          return passes[k];
-        })
-        .filter(p => p.event === event.id);
-    })
-    .then(f => f && f[0])
-    .catch(err => {
-      console.error(err);
-      return null;
-    });
-
-  let [isOwner, userPass] = await Promise.all([
-    isOwnerPromise,
-    userPassPromise
-  ]);
-  console.log('userPass:', userPass);
-
-  //If you aren't an owner and don't have invites left reject
-  if (!isOwner && !(userPass && userPass.additionalInvitesLeft > 0)) {
-    return Promise.reject("You don't have invites left.");
-  }
-  //Check if there have already been to many passes given out for the event
-  const numberOfEventPasses = await database
-    .ref('passes')
-    .orderByChild('event')
-    .equalTo(`${newInvite.event}`)
-    .once('value')
-    .then(snap => {
-      if (snap.val()) {
-        return Object.keys(snap.val()).length;
-      }
-      return 0;
-    });
-  //guest limit reached
-  if (numberOfEventPasses >= event.guestLimit) {
-    return Promise.reject('Event is full.');
-  }
-  //We are good to add the invite and decrement the sharer's additionInvitesLeft
-  if (!isOwner) {
-    await database
-      .ref(`/passes/${userPass.id}/additionalInvitesLeft`)
-      .transaction(left => {
-        return (left || 0) - 1;
-      });
-  }
-
-
-
-  */
-
-  return database
-    .ref('/invites')
-    .push({
-      ...newInvite
-    })
-    .then(push => push.once('value'))
-    .then(snap => {
-      let invite = InviteModel({ id: snap.key, ...snap.val() });
-      invite.eventId = snap.val().event;
-      invite = invite.setEvent(newInvite);
-      return invite;
-    });
-};
-
-/**
- * Pushes a new PassModel to /passes.
- * @param {PassModel} newPass a PassModel.
- */
-const pushPassToDB = newPass => {
-  return database
-    .ref('passes')
-    .push(newPass)
-    .then(pass => pass.once('value'))
-    .then(snap =>
-      PassModel({
-        id: snap.key,
-        ...snap.val()
+    fetch(endpoint, { headers: { 'Content-Type': 'application/json' } })
+      .then(res => res.json())
+      .then(json => {
+        let invite = InviteModel({ ...json, event: json.event.id });
+        resolve(invite.setEvent(json.event));
       })
-    );
+      .catch(error => {
+        reject(error);
+      });
+  });
 };
 
-//TODO change to be a firebase function
-/**
- * This fucntion returns a promise to a valid pass (if the invite was valid).
- * We check if the user already has a pass for the event if they do we get that one.
- * If they don't we use the invite and push that new pass to the db
- * 
- * @param invite The invite that we want to exchange for a pass.
- * @returns PassModel
- */
-export const exchangeInviteForPass = async (invite, event, userId) => {
-  //Lets check if the user already has a pass for the event
-  const usersPass = await database
-    .ref('/')
-    .child('passes')
-    .orderByChild('user')
-    .equalTo(`${userId}`)
-    .once('value')
-    .then(snap => snap.val())
-    .then(passes => {
-      if (!passes) {
-        return null;
-      }
+export const generateInviteCloudFunction = eventId => {
+  return new Promise((resolve, reject) => {
+    auth.currentUser.getToken().then(token => {
+      let endpoint = `${process.env
+        .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/generateNewInvite?eventId=${eventId}`;
 
-      return Object.keys(passes)
-        .map(k => {
-          passes[k]['id'] = k;
-          return passes[k];
+      fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+        //mode: 'no-cors'
+      })
+        .then(res => res.json())
+        .then(json => {
+          let invite = InviteModel({ ...json, event: json.event.id });
+          resolve(invite.setEvent(json.event));
         })
-        .filter(p => p.event === event.id);
-    })
-    .then(f => (f ? f[0] : null));
-  console.log('userPass:', usersPass);
+        .catch(error => {
+          reject(error);
+        });
+    });
+  });
+};
 
-  //return the user's pass
-  if (usersPass) {
-    return Promise.resolve(usersPass);
-  }
-  if (!invite) {
-    return Promise.reject('Invite needed.');
-  }
-  //User doesn't have a pass lets check if we can even give them one
-  const isUsed = await database
-    .ref(`invites/${invite.id}/isUsed`)
-    .once('value')
-    .then(snap => snap.val());
+export const acceptInviteInDB = (inviteId, eventId, userId) => {
+  return new Promise((resolve, reject) => {
+    database
+      .ref(`/invites/${inviteId}`)
+      .update({ claimedByUser: userId })
+      .then(dbObj => {
+        if (!dbObj) {
+          return resolve(null);
+        }
 
-  //if invite is used reject
-  if (isUsed) {
-    return Promise.reject('Invite already used');
-  }
-  //use invite
-  await database.ref(`invites/${invite.id}`).update({ isUsed: true });
-  //The invite is valid lets get a new pass
-  return pushPassToDB({
-    desc: event.desc,
-    isUsed: false,
-    additionalInvitesLeft: 2,
-    user: userId,
-    event: event.id
+        database
+          .ref(`/users/${userId}/events/${eventId}/pass`)
+          .once('child_changed')
+          .then(snap => {
+            return resolve(PassModel({ id: snap.key, ...snap.val() }));
+          })
+          .catch(error => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
   });
 };
 
@@ -334,10 +221,10 @@ export const signOutViaFirebase = () => {
 };
 
 export const claimPassInDB = passId => {
-  console.log('claiming pass:', passId);
   if (!passId) {
     return Promise.reject(console.error);
   }
+
   return database
     .ref(`/passes/${passId}`)
     .update({ isUsed: true })

@@ -5,7 +5,7 @@ import actionType from '../constants';
  */
 export default (state = {}, action) => {
   switch (action.type) {
-    case actionType.EXCHANGE_INVITE_FULFILLED: {
+    case actionType.ACCEPT_INVITE_FULFILLED: {
       return action.payload;
     }
     default:

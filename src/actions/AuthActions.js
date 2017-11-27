@@ -1,13 +1,42 @@
 import actionType from '../constants';
 import {
   loginViaFirebase,
-  signOutViaFirebase
+  signOutViaFirebase,
+  getUserData
 } from '../services/FirebaseService';
 
-export const authStateChange = user => {
+export const showLoginModal = () => {
   return {
-    type: actionType.AUTH_STATE_CHANGE,
-    payload: user
+    type: actionType.SHOW_LOGIN_MODAL
+  };
+};
+
+export const hideLoginModal = () => {
+  return {
+    type: actionType.HIDE_LOGIN_MODAL
+  };
+};
+
+export const authStateChange = user => {
+  return dispatch => {
+    dispatch({
+      type: actionType.AUTH_STATE_CHANGE,
+      payload: user
+    });
+
+    getUserData(user.id)
+      .then(data => {
+        dispatch({
+          type: actionType.GET_USER_DATA_SUCCESS,
+          payload: user.setEvents(data.events)
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionType.GET_USER_DATA_FAILED,
+          payload: error
+        });
+      });
   };
 };
 

@@ -1,32 +1,30 @@
 import React from 'react';
 import './EventDetail.css';
 import { connect } from 'react-redux';
-import queryString from 'query-string';
 
 import { getEvent } from '../../actions/EventsActions';
-import { addInvite, getInvite } from '../../actions/InvitesActions';
-import { claimInvite } from '../../actions/PassActions';
+import { getInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
-
-// import _ from 'lodash';
-import QRCode from 'qrcode.react';
 
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
+
 import Dialog from 'material-ui/Dialog';
+import ShowPassDialog from '../Dialogs/ShowPassDialog';
+import InviteMorePeopleDialog from '../Dialogs/InviteMorePeopleDialog';
+
 import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import { push } from 'react-router-redux';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+
+import Loader from '../Common/Loader';
 
 /**
  * Displays details about the events specified in the route's id. 
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
-  //store just a little state to open 3 dialogs
-  state = {};
   constructor(props) {
     super(props);
     this.state = {
@@ -36,22 +34,8 @@ class EventDetail extends React.Component {
     };
   }
 
-  /**
-   * Open share dialog and generate an invitation link.
-   */
   openShare = () => {
     this.setState({ shareOpen: true });
-    let { event, user } = this.props;
-    if (event && user) {
-      this.props.addInvite(
-        {
-          event: event.id,
-          isUsed: false
-        },
-        event,
-        user.id
-      );
-    }
   };
 
   closeShare = () => {
@@ -75,119 +59,117 @@ class EventDetail extends React.Component {
   };
 
   componentDidMount() {
-    const { eventId, inviteId } = this.props;
-    console.log('props', this.props);
-    //we always have an event
+    const { eventId } = this.props;
     this.props.getEvent(eventId);
-    //We may not have an invite
-    if (inviteId) {
-      this.props.getInvite(inviteId);
-    }
 
-    this.configureAppHeader();
-  }
-
-  componentDidUpdate() {
     this.configureAppHeader();
   }
 
   componentWillReceiveProps(nextProps) {
-    //const { invite, user, event, pass } = nextProps;
-    //const valid = pass && Object.keys(pass).length > 0;
-    //if (user && event && !valid) {
-    //this.props.claimInvite(invite, event, user.id); // Don't claim this here
-    //}
+    let { event, user } = nextProps;
+
+    if (event) {
+      this.configureAppHeader(nextProps);
+    }
+
+    if (
+      user &&
+      user.events &&
+      !this.props.invite &&
+      user.events[event.id] &&
+      user.events[event.id].invite
+    ) {
+      this.props.getInvite(user.events[event.id].invite);
+    }
   }
 
-  configureAppHeader = () => {
-    let { event } = this.props;
+  configureAppHeader = (nextProps = this.props) => {
+    let { event } = nextProps;
 
     this.props.setHeader({
       pageTitle: event && event.title,
       headerTitle: event && event.title,
-      backButton: '/list'
+      backButton: '/events'
     });
   };
 
   render() {
-    let { event, inviteLink, pass } = this.props;
-    let view = null;
-    if (event && pass) {
-      const shareActions = [
-        <FlatButton label="Close" primary={true} onClick={this.closeShare} />,
-        <CopyToClipboard text={inviteLink}>
-          <FlatButton label="Copy" primary={true} onClick={this.closeShare} />
-        </CopyToClipboard>
-      ];
-      const sendActions = [
-        <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
-        <FlatButton label="Send" primary={true} onClick={this.closeSend} />
-      ];
-      const showPassActions = [
-        <FlatButton label="Cancel" primary={true} onClick={this.closePass} />
-      ];
-      view = (
-        <div>
-          {/* The event info card */}
-          <EventCard
-            event={event}
-            openInvite={this.openShare}
-            openSend={this.openSend}
-            showPass={this.openPass}
-          />
+    let { event, pass, user, invite } = this.props;
 
-          {/* invite share dialog */}
-          <Dialog
-            title="Your invite link"
-            actions={shareActions}
-            modal={false}
-            open={this.state.shareOpen}
-            onRequestClose={this.closeShare}
-          >
-            <div>{inviteLink}</div>
-          </Dialog>
-
-          {/* Messaging dialog */}
-          <Dialog
-            title="Compose message"
-            actions={sendActions}
-            modal={false}
-            open={this.state.sendOpen}
-            onRequestClose={this.closeSend}
-          >
-            <TextField
-              name="message-field"
-              label="Message Text"
-              multiLine={true}
-            />
-          </Dialog>
-
-          {/* {this.renderQRCode(pass)} */}
-          {/* Pass dialog */}
-          <Dialog
-            title="This is your pass to the event:"
-            actions={showPassActions}
-            modal={false}
-            open={this.state.passOpen}
-            onRequestClose={this.closePass}
-          >
-            <QRCode value={pass.id || 'error'} size={256} />
-          </Dialog>
-
-          <Fab
-            className="fab"
-            secondary={true}
-            onClick={_ => this.props.push(`/scanner/${event.id}`)}
-          >
-            <CropFree style={{ fill: '#000' }} />
-          </Fab>
-        </div>
-      );
-    } else {
-      view = <h1>loading...</h1>;
+    if (!event || !user || user.events === null) {
+      return <Loader />;
     }
 
-    return <div className="EventDetail">{view}</div>;
+    let isOwner =
+      user.events &&
+      user.events[event.id] &&
+      user.events[event.id].isOwner === true;
+    let canInviteMore =
+      (event.spotsLeft === null || event.spotsLeft > 0) &&
+      (isOwner || (invite && invite.additionalInvitesLeft > 0));
+
+    const sendActions = [
+      <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
+      <FlatButton label="Send" primary={true} onClick={this.closeSend} />
+    ];
+
+    const scanButton = (
+      <Fab
+        className="fab"
+        secondary={true}
+        onClick={_ => this.props.push(`/event/${event.id}/scanner`)}
+      >
+        <CropFree style={{ fill: '#000' }} />
+      </Fab>
+    );
+
+    return (
+      <div className="EventDetail">
+        <EventCard event={event}>
+          {isOwner ? (
+            <FlatButton label="Send Message" onClick={this.openSend} />
+          ) : null}
+          {canInviteMore ? (
+            <FlatButton label="Invite More People" onClick={this.openShare} />
+          ) : (
+            <FlatButton label="Cannot Invite More People" disabled={true} />
+          )}
+          <FlatButton label="Show Pass" onClick={this.openPass} />
+        </EventCard>
+
+        {canInviteMore ? (
+          <InviteMorePeopleDialog
+            event={event}
+            show={this.state.shareOpen}
+            onClose={this.closeShare}
+          />
+        ) : null}
+
+        <Dialog
+          title="Compose message"
+          actions={sendActions}
+          modal={false}
+          open={this.state.sendOpen}
+          onRequestClose={this.closeSend}
+        >
+          <TextField
+            name="message-field"
+            label="Message Text"
+            multiLine={true}
+          />
+        </Dialog>
+
+        {pass ? (
+          <ShowPassDialog
+            pass={pass}
+            show={this.state.passOpen}
+            onClose={this.closePass}
+          />
+        ) : null}
+
+        {isOwner ? scanButton : null}
+      </div>
+    );
   }
 }
 
@@ -205,20 +187,16 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     event,
-    inviteLink: state.inviteLink,
-    invite: state.invite,
-    inviteId: queryString.parse(ownProps.location.search).invite,
     eventId,
     user: state.auth.userObject,
-    pass: state.pass
+    pass: state.pass,
+    invite: state.invite
   };
 };
 
 export default connect(mapStateToProps, {
   getEvent,
   push,
-  addInvite,
   getInvite,
-  claimInvite,
   setHeader
 })(EventDetail);

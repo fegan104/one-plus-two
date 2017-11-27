@@ -6,7 +6,7 @@ import actionType from '../constants';
  */
 export default (state = '', action) => {
   switch (action.type) {
-    case actionType.ADD_INVITE_FULFILLED: {
+    case actionType.GENERATE_NEW_INVITE_FULFILLED: {
       return action.payload;
     }
 

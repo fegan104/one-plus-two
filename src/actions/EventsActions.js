@@ -6,12 +6,12 @@ import {
 import actionType from '../constants';
 import { push } from 'react-router-redux';
 
-export const loadEvents = userId => {
+export const loadEvents = eventIds => {
   return dispatch => {
     dispatch({
       type: actionType.LOAD_EVENTS_REQUEST
     });
-    getEventsDB(userId)
+    getEventsDB(eventIds)
       .then(events => {
         dispatch({
           type: actionType.LOAD_EVENTS_SUCCESS,
@@ -27,53 +27,13 @@ export const loadEvents = userId => {
   };
 };
 
-/**
- * This action can be dispatched where the reducer will then
- * add the event to the store.
- * @param {string} name 
- * @param {string} location 
- * @param {string} desc 
- * @param {DateTime} date 
- * @param {int} guestLimit 
- * @param {string} owner 
- * @param {boolean} isSelfEnrollable 
- */
-export const addEvent = ({
-  title,
-  location,
-  desc,
-  date,
-  time,
-  guestLimit,
-  picture,
-  owner,
-  isSelfEnrollable,
-  ...rest
-}) => {
-  //We need to combine the selected day and the
-  //selected time into one date time
-  const selectedTime = new Date(time);
-  const dateTime = new Date(date);
-  dateTime.setHours(selectedTime.getHours());
-  dateTime.setMinutes(selectedTime.getMinutes());
+export const addEvent = event => {
   return dispatch => {
-    let owners = {};
-    owners[owner] = true;
-
     return {
       type: actionType.ADD_EVENT,
-      payload: pushEventToDB({
-        title,
-        location,
-        desc,
-        dateTime: dateTime.toUTCString(),
-        guestLimit,
-        picture,
-        owners,
-        isSelfEnrollable
-      })
+      payload: pushEventToDB(event)
         .then(newEvent => {
-          dispatch(push(`/event/${newEvent.id}`));
+          dispatch(push(`/event/${newEvent.id}`)); //TODO: actions should not do routing
           return newEvent;
         })
         .catch(error => {

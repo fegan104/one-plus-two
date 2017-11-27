@@ -9,6 +9,10 @@ export default (state = {}, action) => {
       return action.payload;
     }
 
+    case actionType.GET_INVITE_SUCCESS_EMPTY_EVENT_INFO: {
+      return action.payload;
+    }
+
     default:
       return state;
   }

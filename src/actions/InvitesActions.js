@@ -1,7 +1,7 @@
 import {
   getInviteFromDB,
-  getEventFromDB,
-  pushInviteToDB
+  generateInviteCloudFunction,
+  getInviteInfoFromCloudFunction
 } from '../services/FirebaseService';
 import actionType from '../constants';
 
@@ -17,20 +17,28 @@ export const getInvite = id => {
           type: actionType.GET_INVITE_SUCCESS_EMPTY_EVENT_INFO,
           payload: invite
         });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionType.GET_INVITE_FAILED,
+          payload: error
+        });
+      });
+  };
+};
 
-        getEventFromDB(invite.eventId)
-          .then(event => {
-            dispatch({
-              type: actionType.GET_INVITE_SUCCESS,
-              payload: invite.setEvent(event)
-            });
-          })
-          .catch(error => {
-            dispatch({
-              type: actionType.GET_INVITE_FAILED,
-              payload: error
-            });
-          });
+export const getInviteInfoWithoutPermissions = id => {
+  return dispatch => {
+    dispatch({
+      type: actionType.GET_INVITE_REQUEST
+    });
+
+    getInviteInfoFromCloudFunction(id)
+      .then(invite => {
+        dispatch({
+          type: actionType.GET_INVITE_SUCCESS,
+          payload: invite
+        });
       })
       .catch(error => {
         dispatch({
@@ -47,11 +55,11 @@ export const getInvite = id => {
  * @param event We use this for convenience
  * @param userId The user id of the inviter
  */
-export const addInvite = (newInvite, event, userId) => {
+export const generateNewInvite = event => {
   return {
-    type: actionType.ADD_INVITE,
-    payload: pushInviteToDB(newInvite, event, userId).then(val => {
-      let inviteLink = `https://www.one-plus-two.com/event/${val.eventId}?invite=${val.id}`;
+    type: actionType.GENERATE_NEW_INVITE,
+    payload: generateInviteCloudFunction(event).then(val => {
+      let inviteLink = `https://www.one-plus-two.com/invite/${val.id}`;
       return inviteLink;
     })
   };

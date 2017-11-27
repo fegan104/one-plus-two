@@ -24,12 +24,44 @@ import { connect } from 'react-redux';
 import { addEvent } from '../../actions/EventsActions';
 import { setHeader } from '../../actions/HeaderActions';
 
+import EventModel from '../../models/EventModel';
+
 class CreateEvent extends Component {
-  componentDidMount() {
-    this.configureAppHeader();
+  constructor(props) {
+    super(props);
+
+    this.state = {};
   }
 
-  componentDidUpdate() {
+  handleTextChange = (field, event) => {
+    let delta = {};
+    delta[field] = event.target.value;
+
+    this.setState(delta);
+  };
+
+  handleCreateEvent = () => {
+    let { user, addEvent } = this.props;
+
+    let owners = {};
+    owners[user.id] = true;
+
+    let selectedTime = new Date(this.state.time);
+    let dateTime = new Date(this.state.date);
+    dateTime.setHours(selectedTime.getHours());
+    dateTime.setMinutes(selectedTime.getMinutes());
+
+    addEvent(
+      EventModel({
+        ...this.state,
+        dateTime: dateTime.toUTCString(),
+        owners,
+        isSelfEnrollable: false
+      })
+    );
+  };
+
+  componentDidMount() {
     this.configureAppHeader();
   }
 
@@ -42,16 +74,6 @@ class CreateEvent extends Component {
   };
 
   render() {
-    let { addEvent, user } = this.props;
-
-    let titleInput,
-      locationInput,
-      descInput,
-      dateInput,
-      timeInput,
-      maxGuestsInput,
-      photoInput;
-
     return (
       <div>
         <List className="CreateEvent-list">
@@ -61,9 +83,8 @@ class CreateEvent extends Component {
               <TextField
                 floatingLabelText="Event Title"
                 fullWidth={true}
-                ref={node => {
-                  node && (titleInput = node.input);
-                }}
+                value={this.state.title}
+                onChange={this.handleTextChange.bind(null, 'title')}
               />
             }
           />
@@ -77,9 +98,8 @@ class CreateEvent extends Component {
                 fullWidth={true}
                 multiLine={true}
                 rows={2}
-                ref={node => {
-                  node && (descInput = node.input.refs.input);
-                }}
+                value={this.state.desc}
+                onChange={this.handleTextChange.bind(null, 'desc')}
               />
             }
           />
@@ -89,9 +109,8 @@ class CreateEvent extends Component {
               <TextField
                 fullWidth={true}
                 floatingLabelText="Location"
-                ref={node => {
-                  node && (locationInput = node.input);
-                }}
+                value={this.state.location}
+                onChange={this.handleTextChange.bind(null, 'location')}
               />
             }
           />
@@ -102,9 +121,8 @@ class CreateEvent extends Component {
                 floatingLabelText="Max guests"
                 fullWidth={true}
                 type="number"
-                ref={node => {
-                  node && (maxGuestsInput = node.input);
-                }}
+                value={this.state.guestLimit}
+                onChange={this.handleTextChange.bind(null, 'guestLimit')}
               />
             }
           />
@@ -114,9 +132,8 @@ class CreateEvent extends Component {
               <DatePicker
                 fullWidth={true}
                 hintText="Pick a day"
-                ref={node => {
-                  node && (dateInput = node);
-                }}
+                value={this.state.date}
+                onChange={this.handleTextChange.bind(null, 'date')}
               />
             }
           />
@@ -126,9 +143,8 @@ class CreateEvent extends Component {
               <TimePicker
                 fullWidth={true}
                 hintText="Pick a time"
-                ref={node => {
-                  node && (timeInput = node);
-                }}
+                value={this.state.time}
+                onChange={this.handleTextChange.bind(null, 'time')}
               />
             }
           />
@@ -138,9 +154,8 @@ class CreateEvent extends Component {
               <TextField
                 floatingLabelText="Link to event banner image"
                 fullWidth={true}
-                ref={node => {
-                  node && (photoInput = node.input);
-                }}
+                value={this.state.picture}
+                onChange={this.handleTextChange.bind(null, 'picture')}
               />
             }
           />
@@ -171,21 +186,7 @@ class CreateEvent extends Component {
           />
         </List>
 
-        <Fab
-          className="fab"
-          onClick={_ =>
-            addEvent({
-              title: titleInput.value,
-              location: locationInput.value,
-              desc: descInput.value,
-              date: dateInput.state.date,
-              time: timeInput.state.time,
-              guestLimit: maxGuestsInput.value,
-              picture: photoInput.value,
-              owner: user.id,
-              isSelfEnrollable: false
-            })}
-        >
+        <Fab className="fab" onClick={this.handleCreateEvent}>
           <DoneIcon />
         </Fab>
       </div>
