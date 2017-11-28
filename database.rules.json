@@ -32,6 +32,9 @@
     "users": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
+        "fcmToken":{
+          ".write":  "auth != null && auth.uid === $uid"
+        },
         "events": {
           "$event": {
             "invite": {
