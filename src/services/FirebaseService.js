@@ -28,7 +28,9 @@ export const init = authCallback => {
     database = firebase.database();
     auth = firebase.auth();
     messaging = firebase.messaging();
+  }
 
+  if (auth && authCallback) {
     auth.onAuthStateChanged(user => {
       authCallback(user);
     });
@@ -237,8 +239,14 @@ export const claimPassInDB = passId => {
 export const getFCMToken = user => {
   // Get Instance ID token. Initially this makes a network call, once retrieved
   // subsequent calls to getToken will return from cache.
-  messaging
-    .getToken()
+  console.log('user:', user);
+  return messaging
+    .requestPermission()
+    .then(_ => {
+      console.log('Notification permission granted.');
+      // TODO(developer): Retrieve an Instance ID token for use with FCM.
+      return messaging.getToken();
+    })
     .then(currentToken => {
       if (currentToken) {
         console.log('successfully registered fcm token.');
@@ -249,22 +257,11 @@ export const getFCMToken = user => {
         console.log(
           'No Instance ID token available. Request permission to generate one.'
         );
-        // Show permission UI.
-        return messaging
-          .requestPermission()
-          .then(_ => {
-            console.log('Notification permission granted.');
-            // TODO(developer): Retrieve an Instance ID token for use with FCM.
-            return getFCMToken(user.id); //this could not possibly leed to an infinite loop.
-          })
-          .catch(err => {
-            console.log('Unable to get permission to notify.', err);
-            return user;
-          });
+        return user;
       }
     })
     .catch(err => {
-      console.log('An error occurred while retrieving token. ', err);
+      console.log('Unable to get permission to notify.', err);
       return user;
     });
 };
