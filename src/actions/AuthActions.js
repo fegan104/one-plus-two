@@ -42,7 +42,6 @@ export const authStateChange = user => {
 };
 
 export const refreshToken = user => {
-  console.log('refreshing user:', user);
   return {
     type: actionType.REFRESH_TOKEN,
     payload: getFCMToken(user)

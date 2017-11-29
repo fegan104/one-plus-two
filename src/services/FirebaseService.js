@@ -239,17 +239,16 @@ export const claimPassInDB = passId => {
 export const getFCMToken = user => {
   // Get Instance ID token. Initially this makes a network call, once retrieved
   // subsequent calls to getToken will return from cache.
-  console.log('user:', user);
   return messaging
     .requestPermission()
     .then(_ => {
       console.log('Notification permission granted.');
-      // TODO(developer): Retrieve an Instance ID token for use with FCM.
+      // Retrieve an Instance ID token for use with FCM.
       return messaging.getToken();
     })
     .then(currentToken => {
       if (currentToken) {
-        console.log('successfully registered fcm token.');
+        console.log('successfully registered fcm token.', currentToken);
         database.ref(`/users/${user.id}`).update({ fcmToken: currentToken });
         return { ...user, fcmToken: currentToken };
       } else {

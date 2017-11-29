@@ -46,7 +46,7 @@ export default (state = initialState, action) => {
     }
 
     case actionType.REFRESH_TOKEN_FULFILLED: {
-      return { ...initialState, userObject: action.payload };
+      return { ...state, userObject: action.payload };
     }
 
     default:
