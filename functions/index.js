@@ -1,4 +1,4 @@
-import { event } from 'firebase-functions/lib/providers/analytics';
+// import { event } from 'firebase-functions/lib/providers/analytics';
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
