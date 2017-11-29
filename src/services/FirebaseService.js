@@ -249,7 +249,7 @@ export const getFCMToken = user => {
     })
     .then(currentToken => {
       if (currentToken) {
-        console.log('successfully registered fcm token.');
+        console.log('successfully registered fcm token.', currentToken);
         database.ref(`/users/${user.id}`).update({ fcmToken: currentToken });
         return { ...user, fcmToken: currentToken };
       } else {
