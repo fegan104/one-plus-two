@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import Home from './components/Home/Home';
 import CreateEvent from './components/Event/CreateEvent';
 import EventList from './components/Event/EventList';
