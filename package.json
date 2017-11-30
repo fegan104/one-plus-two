@@ -40,6 +40,7 @@
     "precommit": "lint-staged",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "eject": "react-scripts eject",
     "test": "react-scripts test --env=jsdom --forceExit",
     "deploy": "npm install -g firebase-tools && npm run build && cd functions && npm install && cd .. && firebase deploy --token $FIREBASE_DEPLOY_KEY"
   },
