@@ -7,12 +7,6 @@
 
 // To learn more about the benefits of this model, read https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
-import * as firebase from 'firebase/app';
-import '@firebase/messaging';
-import { init as firebaseInit } from './services/FirebaseService';
-firebaseInit(null);
-let messaging = firebase.messaging();
-
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -75,23 +69,6 @@ function registerValidSW(swUrl) {
         };
       };
       return registration;
-    })
-    .then(registration => {
-      messaging.useServiceWorker(registration);
-      messaging.setBackgroundMessageHandler(payload => {
-        console.log('[sw.js] Received background message ', payload);
-        // Customize notification here
-        const notificationTitle = 'Background Message Title';
-        const notificationOptions = {
-          body: 'Background Message body.',
-          icon: '/firebase-logo.png'
-        };
-
-        return registration.showNotification(
-          notificationTitle,
-          notificationOptions
-        );
-      });
     })
     .catch(error => {
       console.error('Error during service worker registration:', error);
