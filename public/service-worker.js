@@ -1,9 +1,9 @@
 // Import and configure the Firebase SDK
 // These scripts are made available when the app is served or deployed on Firebase Hosting
 // If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup
-const firebase = require('/__/firebase/4.6.2/firebase-app.js');
-require('/__/firebase/4.6.2/firebase-messaging.js');
-require('/__/firebase/init.js');
+importScript('/__/firebase/4.6.2/firebase-app.js');
+importScript('/__/firebase/4.6.2/firebase-messaging.js');
+importScript('/__/firebase/init.js');
 
 const messaging = firebase.messaging();
 
@@ -19,6 +19,7 @@ messaging.setBackgroundMessageHandler(payload => {
   };
 
   // eslint-disable-line no-restricted-globals
-  return self.registration.showNotification(notificationTitle,
-      notificationOptions);
+  return self
+    .registration
+    .showNotification(notificationTitle, notificationOptions);
 });
