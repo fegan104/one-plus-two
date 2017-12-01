@@ -29,6 +29,7 @@ export const init = authCallback => {
     auth = firebase.auth();
     messaging = firebase.messaging();
     messaging.onMessage(payload => {
+      console.log('message received.');
       new Notification('Firebase Title', { body: 'Firebase body' });
     });
   }
