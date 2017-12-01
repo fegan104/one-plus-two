@@ -13,13 +13,8 @@ const messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler(payload => {
   console.log('[service-worker.js] Received background message ', payload);
   // Customize notification here
-  const notificationTitle = 'Background Message Title';
-  const notificationOptions = {
-    body: 'Background Message body.'
-  };
+  const { title, body } = payload.notification;
 
   // eslint-disable-line no-restricted-globals
-  return self
-    .registration
-    .showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(title, { body });
 });
