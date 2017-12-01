@@ -70,7 +70,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
 	const text = snap.val().text;
 	const payload = {
 		notification: {
-			title: `${snapshot.val().title} posted ${text ? 'a message' : 'an image'}`,
+			title: `${snap.val().title} posted ${text ? 'a message' : 'an image'}`,
 			body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : ''
 		}
 	};
@@ -120,7 +120,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
  */
 exports.addUser = functions.auth.user().onCreate(event => {
 	let user = event.data;
-	return firebase.database.ref(`/users/${user.uid}`).update(user)
+	return admin.database.ref(`/users/${user.uid}`).update(user)
 })
 
 exports.updateEventOwners = functions.database.ref('/events/{eventId}/owners').onWrite(event => {
