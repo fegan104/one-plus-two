@@ -64,7 +64,7 @@ exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(ev
  * each user who has a pass for the event.
  */
 exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messageId}').onCreate(event => {
-  const { snap } = event.data;
+  const snap = event.data.val();
   //TODO add message contents to notification payload?
   const { eventId, messageId } = event.params;
 
@@ -95,7 +95,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
     })
     .then(_ => {
       // Notification details.
-      const text = snap.val().text;
+      const text = snap.text;
       const payload = {
         notification: {
           title: `New message in ${data.eventName}`,
@@ -128,7 +128,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
  * Triggers whenever a new user signs up and add them to the db.
  */
 exports.addUser = functions.auth.user().onCreate(event => {
-  let user = event.data;
+  let user = event.data.val();
   return admin.database.ref(`/users/${user.uid}`).update(user)
 })
 
