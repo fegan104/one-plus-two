@@ -78,6 +78,7 @@ function registerValidSW(swUrl) {
       return registration;
     })
     .then(registration => {
+      console.log('registered custom service worker.');
       messaging.useServiceWorker(registration);
       return registration;
     })
