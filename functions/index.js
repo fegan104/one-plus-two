@@ -66,7 +66,7 @@ exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(ev
 exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messageId}').onCreate(event => {
   const { snap } = event.data;
   //TODO add message contents to notification payload?
-  const { eventIdParam, messageIdParam } = event.params;
+  const { eventId, messageId } = event.params;
 
   //There is no way promise more than 1 value so we'll accumulate them here
   let data = {};
@@ -74,7 +74,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
   return admin.database().ref('/')
     .child('passes')
     .orderByChild(`event`)//query all passes for event
-    .equalTo(eventIdParam)
+    .equalTo(eventId)
     .once('value')
     .then(passes => Object.keys(passes).map(k => passes[k].user))
     .then(guests => {
@@ -88,7 +88,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
       const tokens = tokensSnap.map(s => s.val());
       data.tokens = tokens;
     })
-    .then(_ => admin.database.ref(`/events/${eventIdParam}`).val().title)
+    .then(_ => admin.database.ref(`/events/${eventId}`).val().title)
     .then(eventName => {
       data.eventName = eventName;
     })
