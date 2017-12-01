@@ -80,7 +80,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
     .then(guests => {
       let guestPromises = []
       guests.forEach(g => {
-        guestPromises.push(admin.database.ref(`/users/${g}`).child('fcmToken').once('value'));
+        guestPromises.push(admin.database().ref(`/users/${g}`).child('fcmToken').once('value'));
       });
       return Promise.all(guestPromises);
     })
@@ -88,7 +88,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
       const tokens = tokensSnap.map(s => s.val());
       data.tokens = tokens;
     })
-    .then(_ => admin.database.ref(`/events/${eventId}`).val().title)
+    .then(_ => admin.database().ref(`/events/${eventId}`).val().title)
     .then(eventName => {
       data.eventName = eventName;
     })
