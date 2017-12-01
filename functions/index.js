@@ -2,61 +2,61 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const cors = require('cors')({origin: true});
+const cors = require('cors')({ origin: true });
 
 admin.initializeApp(functions.config().firebase);
 
 exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(event => {
-	const userId = event.data.child('claimedByUser').val();
-	const eventId = event.data.child('event').val();
-	const isUsed = event.data.child('isUsed').val();
-	const rootDb = admin.database().ref()
+  const userId = event.data.child('claimedByUser').val();
+  const eventId = event.data.child('event').val();
+  const isUsed = event.data.child('isUsed').val();
+  const rootDb = admin.database().ref()
 
-	if (!userId || !eventId || isUsed) {
-		return;
-	}
+  if (!userId || !eventId || isUsed) {
+    return;
+  }
 
-	let passObj = {
-		user: userId,
-		event: eventId,
-		isUsed: false
-	};
+  let passObj = {
+    user: userId,
+    event: eventId,
+    isUsed: false
+  };
 
-	let otherTablesPromise = new Promise((resolve, reject) => {
-		rootDb
-			.child(`/users/${userId}/events/${eventId}/invite`)
-			.set(event.params.inviteId)
-			.then(req => {
-				rootDb
-					.child('passes')
-					.push(passObj)
-					.then(pass => pass.once('value'))
-					.then(snap => {
-						rootDb
-							.child(`/users/${userId}/events/${eventId}/pass`)
-							.set(snap.key)
-							.then(final => {
-								resolve(final);
-							})
-							.catch(error => {
-								reject(error);
-							});
-					})
-					.catch(error => {
-						reject(error);
-					});
-			})
-			.catch(error => {
-				reject(error);
-			});
-	});
+  let otherTablesPromise = new Promise((resolve, reject) => {
+    rootDb
+      .child(`/users/${userId}/events/${eventId}/invite`)
+      .set(event.params.inviteId)
+      .then(req => {
+        rootDb
+          .child('passes')
+          .push(passObj)
+          .then(pass => pass.once('value'))
+          .then(snap => {
+            rootDb
+              .child(`/users/${userId}/events/${eventId}/pass`)
+              .set(snap.key)
+              .then(final => {
+                resolve(final);
+              })
+              .catch(error => {
+                reject(error);
+              });
+          })
+          .catch(error => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 
-	let updateInvitePromise = event.data.ref.child('isUsed').set(true);
+  let updateInvitePromise = event.data.ref.child('isUsed').set(true);
 
-	return Promise.all([
-		otherTablesPromise,
-		updateInvitePromise
-	]);
+  return Promise.all([
+    otherTablesPromise,
+    updateInvitePromise
+  ]);
 });
 
 /**
@@ -64,54 +64,61 @@ exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(ev
  * each user who has a pass for the event.
  */
 exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messageId}').onCreate(event => {
-	const { snap } = event.data;
+  const { snap } = event.data;
+  const { eventIdParam, messageIdParam } = event.params;
 
-	// Notification details.
-	const text = snap.val().text;
-	const payload = {
-		notification: {
-			title: `${snap.val().title} posted ${text ? 'a message' : 'an image'}`,
-			body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : ''
-		}
-	};
 
-	// Get the list of device tokens.
-	return admin.database().ref('/')
-		.child('passes')
-		.orderByChild(`event`)//query all passes for event
-		.equalTo(event.params.eventId)
-		.once('value')
-		.then(passes => Object.keys(passes).map(k => passes[k].user))
-		.then(guests => {
-			let guestPromises = []
-			guests.forEach(g => {
-				guestPromises.push(admin.database.ref(`/users/${g}`).child('fcmToken').once('value'));
-			});
-			return Promise.all(guestPromises);
-		})
-		.then(tokensSnap => {
-			if (tokensSnap) {
-				const tokens = tokensSnap.map(s => s.val())
-				// Send notifications to all tokens.
-				return admin.messaging().sendToDevice(tokens, payload).then(response => {
-					// For each message check if there was an error.
-					const tokensToRemove = [];
-					response.results.forEach((result, index) => {
-						const error = result.error;
-						if (error) {
-							console.error('Failure sending notification to', tokens[index], error);
-							// Cleanup the tokens who are not registered anymore.
-							if (error.code === 'messaging/invalid-registration-token' ||
-								error.code === 'messaging/registration-token-not-registered') {
-								// tokensToRemove.push(allTokens.ref.child(tokens[index]).remove());
-								//TODO remove invalid tokens
-							}
-						}
-					});
-					return Promise.all(tokensToRemove);
-				});
-			}
-		});
+  let data = {};
+  // Get the list of device tokens.
+  return admin.database().ref('/')
+    .child('passes')
+    .orderByChild(`event`)//query all passes for event
+    .equalTo(eventIdParam)
+    .once('value')
+    .then(passes => Object.keys(passes).map(k => passes[k].user))
+    .then(guests => {
+      let guestPromises = []
+      guests.forEach(g => {
+        guestPromises.push(admin.database.ref(`/users/${g}`).child('fcmToken').once('value'));
+      });
+      return Promise.all(guestPromises);
+    })
+    .then(tokensSnap => {
+      const tokens = tokensSnap.map(s => s.val());
+      data.tokens = tokens;
+    })
+    .then(_ => admin.database.ref(`/events/${eventIdParam}`).val().title)
+    .then(eventName => {
+      data.eventName = eventName;
+    })
+    .then(_ => {
+      // Notification details.
+      const text = snap.val().text;
+      const payload = {
+        notification: {
+          title: `New message in ${data.eventName}`,
+          body: text ? (text.length <= 100 ? text : text.substring(0, 97) + '...') : ''
+        }
+      };
+      // Send notifications to all tokens.
+      return admin.messaging().sendToDevice(data.tokens, payload).then(response => {
+        // For each message check if there was an error.
+        const tokensToRemove = [];
+        response.results.forEach((result, index) => {
+          const error = result.error;
+          if (error) {
+            console.error('Failure sending notification to', data.tokens[index], error);
+            // Cleanup the tokens who are not registered anymore.
+            // if (error.code === 'messaging/invalid-registration-token' ||
+            // 	error.code === 'messaging/registration-token-not-registered') {
+            // 	// tokensToRemove.push(allTokens.ref.child(tokens[index]).remove());
+            // 	//TODO remove invalid tokens
+            // }
+          }
+        });
+        return Promise.all(tokensToRemove);
+      });
+    });
 
 });
 
@@ -119,8 +126,8 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
  * Triggers whenever a new user signs up and add them to the db.
  */
 exports.addUser = functions.auth.user().onCreate(event => {
-	let user = event.data;
-	return admin.database.ref(`/users/${user.uid}`).update(user)
+  let user = event.data;
+  return admin.database.ref(`/users/${user.uid}`).update(user)
 })
 
 exports.updateEventOwners = functions.database.ref('/events/{eventId}/owners').onWrite(event => {
@@ -168,7 +175,7 @@ exports.updateEventOwners = functions.database.ref('/events/{eventId}/owners').o
 });
 
 exports.getInviteInfo = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {    
+  cors(req, res, () => {
     const rootDb = admin.database().ref();
 
     rootDb
@@ -178,7 +185,7 @@ exports.getInviteInfo = functions.https.onRequest((req, res) => {
         if (!dbObj) {
           res.status(200).end();
           return;
-        } 
+        }
 
         let invite = dbObj.val();
         invite.id = dbObj.key;
@@ -205,11 +212,11 @@ exports.getInviteInfo = functions.https.onRequest((req, res) => {
 
             newInvite.event = event;
             res.status(200).json(newInvite);
-        })
-    })
-    .catch(err => {
-      res.status(404).send(err);
-    });
+          })
+      })
+      .catch(err => {
+        res.status(404).send(err);
+      });
   });
 });
 
@@ -221,7 +228,7 @@ let decreaseSpotsLeft = (rootDb, eventObject) => {
       reject('no more space');
       return;
     }
-    
+
     let spotsLeft = (event.spotsLeft || event.guestLimit);
 
     rootDb
@@ -230,7 +237,7 @@ let decreaseSpotsLeft = (rootDb, eventObject) => {
       .then(snap => {
         resolve(snap);
       });
-  });    
+  });
 };
 
 let buildInvite = (rootDb, isOwner, eventObject) => {
@@ -253,7 +260,7 @@ let buildInvite = (rootDb, isOwner, eventObject) => {
         newInvite.id = snap.key;
 
         resolve(newInvite);
-    });
+      });
   });
 };
 
@@ -268,7 +275,7 @@ let buildInviteAndUpdateEvent = (rootDb, eventObject, createViaOldInvite = null)
 
           if (oldInvite.additionalInvitesLeft > 0) {
             oldInvite
-              .set({additionalInvitesLeft: oldInvite.additionalInvitesLeft - 1})
+              .set({ additionalInvitesLeft: oldInvite.additionalInvitesLeft - 1 })
               .then(q => decreaseSpotsLeft(rootDb, eventObject))
               .then(q => buildInvite(rootDb, false, eventObject))
               .then(newInvite => {
@@ -327,7 +334,7 @@ exports.generateNewInvite = functions.https.onRequest((req, res) => {
                 .then(invite => {
                   res.status(200).json(invite);
                   return;
-              });
+                });
             } else {
               rootDb
                 .child(`/users/${uid}/events/${eventId}/invite`)
@@ -342,7 +349,7 @@ exports.generateNewInvite = functions.https.onRequest((req, res) => {
                     .then(invite => {
                       res.status(200).json(invite);
                       return;
-                  });
+                    });
                 });
             }
           })
@@ -352,7 +359,7 @@ exports.generateNewInvite = functions.https.onRequest((req, res) => {
           });
       })
       .catch((err) => {
-        res.status(401).send(err); 
+        res.status(401).send(err);
       });
   });
 });
