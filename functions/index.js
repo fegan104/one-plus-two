@@ -67,7 +67,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
   const { snap } = event.data;
   const { eventIdParam, messageIdParam } = event.params;
 
-
+  //There is no way promise more than 1 value so we'll accumulate them here
   let data = {};
   // Get the list of device tokens.
   return admin.database().ref('/')
