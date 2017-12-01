@@ -88,7 +88,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
       const tokens = tokensSnap.map(s => s.val());
       data.tokens = tokens;
     })
-    .then(_ => admin.database().ref(`/events/${eventId}`).val().title)
+    .then(_ => admin.database().ref(`/events/${eventId}`).once('value').val().title)
     .then(eventName => {
       data.eventName = eventName;
     })
