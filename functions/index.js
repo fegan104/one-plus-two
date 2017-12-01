@@ -65,6 +65,7 @@ exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(ev
  */
 exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messageId}').onCreate(event => {
   const { snap } = event.data;
+  //TODO add message contents to notification payload?
   const { eventIdParam, messageIdParam } = event.params;
 
   //There is no way promise more than 1 value so we'll accumulate them here
