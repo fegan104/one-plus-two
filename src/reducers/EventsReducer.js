@@ -14,6 +14,11 @@ export default (state = [], action) => {
     case actionType.GET_EVENT_FULFILLED: {
       return [action.payload];
     }
+    case actionType.ADD_MESSAGE_FULFILLED: {
+      return [
+        { ...state[0], newsFeed: [...state[0].newsFeed, action.payload] }
+      ];
+    }
 
     default:
       return state;

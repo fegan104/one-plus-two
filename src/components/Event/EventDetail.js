@@ -2,7 +2,7 @@ import React from 'react';
 import './EventDetail.css';
 import { connect } from 'react-redux';
 
-import { getEvent } from '../../actions/EventsActions';
+import { getEvent, sendMessage } from '../../actions/EventsActions';
 import { getInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
 
@@ -30,7 +30,8 @@ class EventDetail extends React.Component {
     this.state = {
       shareOpen: false,
       sendOpen: false,
-      passOpen: false
+      passOpen: false,
+      messageText: ''
     };
   }
 
@@ -56,6 +57,10 @@ class EventDetail extends React.Component {
 
   closePass = () => {
     this.setState({ passOpen: false });
+  };
+
+  handleMessage = event => {
+    this.setState({ messageText: event.target.value });
   };
 
   componentDidMount() {
@@ -110,7 +115,14 @@ class EventDetail extends React.Component {
 
     const sendActions = [
       <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
-      <FlatButton label="Send" primary={true} onClick={this.closeSend} />
+      <FlatButton
+        label="Send"
+        primary={true}
+        onClick={_ => {
+          this.props.sendMessage(event.id, this.state.messageText);
+          this.closeSend();
+        }}
+      />
     ];
 
     const scanButton = (
@@ -156,6 +168,8 @@ class EventDetail extends React.Component {
             name="message-field"
             label="Message Text"
             multiLine={true}
+            value={this.state.messageText}
+            onChange={this.handleMessage}
           />
         </Dialog>
 
@@ -198,5 +212,6 @@ export default connect(mapStateToProps, {
   getEvent,
   push,
   getInvite,
-  setHeader
+  setHeader,
+  sendMessage
 })(EventDetail);

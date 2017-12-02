@@ -1,7 +1,8 @@
 import {
   getEventsDB,
   pushEventToDB,
-  getEventFromDB
+  getEventFromDB,
+  pushMessageToDB
 } from '../services/FirebaseService';
 import actionType from '../constants';
 import { push } from 'react-router-redux';
@@ -47,5 +48,12 @@ export const getEvent = eventId => {
   return {
     type: actionType.GET_EVENT,
     payload: getEventFromDB(eventId)
+  };
+};
+
+export const sendMessage = (eventID, body) => {
+  return {
+    type: actionType.ADD_MESSAGE,
+    payload: pushMessageToDB(eventID, body)
   };
 };

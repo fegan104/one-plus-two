@@ -269,3 +269,15 @@ export const getFCMToken = user => {
       return user;
     });
 };
+
+export const pushMessageToDB = (eventId, body) => {
+  return database
+    .ref(`/events/${eventId}/newsFeed`)
+    .push({
+      title: 'Title',
+      body
+    })
+    .once('value')
+    .then(snap => snap.val())
+    .catch(console.error);
+};
