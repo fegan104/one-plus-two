@@ -76,8 +76,12 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
     .orderByChild(`event`)//query all passes for event
     .equalTo(eventId)
     .once('value')
-    .then(passes => Object.keys(passes).map(k => passes[k].user))
+    .then(passesSnap => {
+      const passes = passesSnap.val();
+      return Object.keys(passes).map(k => passes[k].user);
+    })
     .then(guests => {
+      console.log("guests:", guests);
       let guestPromises = []
       guests.forEach(g => {
         guestPromises.push(admin.database().ref(`/users/${g}`).child('fcmToken').once('value'));
@@ -86,12 +90,14 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
     })
     .then(tokensSnap => {
       const tokens = tokensSnap.map(s => s.val());
+      console.log("data:", data);
       data.tokens = tokens;
     })
     .then(_ => admin.database().ref(`/events/${eventId}`).once('value'))
     .then(eventSnap => eventSnap.val().title)
     .then(eventName => {
       data.eventName = eventName;
+      console.log("data:", data);
     })
     .then(_ => {
       // Notification details.
