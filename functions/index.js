@@ -103,6 +103,7 @@ exports.sendMessage = functions.database.ref('/events/{eventId}/newsFeed/{messag
         }
       };
       // Send notifications to all tokens.
+      console.log("sending to tokens:", data.tokens);
       return admin.messaging().sendToDevice(data.tokens, payload).then(response => {
         // For each message check if there was an error.
         const tokensToRemove = [];
