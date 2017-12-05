@@ -84,8 +84,9 @@ export const getEventFromDB = eventId => {
         if (!dbObj) {
           return resolve(null);
         }
-
-        let event = EventModel({ id: dbObj.key, ...dbObj.val() });
+        const eventVal = dbObj.val();
+        // const newsFeed = Object.keys(eventVal.newsFeed).map(k => eventVal.newsFeed[k]);
+        let event = EventModel({ id: dbObj.key, /*newsFeed,*/ ...eventVal });
 
         return resolve(event);
       })
@@ -268,4 +269,16 @@ export const getFCMToken = user => {
       console.log('Unable to get permission to notify.', err);
       return user;
     });
+};
+
+export const pushMessageToDB = (eventId, body) => {
+  return database
+    .ref(`/events/${eventId}/newsFeed`)
+    .push({
+      title: 'Title',
+      body
+    })
+    .once('value')
+    .then(snap => snap.val())
+    .catch(console.error);
 };
