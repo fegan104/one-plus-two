@@ -181,6 +181,10 @@ class EventDetail extends React.Component {
           />
         ) : null}
 
+        <ul>
+          {event.newsFeed.map((m, index) => <li key={index}>{m.body}</li>)}
+        </ul>
+
         {isOwner ? scanButton : null}
       </div>
     );

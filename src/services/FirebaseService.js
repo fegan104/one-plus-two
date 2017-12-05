@@ -84,8 +84,9 @@ export const getEventFromDB = eventId => {
         if (!dbObj) {
           return resolve(null);
         }
-
-        let event = EventModel({ id: dbObj.key, ...dbObj.val() });
+        const eventVal = dbObj.val();
+        // const newsFeed = Object.keys(eventVal.newsFeed).map(k => eventVal.newsFeed[k]);
+        let event = EventModel({ id: dbObj.key, /*newsFeed,*/ ...eventVal });
 
         return resolve(event);
       })

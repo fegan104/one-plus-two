@@ -7,6 +7,7 @@ export default ({
   canBringXPeople,
   location,
   owners,
+  newsFeed,
   picture,
   stats,
   title,
