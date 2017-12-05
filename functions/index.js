@@ -1,10 +1,17 @@
-// import { event } from 'firebase-functions/lib/providers/analytics';
-
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
+const nodemailer = require('nodemailer');
 
 admin.initializeApp(functions.config().firebase);
+
+const mailTransport = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: functions.config().gmail.email,
+    pass: functions.config().gmail.password
+  }
+});
 
 exports.acceptInvite = functions.database.ref('/invites/{inviteId}').onUpdate(event => {
   const userId = event.data.child('claimedByUser').val();
@@ -372,3 +379,59 @@ exports.generateNewInvite = functions.https.onRequest((req, res) => {
       });
   });
 });
+/**
+ * send an email to each guest each time a new message is posted.
+ */
+exports.sendEmail = functions.database.ref('/events/{eventId}/newsFeed/{messageId}').onCreate(event => {
+
+  let guests = []
+
+  admin.database().ref().child('passes')
+    .orderByChild(`event`)//query all passes for event
+    .equalTo(event.params.eventId)
+    .once('value')
+    .then(passesSnap => {
+      const passes = passesSnap.val();
+      return Object.keys(passes).map(k => passes[k].user);
+    })
+    .then(guests => {
+      console.log("guests:", guests);
+      let guestPromises = []
+      guests.forEach(g => {
+        guestPromises.push(admin.database().ref(`/users/${g}`).once('value'));
+      });
+      return Promise.all(guestPromises);
+    })
+    .then(guestSnaps => {//Now we have an array of user snapshots
+      guests = guestSnaps.map(g => g.val())
+      console.log("guests:", guests)
+    })
+    .then(_ => admin.database().ref(`/events/${event.params.eventId}`).once('value'))
+    .then(eventSnap => {
+      const eventData = eventSnap.val();
+      const messageData = eventData.newsFeed[event.params.messageId];
+      console.log("message data:", messageData);
+      //promise all emails
+      const emailPromises = []
+      guests.forEach(g => {
+        emailPromises.push(emailUserMessage(g, eventData, messageData))
+      })
+
+      return Promise.all(emailPromises)
+    })
+});
+
+let emailUserMessage = ( user, event, message ) => {
+  const APP_NAME = "OnePlusTwo"
+
+  const mailOptions = {
+    from: `${APP_NAME} <OnePlusTwoMQP@gmail.com.com>`,
+    to: user.email
+  };
+  // The user subscribed to the newsletter.
+  mailOptions.subject = `New message posted in ${event.title}`;
+  mailOptions.text = message.body;
+  return mailTransport.sendMail(mailOptions).then(_ => {
+    console.log('New welcome email sent to:', user.email);
+  });
+}
