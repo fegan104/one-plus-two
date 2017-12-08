@@ -86,7 +86,14 @@ class EventDetail extends React.Component {
       user.events[event.id].invite
     ) {
       this.props.getInvite(user.events[event.id].invite);
-      this.props.loadPass(user.event[event.id].pass);
+    }
+    if (
+      user &&
+      user.events &&
+      user.events[event.id] &&
+      user.events[event.id].pass
+    ) {
+      this.props.loadPass(user.events[event.id].pass);
     }
   }
 
