@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { getEvent, sendMessage } from '../../actions/EventsActions';
 import { getInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
+import { loadPass } from '../../actions/PassActions';
 
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
@@ -85,6 +86,7 @@ class EventDetail extends React.Component {
       user.events[event.id].invite
     ) {
       this.props.getInvite(user.events[event.id].invite);
+      this.props.loadPass(user.event[event.id].pass);
     }
   }
 
@@ -102,6 +104,8 @@ class EventDetail extends React.Component {
     let { event, pass, user, invite } = this.props;
 
     if (!event || !user || user.events === null) {
+      // console.log("event:", event)
+      // console.log("user:", user)
       return <Loader />;
     }
 
@@ -217,5 +221,6 @@ export default connect(mapStateToProps, {
   push,
   getInvite,
   setHeader,
-  sendMessage
+  sendMessage,
+  loadPass
 })(EventDetail);

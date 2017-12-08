@@ -49,6 +49,7 @@ export const getUserData = userId => {
       .once('value')
       .then(dbObj => {
         if (!dbObj) {
+          console.error('no user data');
           return resolve({});
         }
 
@@ -85,8 +86,10 @@ export const getEventFromDB = eventId => {
           return resolve(null);
         }
         const eventVal = dbObj.val();
-        // const newsFeed = Object.keys(eventVal.newsFeed).map(k => eventVal.newsFeed[k]);
-        let event = EventModel({ id: dbObj.key, /*newsFeed,*/ ...eventVal });
+        const newsFeed = Object.keys(eventVal.newsFeed).map(
+          k => eventVal.newsFeed[k]
+        );
+        let event = EventModel({ id: dbObj.key, ...eventVal, newsFeed });
 
         return resolve(event);
       })
@@ -94,6 +97,15 @@ export const getEventFromDB = eventId => {
         reject(error);
       });
   });
+};
+
+export const getPassFromDB = passId => {
+  return database
+    .ref(`/passes/${passId}`)
+    .once('value')
+    .then(snap => {
+      return PassModel({ id: snap.key, ...snap.val() });
+    });
 };
 
 /**
@@ -254,15 +266,15 @@ export const getFCMToken = user => {
     })
     .then(currentToken => {
       if (currentToken) {
-        console.log('successfully registered fcm token.', currentToken);
+        console.log('Successfully registered FCM token.', currentToken);
         database.ref(`/users/${user.id}`).update({ fcmToken: currentToken });
-        return { ...user, fcmToken: currentToken };
+        return currentToken;
       } else {
         // Show permission request.
         console.log(
           'No Instance ID token available. Request permission to generate one.'
         );
-        return user;
+        return null;
       }
     })
     .catch(err => {

@@ -8,6 +8,9 @@ export default (state = {}, action) => {
     case actionType.ACCEPT_INVITE_FULFILLED: {
       return action.payload;
     }
+    case actionType.GET_PASS_FULFILLED: {
+      return action.payload;
+    }
     default:
       return state;
   }

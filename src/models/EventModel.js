@@ -21,7 +21,7 @@ export default ({
   isSelfEnrollable: isSelfEnrollable || false,
   canBringXPeople: canBringXPeople || 1,
   location: location || '',
-  newsFeed: [], // TODO
+  newsFeed: newsFeed || [],
   owners: owners || {},
   picture: picture || '',
   stats: stats || {},
