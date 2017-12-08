@@ -90,6 +90,7 @@ class EventDetail extends React.Component {
     if (
       user &&
       user.events &&
+      !this.props.pass &&
       user.events[event.id] &&
       user.events[event.id].pass
     ) {
@@ -157,7 +158,9 @@ class EventDetail extends React.Component {
           ) : (
             <FlatButton label="Cannot Invite More People" disabled={true} />
           )}
-          <FlatButton label="Show Pass" onClick={this.openPass} />
+          {pass ? (
+            <FlatButton label="Show Pass" onClick={this.openPass} />
+          ) : null}
         </EventCard>
 
         {canInviteMore ? (
