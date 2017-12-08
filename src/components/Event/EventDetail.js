@@ -154,9 +154,9 @@ class EventDetail extends React.Component {
             <FlatButton label="Send Message" onClick={this.openSend} />
           ) : null}
           {canInviteMore ? (
-            <FlatButton label="Invite More People" onClick={this.openShare} />
+            <FlatButton label="Invite Guests" onClick={this.openShare} />
           ) : (
-            <FlatButton label="Cannot Invite More People" disabled={true} />
+            <FlatButton label="Cannot Invite More Guests" disabled={true} />
           )}
           {pass ? (
             <FlatButton label="Show Pass" onClick={this.openPass} />
