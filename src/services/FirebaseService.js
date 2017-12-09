@@ -3,6 +3,7 @@ import '@firebase/messaging';
 import EventModel from '../models/EventModel';
 import InviteModel from '../models/InviteModel';
 import PassModel from '../models/PassModel';
+import UserModel from '../models/UserModel';
 import constants from '../constants';
 
 // eslint-disable-next-line
@@ -19,6 +20,34 @@ const getAge = dateString => {
     age--;
   }
   return age;
+};
+
+const cloudEndpoint = url => {
+  return new Promise((resolve, reject) => {
+    auth.currentUser.getToken().then(token => {
+      let endpoint = `${
+        process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
+      }/${url}`;
+
+      fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+        //mode: 'no-cors'
+      }).then(response => {
+        if (!response.ok) {
+          response.json().then(json => {
+            reject(json);
+          });
+          return;
+        }
+
+        const json = response.json();
+        resolve(json);
+      });
+    });
+  });
 };
 
 /**
@@ -214,27 +243,14 @@ export const getInviteInfoFromCloudFunction = inviteId => {
 
 export const generateInviteCloudFunction = eventId => {
   return new Promise((resolve, reject) => {
-    auth.currentUser.getToken().then(token => {
-      let endpoint = `${
-        process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
-      }/generateNewInvite?eventId=${eventId}`;
-
-      fetch(endpoint, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
-        //mode: 'no-cors'
+    cloudEndpoint(`generateNewInvite?eventId=${eventId}`)
+      .then(json => {
+        let invite = InviteModel({ ...json, event: json.event.id });
+        resolve(invite.setEvent(json.event));
       })
-        .then(res => res.json())
-        .then(json => {
-          let invite = InviteModel({ ...json, event: json.event.id });
-          resolve(invite.setEvent(json.event));
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+      .catch(error => {
+        reject(error);
+      });
   });
 };
 
@@ -284,14 +300,23 @@ export const signOutViaFirebase = () => {
 };
 
 export const checkInPassInDB = passId => {
-  if (!passId) {
-    return Promise.reject(console.error);
-  }
+  return new Promise((resolve, reject) => {
+    cloudEndpoint(`checkInPass?passId=${passId}`)
+      .then(json => {
+        let user = UserModel({ ...json });
+        resolve(user);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
 
+export const monitorPassInDB = passId => {
   return database
     .ref(`/passes/${passId}`)
-    .update({ isUsed: true, checkedInAt: new Date() })
-    .catch(console.error);
+    .once('child_changed')
+    .then(snap => getPassFromDB(passId));
 };
 
 export const getFCMToken = user => {

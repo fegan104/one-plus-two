@@ -54,8 +54,9 @@ const buildInviteAndUpdateEvent = (rootDb, eventObject, createViaOldInvite = nul
           const oldInvite = snap.val();
 
           if (oldInvite.additionalInvitesLeft > 0) {
-            oldInvite
-              .set({ additionalInvitesLeft: oldInvite.additionalInvitesLeft - 1 })
+            rootDb
+              .child(`/invites/${createViaOldInvite}`)
+              .update({ additionalInvitesLeft: oldInvite.additionalInvitesLeft - 1 })
               .then(q => decreaseSpotsLeft(rootDb, eventObject))
               .then(q => buildInvite(rootDb, false, eventObject))
               .then(newInvite => {

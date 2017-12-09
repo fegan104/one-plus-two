@@ -8,21 +8,25 @@ import QRCode from 'qrcode.react';
 class ShowPassDialog extends Component {
   render() {
     let actions = [
-      <FlatButton label="Cancel" primary={true} onClick={this.props.onClose} />
+      <FlatButton label="Close" primary={true} onClick={this.props.onClose} />
     ];
+
+    let { pass } = this.props;
 
     return (
       <Dialog
-        title="Show this at entrance"
+        title="Show at entrance"
         actions={actions}
         modal={false}
         open={this.props.show}
         onRequestClose={this.props.onClose}
       >
         <QRCode
-          value={(this.props.pass && this.props.pass.id) || 'error'}
-          size={256}
+          value={(pass && pass.id) || 'error'}
+          size={200}
+          fgColor={pass && pass.isUsed ? 'gray' : 'black'}
         />
+        {pass && pass.isUsed ? <div>This pass has been used.</div> : null}
       </Dialog>
     );
   }

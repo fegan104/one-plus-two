@@ -9,6 +9,7 @@ const GenerateNewInvite = require('./src/GenerateNewInvite');
 const SendMessage = require('./src/SendMessage');
 const SendEmail = require('./src/SendEmail');
 const GetEventStats = require('./src/GetEventStats');
+const CheckInPass = require('./src/CheckInPass')
 
 admin.initializeApp(functions.config().firebase);
 
@@ -20,3 +21,4 @@ exports.getInviteInfo = GetInviteInfo(functions, admin);
 exports.generateNewInvite = GenerateNewInvite(functions, admin);
 exports.sendEmail = SendEmail(functions, admin);
 exports.getEventStats = GetEventStats(functions, admin);
+exports.checkInPass = CheckInPass(functions, admin);

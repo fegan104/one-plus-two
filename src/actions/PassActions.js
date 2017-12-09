@@ -1,7 +1,11 @@
 import actionType from '../constants';
 import { push } from 'react-router-redux';
 
-import { acceptInviteInDB, getPassFromDB } from '../services/FirebaseService';
+import {
+  acceptInviteInDB,
+  getPassFromDB,
+  monitorPassInDB
+} from '../services/FirebaseService';
 
 export const acceptInvite = (inviteId, eventId, userId) => {
   return dispatch => {
@@ -23,5 +27,20 @@ export const loadPass = passId => {
   return {
     type: actionType.GET_PASS,
     payload: getPassFromDB(passId)
+  };
+};
+
+export const monitorPass = passId => {
+  return dispatch => {
+    dispatch({
+      type: actionType.REFRESH_PASS
+    });
+
+    monitorPassInDB(passId).then(passObj => {
+      dispatch({
+        type: actionType.REFRESH_PASS_FULFILLED,
+        payload: passObj
+      });
+    });
   };
 };

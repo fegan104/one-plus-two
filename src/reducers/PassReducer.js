@@ -11,6 +11,9 @@ export default (state = null, action) => {
     case actionType.GET_PASS_FULFILLED: {
       return action.payload;
     }
+    case actionType.REFRESH_PASS_FULFILLED: {
+      return action.payload;
+    }
     default:
       return state;
   }

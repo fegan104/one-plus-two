@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { getEvent, sendMessage } from '../../actions/EventsActions';
 import { getInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
-import { loadPass } from '../../actions/PassActions';
+import { loadPass, monitorPass } from '../../actions/PassActions';
 
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
@@ -22,7 +22,7 @@ import { push } from 'react-router-redux';
 import Loader from '../Common/Loader';
 
 /**
- * Displays details about the events specified in the route's id. 
+ * Displays details about the events specified in the route's id.
  * Makes a request for the specified event frmo firebase and pulls it fomr the store.
  */
 class EventDetail extends React.Component {
@@ -97,6 +97,11 @@ class EventDetail extends React.Component {
       user.events[event.id].pass
     ) {
       this.props.loadPass(user.events[event.id].pass);
+    }
+
+    if (this.props.pass) {
+      console.log('qqq', this.props.pass, this.props.pass.id);
+      this.props.monitorPass(this.props.pass.id);
     }
   }
 
@@ -234,5 +239,6 @@ export default connect(mapStateToProps, {
   getInvite,
   setHeader,
   sendMessage,
-  loadPass
+  loadPass,
+  monitorPass
 })(EventDetail);
