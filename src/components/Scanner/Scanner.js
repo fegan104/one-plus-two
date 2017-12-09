@@ -1,7 +1,7 @@
 import React from 'react';
 import './Scanner.css';
 import QrReader from 'react-qr-reader';
-import Loader from '../Common/Loader';
+//import Loader from '../Common/Loader';
 import { checkInPass } from '../../actions/ScannerActions';
 import { setHeader } from '../../actions/HeaderActions';
 
