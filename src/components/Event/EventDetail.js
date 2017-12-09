@@ -76,6 +76,8 @@ class EventDetail extends React.Component {
 
     if (event) {
       this.configureAppHeader(nextProps);
+    } else {
+      return;
     }
 
     if (

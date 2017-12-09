@@ -48,7 +48,7 @@ export const getUserData = userId => {
       .ref(`/users/${userId}`)
       .once('value')
       .then(dbObj => {
-        if (!dbObj) {
+        if (!dbObj.val()) {
           console.error('no user data');
           return resolve({});
         }
@@ -65,7 +65,15 @@ export const getUserData = userId => {
  * Returns a Promise to an array of EventModels from firebase.
  */
 export const getEventsDB = eventIds => {
-  return Promise.all(eventIds.map(id => getEventFromDB(id)));
+  const FAIL_TOKEN = Symbol('failed');
+
+  let promises = eventIds.map(id => getEventFromDB(id));
+
+  const resolvedPromises = Promise.all(
+    promises.map(p => p.catch(e => FAIL_TOKEN))
+  ).then(values => values.filter(v => v !== FAIL_TOKEN));
+
+  return resolvedPromises;
 };
 
 /**
@@ -78,9 +86,10 @@ export const getEventFromDB = eventId => {
       .ref(`/events/${eventId}`)
       .once('value')
       .then(dbObj => {
-        if (!dbObj) {
-          return resolve(null);
+        if (!dbObj.val()) {
+          return reject('no such event');
         }
+
         const eventVal = dbObj.val();
         const newsFeed = eventVal.newsFeed
           ? Object.keys(eventVal.newsFeed).map(k => eventVal.newsFeed[k])
@@ -120,8 +129,8 @@ export const pushEventToDB = newEvent => {
       .push(newEvent)
       .then(push => push.once('value'))
       .then(dbObj => {
-        if (!dbObj) {
-          return resolve(null);
+        if (!dbObj.val()) {
+          return reject('something failed');
         }
 
         let event = EventModel({ id: dbObj.key, ...dbObj.val() });
@@ -140,8 +149,8 @@ export const getInviteFromDB = inviteId => {
       .ref(`/invites/${inviteId}`)
       .once('value')
       .then(dbObj => {
-        if (!dbObj) {
-          return resolve(null);
+        if (!dbObj.val()) {
+          return reject('no such invite');
         }
 
         let invite = InviteModel({ id: dbObj.key, ...dbObj.val() });
@@ -202,8 +211,8 @@ export const acceptInviteInDB = (inviteId, eventId, userId) => {
       .ref(`/invites/${inviteId}`)
       .update({ claimedByUser: userId })
       .then(dbObj => {
-        if (!dbObj) {
-          return resolve(null);
+        if (!dbObj.val()) {
+          return reject('cannot claim');
         }
 
         database
