@@ -35,6 +35,12 @@
         "fcmToken":{
           ".write":  "auth != null && auth.uid === $uid"
         },
+        "gender": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "age": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
         "events": {
           "$event": {
             "invite": {

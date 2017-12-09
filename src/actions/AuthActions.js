@@ -27,9 +27,13 @@ export const authStateChange = user => {
 
     getUserData(user.id)
       .then(data => {
+        let newUser = user.setEvents(data.events);
+        newUser.age = data.age;
+        newUser.gender = data.gender;
+
         dispatch({
           type: actionType.GET_USER_DATA_SUCCESS,
-          payload: user.setEvents(data.events)
+          payload: newUser
         });
       })
       .catch(error => {

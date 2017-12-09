@@ -10,6 +10,17 @@ let database;
 let auth;
 let messaging;
 
+const getAge = dateString => {
+  var today = new Date();
+  var birthDate = new Date(dateString);
+  var age = today.getFullYear() - birthDate.getFullYear();
+  var m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 /**
  * Initializes our firebase instance. Called in App contructor.
  */
@@ -36,6 +47,26 @@ export const init = authCallback => {
   }
 
   if (auth && authCallback) {
+    auth.getRedirectResult().then(result => {
+      if (
+        result.credential &&
+        result.additionalUserInfo.providerId === 'facebook.com'
+      ) {
+        const gender = result.additionalUserInfo.profile.gender;
+        const birthday = result.additionalUserInfo.profile.birthday;
+        const age = getAge(birthday);
+
+        let genderPromise = database
+          .ref(`/users/${result.user.uid}/gender`)
+          .set(gender);
+        let agePromise = database.ref(`/users/${result.user.uid}/age`).set(age);
+
+        Promise.all([genderPromise, agePromise]).then(() => {
+          authCallback(result.user);
+        });
+      }
+    });
+
     auth.onAuthStateChanged(user => {
       authCallback(user);
     });
@@ -115,7 +146,7 @@ export const getPassFromDB = passId => {
 };
 
 /**
- * Pushes a new event to firebase. Note owners will be pushed as a 
+ * Pushes a new event to firebase. Note owners will be pushed as a
  * pushId/userId key/value pair. This will also redirect to the event detail
  * screen of the new event.
  * @param {EventModel} newEvent the Event object to be pushed to firebase.
@@ -165,8 +196,9 @@ export const getInviteFromDB = inviteId => {
 
 export const getInviteInfoFromCloudFunction = inviteId => {
   return new Promise((resolve, reject) => {
-    let endpoint = `${process.env
-      .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
+    let endpoint = `${
+      process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
+    }/getInviteInfo?inviteId=${inviteId}`;
 
     fetch(endpoint, { headers: { 'Content-Type': 'application/json' } })
       .then(res => res.json())
@@ -183,8 +215,9 @@ export const getInviteInfoFromCloudFunction = inviteId => {
 export const generateInviteCloudFunction = eventId => {
   return new Promise((resolve, reject) => {
     auth.currentUser.getToken().then(token => {
-      let endpoint = `${process.env
-        .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/generateNewInvite?eventId=${eventId}`;
+      let endpoint = `${
+        process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
+      }/generateNewInvite?eventId=${eventId}`;
 
       fetch(endpoint, {
         headers: {
@@ -240,6 +273,7 @@ export const loginViaFirebase = loginMethod => {
   } else {
     provider = new firebase.auth.FacebookAuthProvider();
     provider.addScope('user_birthday');
+    provider.addScope('public_profile');
   }
 
   auth.signInWithRedirect(provider);
