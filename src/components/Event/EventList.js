@@ -26,6 +26,7 @@ class EventList extends Component {
       user.events &&
       !(this.props.user && this.props.user.events === user.events)
     ) {
+      console.log('events for user:', user);
       this.props.loadEvents(Object.keys(user.events));
     }
   }

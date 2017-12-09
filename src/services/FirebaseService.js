@@ -65,11 +65,7 @@ export const getUserData = userId => {
  * Returns a Promise to an array of EventModels from firebase.
  */
 export const getEventsDB = eventIds => {
-  return Promise.all(
-    eventIds.map(id => {
-      return getEventFromDB(id);
-    })
-  );
+  return Promise.all(eventIds.map(id => getEventFromDB(id)));
 };
 
 /**
@@ -86,14 +82,15 @@ export const getEventFromDB = eventId => {
           return resolve(null);
         }
         const eventVal = dbObj.val();
-        const newsFeed = Object.keys(eventVal.newsFeed).map(
-          k => eventVal.newsFeed[k]
-        );
+        const newsFeed = eventVal.newsFeed
+          ? Object.keys(eventVal.newsFeed).map(k => eventVal.newsFeed[k])
+          : null;
         let event = EventModel({ id: dbObj.key, ...eventVal, newsFeed });
 
         return resolve(event);
       })
       .catch(error => {
+        console.log(`catching at ${eventId}`);
         reject(error);
       });
   });

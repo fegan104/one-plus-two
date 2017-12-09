@@ -34,15 +34,29 @@ class Home extends Component {
           </div>
         </div>
 
-        <Link to="/events/new">
-          <RaisedButton
-            className="Home-button"
-            label="Host an event"
-            primary={true}
-          />
-        </Link>
-        <br />
-        <Link to="/events">All Events</Link>
+        <div className="Home-button-wrapper">
+          <div className="Home-button-container">
+            <div>
+              <Link to="/events/new">
+                <RaisedButton
+                  // className="Home-button"
+                  label="Host an event"
+                  primary={true}
+                />
+              </Link>
+            </div>
+
+            <div>
+              <Link to="/events">
+                <RaisedButton
+                  // className="Home-button"
+                  label="Show My Events"
+                  primary={true}
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
