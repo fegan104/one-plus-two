@@ -1,9 +1,9 @@
 import actionType from '../constants';
-import { claimPassInDB } from '../services/FirebaseService';
+import { checkInPassInDB } from '../services/FirebaseService';
 
-export const claimPass = passId => {
+export const checkInPass = passId => {
   return {
-    type: actionType.CLAIM_PASS,
-    payload: claimPassInDB(passId)
+    type: actionType.CHECK_IN_PASS,
+    payload: checkInPassInDB(passId)
   };
 };

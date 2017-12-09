@@ -9,7 +9,6 @@ export default ({
   owners,
   newsFeed,
   picture,
-  stats,
   title,
   dateTime,
   ...rest
@@ -24,7 +23,6 @@ export default ({
   newsFeed: newsFeed || [],
   owners: owners || {},
   picture: picture || '',
-  stats: stats || {},
   title: title || '',
   dateTime: dateTime || ''
 });

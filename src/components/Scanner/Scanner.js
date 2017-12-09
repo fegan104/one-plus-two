@@ -1,6 +1,6 @@
 import React from 'react';
 import QrReader from 'react-qr-reader';
-import { claimPass } from '../../actions/ScannerActions';
+import { checkInPass } from '../../actions/ScannerActions';
 
 import { connect } from 'react-redux';
 
@@ -13,6 +13,8 @@ class Scanner extends React.Component {
       lastResult: 'No result'
     };
     this.handleScan = this.handleScan.bind(this);
+
+    //this.props.checkInPass('-L-wIDTlNrG-qDnML0Lj');
   }
   handleScan(data) {
     if (data && data !== this.state.lastResult) {
@@ -23,7 +25,7 @@ class Scanner extends React.Component {
           result: data
         };
       }, console.log(this.state));
-      this.props.claimPass(data);
+      this.props.checkInPass(data);
     }
   }
   handleError(err) {
@@ -44,4 +46,4 @@ class Scanner extends React.Component {
   }
 }
 
-export default connect(state => state, { claimPass })(Scanner);
+export default connect(state => state, { checkInPass })(Scanner);

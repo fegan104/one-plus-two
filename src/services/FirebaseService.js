@@ -244,7 +244,7 @@ export const acceptInviteInDB = (inviteId, eventId, userId) => {
       .ref(`/invites/${inviteId}`)
       .update({ claimedByUser: userId })
       .then(dbObj => {
-        if (!dbObj.val()) {
+        if (!dbObj) {
           return reject('cannot claim');
         }
 
@@ -283,14 +283,14 @@ export const signOutViaFirebase = () => {
   return auth.signOut();
 };
 
-export const claimPassInDB = passId => {
+export const checkInPassInDB = passId => {
   if (!passId) {
     return Promise.reject(console.error);
   }
 
   return database
     .ref(`/passes/${passId}`)
-    .update({ isUsed: true })
+    .update({ isUsed: true, checkedInAt: new Date() })
     .catch(console.error);
 };
 

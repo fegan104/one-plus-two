@@ -8,6 +8,7 @@ const GetInviteInfo = require('./src/GetInviteInfo');
 const GenerateNewInvite = require('./src/GenerateNewInvite');
 const SendMessage = require('./src/SendMessage');
 const SendEmail = require('./src/SendEmail');
+const GetEventStats = require('./src/GetEventStats');
 
 admin.initializeApp(functions.config().firebase);
 
@@ -18,3 +19,4 @@ exports.updateEventOwners = UpdateEventOwners(functions, admin);
 exports.getInviteInfo = GetInviteInfo(functions, admin);
 exports.generateNewInvite = GenerateNewInvite(functions, admin);
 exports.sendEmail = SendEmail(functions, admin);
+exports.getEventStats = GetEventStats(functions, admin);

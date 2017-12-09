@@ -44,7 +44,29 @@ const AcceptInvite = (functions, admin) => {
         });
     });
 
-    let updateInvitePromise = event.data.ref.child('isUsed').set(true);
+    let updateInvitePromise = new Promise((resolve, reject) => {
+      rootDb
+        .child(`/users/${userId}`)
+        .once('value')
+        .then(dbObj => {
+          const user = dbObj.val();
+
+          const userDemographics = {
+            gender: user.gender,
+            age: user.age
+          };
+
+          rootDb
+            .child(`/invites/${event.params.inviteId}`)
+            .update({ isUsed: true, userDemographics: userDemographics})
+            .then(final => {
+              resolve(final);
+            }); 
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
 
     return Promise.all([
       otherTablesPromise,
