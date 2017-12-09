@@ -2,7 +2,7 @@ import React from 'react';
 import './Scanner.css';
 import QrReader from 'react-qr-reader';
 //import Loader from '../Common/Loader';
-import { checkInPass } from '../../actions/ScannerActions';
+import { checkInPass, clearScanner } from '../../actions/ScannerActions';
 import { setHeader } from '../../actions/HeaderActions';
 
 import { connect } from 'react-redux';
@@ -29,6 +29,7 @@ class Scanner extends React.Component {
   }
 
   componentDidMount() {
+    this.props.clearScanner();
     this.props.setHeader({
       pageTitle: 'Pass Scanner',
       headerTitle: 'Pass Scanner',
@@ -76,4 +77,8 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { checkInPass, setHeader })(Scanner);
+export default connect(mapStateToProps, {
+  checkInPass,
+  setHeader,
+  clearScanner
+})(Scanner);

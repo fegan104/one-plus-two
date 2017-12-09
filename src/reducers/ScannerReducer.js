@@ -10,6 +10,9 @@ export default (state = initState, action) => {
     case actionType.CHECK_IN_PASS: {
       return { ...initState, loading: true };
     }
+    case actionType.CLEAR_SCANNER: {
+      return initState;
+    }
     case actionType.CHECK_IN_PASS_FULFILLED: {
       return { ...initState, checkIn: true, user: action.payload };
     }

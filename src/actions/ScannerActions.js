@@ -7,3 +7,9 @@ export const checkInPass = passId => {
     payload: checkInPassInDB(passId)
   };
 };
+
+export const clearScanner = () => {
+  return {
+    type: actionType.CLEAR_SCANNER
+  };
+};
