@@ -12,7 +12,9 @@ const EventCard = ({ event, children }) => {
   return (
     <Card>
       <CardMedia overlay={<CardTitle title={event.title.toUpperCase()} />}>
-        <img src={event.picture} alt="banner" className="banner" />
+        <div className="banner-wrapper">
+          <img src={event.picture} alt="banner" className="banner" />
+        </div>
       </CardMedia>
       <CardText>{event.desc}</CardText>
       <CardActions>{children}</CardActions>

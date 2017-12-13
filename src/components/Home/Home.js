@@ -39,7 +39,7 @@ class Home extends Component {
             <div>
               <Link to="/events/new">
                 <RaisedButton
-                  // className="Home-button"
+                  className="Home-button"
                   label="Host an event"
                   primary={true}
                 />
@@ -49,7 +49,7 @@ class Home extends Component {
             <div>
               <Link to="/events">
                 <RaisedButton
-                  // className="Home-button"
+                  className="Home-button"
                   label="Show My Events"
                   primary={true}
                 />

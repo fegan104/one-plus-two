@@ -1,4 +1,13 @@
 .banner {
   width: 100vw;
   height: auto;
+  /* max-height: 40vh; */
+}
+
+.banner-wrapper {
+  max-height: 40vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

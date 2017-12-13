@@ -13,6 +13,7 @@ import CropFree from 'material-ui/svg-icons/image/crop-free';
 import Dialog from 'material-ui/Dialog';
 import ShowPassDialog from '../Dialogs/ShowPassDialog';
 import InviteMorePeopleDialog from '../Dialogs/InviteMorePeopleDialog';
+import EventMessages from './EventMessages';
 
 import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
@@ -202,9 +203,8 @@ class EventDetail extends React.Component {
           />
         ) : null}
 
-        <ul>
-          {event.newsFeed.map((m, index) => <li key={index}>{m.body}</li>)}
-        </ul>
+        <h3 className="feed-header">News Feed:</h3>
+        <EventMessages newsFeed={event.newsFeed} />
 
         {isOwner ? scanButton : null}
       </div>

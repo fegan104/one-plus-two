@@ -10,6 +10,8 @@
 .Home-title {
   margin: 0px auto;
   display: inline-block;
+  font-size: 32px;
+  margin-bottom: 25vh;
 }
 
 img {
@@ -35,6 +37,7 @@ img {
 
 .Home-button {
   margin: 0px auto;
+  margin-bottom: 1em;
 }
 
 .Home-link {
