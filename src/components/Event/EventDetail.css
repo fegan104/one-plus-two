@@ -28,3 +28,15 @@
 .feed-header {
   margin-left: 4px;
 }
+
+.message-bubble {
+  background: #e0e0e0;
+  color: #000;
+  font-size: 18px;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 16px;
+  margin-left: 16px;
+  margin-right: 16px;
+  line-height: 150%;
+}

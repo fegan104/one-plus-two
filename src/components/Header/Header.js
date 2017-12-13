@@ -7,8 +7,8 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import MenuIcon from 'material-ui/svg-icons/navigation/menu';
-import BackIcon from 'material-ui/svg-icons/navigation/chevron-left';
+// import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+// import BackIcon from 'material-ui/svg-icons/navigation/chevron-left';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 
 import LoginDialog from '../Dialogs/LoginDialog';
@@ -87,6 +87,7 @@ class Header extends Component {
           onClose={this.handleCloseLoginModal}
         />
         <AppBar
+          style={{ position: 'fixed' }}
           title={headerTitle}
           iconElementRight={rightButton}
           iconElementLeft={leftButton}

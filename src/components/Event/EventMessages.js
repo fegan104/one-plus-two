@@ -1,31 +1,16 @@
 import React from 'react';
-import { List, ListItem } from 'material-ui/List';
-import { Card } from 'material-ui/Card';
 
 const EventMessages = ({ newsFeed }) => {
   return (
-    <List style={{ marginBottom: '52px' }}>
+    <div style={{ marginBottom: '72px' }}>
       {newsFeed
         .map((m, i) => (
-          <div
-            key={i}
-            style={{
-              background: '#eee',
-              color: '#000',
-              fontSize: '18px',
-              borderRadius: '5px',
-              padding: '10px',
-              marginBottom: '16px',
-              marginLeft: '16px',
-              marginRight: '16px',
-              lineHeight: '150%'
-            }}
-          >
+          <div className="message-bubble" key={i}>
             {m.body}
           </div>
         ))
         .reverse()}
-    </List>
+    </div>
   );
 };
 

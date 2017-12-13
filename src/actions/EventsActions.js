@@ -14,7 +14,6 @@ export const loadEvents = eventIds => {
     });
     getEventsDB(eventIds)
       .then(events => {
-        console.log('dispatching');
         dispatch({
           type: actionType.LOAD_EVENTS_SUCCESS,
           payload: events

@@ -3,10 +3,9 @@ import { connect } from 'react-redux';
 import { loadEvents } from '../../actions/EventsActions';
 import { setHeader } from '../../actions/HeaderActions';
 
-import { Link, push } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { List, ListItem } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import LocalActivity from 'material-ui/svg-icons/maps/local-activity';
 
 /**
  * This is the container component for the event creation screen.
@@ -29,7 +28,6 @@ class EventList extends Component {
       user.events &&
       !(this.props.user && this.props.user.events === user.events)
     ) {
-      console.log('events for user:', user);
       this.props.loadEvents(Object.keys(user.events));
     }
   }

@@ -25,9 +25,8 @@ const getAge = dateString => {
 const cloudEndpoint = url => {
   return new Promise((resolve, reject) => {
     auth.currentUser.getToken().then(token => {
-      let endpoint = `${
-        process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
-      }/${url}`;
+      let endpoint = `${process.env
+        .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/${url}`;
 
       fetch(endpoint, {
         headers: {
@@ -225,9 +224,8 @@ export const getInviteFromDB = inviteId => {
 
 export const getInviteInfoFromCloudFunction = inviteId => {
   return new Promise((resolve, reject) => {
-    let endpoint = `${
-      process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
-    }/getInviteInfo?inviteId=${inviteId}`;
+    let endpoint = `${process.env
+      .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
 
     fetch(endpoint, { headers: { 'Content-Type': 'application/json' } })
       .then(res => res.json())
@@ -343,7 +341,7 @@ export const getFCMToken = user => {
       }
     })
     .catch(err => {
-      console.log('Unable to get permission to notify.', err);
+      console.log('Unable to get permission to notify.');
       return user;
     });
 };
