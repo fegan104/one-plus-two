@@ -16,5 +16,18 @@ messaging.setBackgroundMessageHandler(payload => {
   const { title, body } = payload.notification;
 
   // eslint-disable-line no-restricted-globals
-  return self.registration.showNotification(title, { body });
+  return self.registration.showNotification(title, { 
+    body,
+    icon: '/icon-192x192.png'
+   });
+});
+
+self.addEventListener('notificationclick', event => {
+  console.log('[Service Worker] Notification click Received.');
+
+  event.notification.close();
+
+  event.waitUntil(
+    clients.openWindow('https://one-plus-two.com')
+  );
 });

@@ -72,7 +72,7 @@ export const init = authCallback => {
     messaging.onMessage(payload => {
       console.log('message received.');
       const { title, body } = payload.notification;
-      new Notification(title, { body });
+      new Notification(title, { body, icon: '/icon-192x192.png' });
     });
   }
 
