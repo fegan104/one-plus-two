@@ -9,10 +9,15 @@
 
 .Home-title {
   margin: 0px auto;
-  margin-top: 54px;
+  height: 33vh;
+  /* margin-top: 54px; */
   display: inline-block;
   font-size: 32px;
-  margin-bottom: 16vh;
+  /* margin-bottom: 16vh; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .Home-subtitle {

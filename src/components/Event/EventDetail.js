@@ -190,6 +190,7 @@ class EventDetail extends React.Component {
             name="message-field"
             label="Message Text"
             multiLine={true}
+            fullWidth={true}
             value={this.state.messageText}
             onChange={this.handleMessage}
           />

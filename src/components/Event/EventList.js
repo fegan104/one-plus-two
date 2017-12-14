@@ -42,6 +42,14 @@ class EventList extends Component {
 
   render() {
     let { events } = this.props;
+    let options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
 
     if (events.length === 0) return <h2>You don't have any events yet.</h2>;
 
@@ -50,7 +58,10 @@ class EventList extends Component {
         <div key={event.id}>
           <ListItem
             primaryText={event.title}
-            secondaryText={event.dateTime}
+            secondaryText={new Date(event.dateTime).toLocaleDateString(
+              'en-US',
+              options
+            )}
             leftAvatar={
               <img
                 src={event.picture}

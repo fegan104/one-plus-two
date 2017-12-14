@@ -9,6 +9,18 @@ import Dialog from 'material-ui/Dialog';
 import constants from '../../constants';
 import { login as loginAction } from '../../actions/AuthActions';
 
+const style = {
+  buttonWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  signInButton: {
+    marginBottom: '4px'
+  }
+};
+
 class LoginDialog extends Component {
   loginViaFb = () => {
     this.props.loginAction(constants.FB_AUTH);
@@ -31,16 +43,22 @@ class LoginDialog extends Component {
         open={this.props.show}
         onRequestClose={this.props.onClose}
       >
-        <RaisedButton
-          label="Login via Facebook"
-          primary={true}
-          onClick={this.loginViaFb}
-        />
-        <RaisedButton
-          label="Login via Google"
-          primary={true}
-          onClick={this.loginViaGoogle}
-        />
+        <div style={style.buttonWrapper}>
+          <RaisedButton
+            style={style.signInButton}
+            label="Login via Facebook"
+            backgroundColor="#3B5998"
+            labelColor="#fff"
+            onClick={this.loginViaFb}
+          />
+          <RaisedButton
+            style={style.signInButton}
+            label="Login via Google"
+            backgroundColor="#4885ed"
+            labelColor="#fff"
+            onClick={this.loginViaGoogle}
+          />
+        </div>
       </Dialog>
     );
   }
