@@ -25,11 +25,11 @@ class Home extends Component {
     return (
       <div className="Home">
         <div className="Home-title-conatiner">
-          {/* <img src={logo} alt="logo" /> */}
-          <div className="Home-title circle">
+          <div className="Home-title">
             <div>One</div>
             <div>Plus</div>
             <div>Two</div>
+            <div className="Home-subtitle">Hassle free event management.</div>
           </div>
         </div>
 
