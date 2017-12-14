@@ -35,7 +35,13 @@ class InviteMorePeopleDialog extends Component {
             disabled={!!!this.props.inviteLink}
           />
         </CopyToClipboard>
-        <FlatButton label="Cancel" onClick={this.props.onClose} />
+        <FlatButton
+          label="Cancel"
+          onClick={_ => {
+            this.props.onClose();
+            this.setState({ clicked: false });
+          }}
+        />
       </div>
     ];
 

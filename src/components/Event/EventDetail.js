@@ -3,7 +3,7 @@ import './EventDetail.css';
 import { connect } from 'react-redux';
 
 import { getEvent, sendMessage } from '../../actions/EventsActions';
-import { getInvite } from '../../actions/InvitesActions';
+import { getInvite, clearInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
 import { loadPass, monitorPass } from '../../actions/PassActions';
 
@@ -43,6 +43,7 @@ class EventDetail extends React.Component {
 
   closeShare = () => {
     this.setState({ shareOpen: false });
+    this.props.clearInvite();
   };
 
   openSend = () => {
@@ -241,5 +242,6 @@ export default connect(mapStateToProps, {
   setHeader,
   sendMessage,
   loadPass,
-  monitorPass
+  monitorPass,
+  clearInvite
 })(EventDetail);

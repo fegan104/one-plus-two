@@ -10,6 +10,10 @@ export default (state = '', action) => {
       return action.payload;
     }
 
+    case actionType.CLEAR_INVITE: {
+      return '';
+    }
+
     default:
       return state;
   }

@@ -64,3 +64,9 @@ export const generateNewInvite = event => {
     })
   };
 };
+
+export const clearInvite = () => {
+  return {
+    type: actionType.CLEAR_INVITE
+  };
+};
