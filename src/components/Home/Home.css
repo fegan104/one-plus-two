@@ -9,14 +9,10 @@
 
 .Home-title {
   margin: 0px auto;
+  margin-top: 54px;
   display: inline-block;
   font-size: 32px;
-  margin-bottom: 25vh;
-}
-
-img {
-  height: 50px;
-  display: inline-block;
+  margin-bottom: 16vh;
 }
 
 .Home-buttons-wrapper {
@@ -28,11 +24,13 @@ img {
 }
 
 .Home-button-container {
+  height: 50vh;
   width: 100vw;
   align-items: center;
-  justify-content: center;
+  padding-top: 20vh;
   display: flex;
   flex-direction: column;
+  background: #222;
 }
 
 .Home-button {

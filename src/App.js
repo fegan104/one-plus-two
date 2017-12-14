@@ -27,7 +27,7 @@ import promise from 'redux-promise-middleware';
 const muiTheme = getMuiTheme({
   palette: {
     primary1Color: '#222',
-    accent1Color: '#76FF03'
+    accent1Color: '#00e676'
   }
 });
 

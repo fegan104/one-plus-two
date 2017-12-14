@@ -2,7 +2,8 @@ import {
   getEventsDB,
   pushEventToDB,
   getEventFromDB,
-  pushMessageToDB
+  pushMessageToDB,
+  uploadBannerToDB
 } from '../services/FirebaseService';
 import actionType from '../constants';
 import { push } from 'react-router-redux';
@@ -55,5 +56,12 @@ export const sendMessage = (eventID, body) => {
   return {
     type: actionType.ADD_MESSAGE,
     payload: pushMessageToDB(eventID, body)
+  };
+};
+
+export const uploadBanner = file => {
+  return {
+    type: actionType.UPLOAD_BANNER,
+    payload: uploadBannerToDB(file)
   };
 };

@@ -5,6 +5,7 @@ import InviteLinkReducer from './InviteLinkReducer';
 import AuthReducer from './AuthReducer';
 import ScannerReducer from './ScannerReducer';
 import HeaderReducer from './HeaderReducer';
+import UploadReducer from './UploadReducer';
 import { routerReducer } from 'react-router-redux';
 
 import { combineReducers } from 'redux';
@@ -17,5 +18,6 @@ export default combineReducers({
   auth: AuthReducer,
   router: routerReducer,
   scanned: ScannerReducer,
-  header: HeaderReducer
+  header: HeaderReducer,
+  uploadUrl: UploadReducer
 });

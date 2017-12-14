@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './Home.css';
-import logo from './logo.svg';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -26,8 +25,8 @@ class Home extends Component {
     return (
       <div className="Home">
         <div className="Home-title-conatiner">
-          <img src={logo} alt="logo" />
-          <div className="Home-title">
+          {/* <img src={logo} alt="logo" /> */}
+          <div className="Home-title circle">
             <div>One</div>
             <div>Plus</div>
             <div>Two</div>
@@ -39,9 +38,9 @@ class Home extends Component {
             <div>
               <Link to="/events/new">
                 <RaisedButton
+                  backgroundColor="#fff"
                   className="Home-button"
                   label="Host an event"
-                  primary={true}
                 />
               </Link>
             </div>
@@ -49,9 +48,10 @@ class Home extends Component {
             <div>
               <Link to="/events">
                 <RaisedButton
+                  backgroundColor="#fff"
+                  labelColor="#000"
                   className="Home-button"
                   label="Show My Events"
-                  primary={true}
                 />
               </Link>
             </div>

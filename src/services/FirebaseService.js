@@ -10,6 +10,7 @@ import constants from '../constants';
 let database;
 let auth;
 let messaging;
+let storage;
 
 const getAge = dateString => {
   var today = new Date();
@@ -66,6 +67,7 @@ export const init = authCallback => {
     firebase.initializeApp(config);
     database = firebase.database();
     auth = firebase.auth();
+    storage = firebase.storage();
     messaging = firebase.messaging();
     messaging.onMessage(payload => {
       console.log('message received.');
@@ -356,4 +358,11 @@ export const pushMessageToDB = (eventId, body) => {
     .once('value')
     .then(snap => snap.val())
     .catch(console.error);
+};
+
+export const uploadBannerToDB = file => {
+  return storage
+    .ref('event-banners/' + file.name)
+    .put(file)
+    .then(snap => snap.downloadURL);
 };

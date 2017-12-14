@@ -43,6 +43,8 @@ class EventList extends Component {
   render() {
     let { events } = this.props;
 
+    if (events.length === 0) return <h2>You don't have any events yet.</h2>;
+
     let eventDivs = events.map(event => {
       return (
         <div key={event.id}>
