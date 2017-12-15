@@ -82,3 +82,10 @@ export const signOut = () => {
       });
   };
 };
+
+export const addUserEvent = newEventId => {
+  return {
+    type: actionType.ADD_EVENT_TO_USER,
+    payload: newEventId
+  };
+};

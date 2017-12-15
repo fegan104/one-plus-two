@@ -65,7 +65,7 @@ class EventList extends Component {
             leftAvatar={
               <img
                 src={event.picture}
-                alt="Event baner"
+                alt="Event banner"
                 style={{ height: '40px', width: '40px' }}
               />
             }

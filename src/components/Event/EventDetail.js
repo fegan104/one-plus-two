@@ -127,9 +127,10 @@ class EventDetail extends React.Component {
     }
 
     let isOwner =
-      user.events &&
-      user.events[event.id] &&
-      user.events[event.id].isOwner === true;
+      (user.events &&
+        user.events[event.id] &&
+        user.events[event.id].isOwner === true) ||
+      event.owners[user.id];
     let canInviteMore =
       (event.spotsLeft === null || event.spotsLeft > 0) &&
       (isOwner || (invite && invite.additionalInvitesLeft > 0));

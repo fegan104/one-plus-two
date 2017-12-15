@@ -20,18 +20,27 @@ import ImportContacts from 'material-ui/svg-icons/communication/import-export';
 import PlusOne from 'material-ui/svg-icons/social/plus-one';
 import InsertPhoto from 'material-ui/svg-icons/editor/insert-photo';
 import RaisedButton from 'material-ui/RaisedButton';
+import Loader from '../Common/Loader';
 
 import { connect } from 'react-redux';
-import { addEvent, uploadBanner } from '../../actions/EventsActions';
+import {
+  addEvent,
+  uploadBanner,
+  loadEvents
+} from '../../actions/EventsActions';
 import { setHeader } from '../../actions/HeaderActions';
 
 import EventModel from '../../models/EventModel';
+
+const NONE = 'None';
 
 class CreateEvent extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      importFrom: NONE
+    };
   }
 
   handleTextChange = (field, event) => {
@@ -53,13 +62,19 @@ class CreateEvent extends Component {
     });
   };
 
+  handleMenuChange = (event, index, value) => {
+    this.setState({ importFrom: value });
+  };
+
   handleFileUpload = event => {
     const file = event.target.files[0];
     this.props.uploadBanner(file);
+    this.setState({ uploadStarted: true });
   };
 
   handleCreateEvent = () => {
     let { user, addEvent, uploadUrl } = this.props;
+    const guestLimit = parseInt(this.state.guestLimit);
 
     let owners = {};
     owners[user.id] = true;
@@ -69,12 +84,20 @@ class CreateEvent extends Component {
     dateTime.setHours(selectedTime.getHours());
     dateTime.setMinutes(selectedTime.getMinutes());
 
+    let importFrom = this.state.importFrom;
+    if (importFrom === NONE) {
+      importFrom = null;
+    }
+
     addEvent(
       EventModel({
         ...this.state,
         picture: uploadUrl,
+        guestLimit: guestLimit,
+        spotsLeft: guestLimit,
         dateTime: dateTime.toUTCString(),
         owners,
+        importFrom,
         isSelfEnrollable: false
       })
     );
@@ -82,6 +105,9 @@ class CreateEvent extends Component {
 
   componentDidMount() {
     this.configureAppHeader();
+    if (this.props.user && this.props.user.events) {
+      this.props.loadEvents(Object.keys(this.props.user.events));
+    }
   }
 
   configureAppHeader = () => {
@@ -92,6 +118,54 @@ class CreateEvent extends Component {
     });
   };
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.uploadUrl) {
+      this.setState({ uploadStarted: false });
+    }
+    let user = newProps.user;
+    let userId = user && user.id;
+
+    if (
+      userId &&
+      user.events &&
+      !(this.props.user && this.props.user.events === user.events)
+    ) {
+      this.props.loadEvents(Object.keys(user.events));
+    }
+  }
+
+  renderUpload = () => {
+    if (this.props.uploadUrl) {
+      return <div>Image uploaded successfully!</div>;
+    } else if (this.state.uploadStarted) {
+      return <Loader />;
+    } else {
+      return (
+        <RaisedButton
+          label="Upload a banner"
+          labelPosition="before"
+          primary={true}
+          containerElement="label"
+        >
+          <input
+            type="file"
+            onChange={this.handleFileUpload}
+            style={{
+              cursor: 'pointer',
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+              width: '100%',
+              opacity: 0
+            }}
+          />
+        </RaisedButton>
+      );
+    }
+  };
+
   render() {
     return (
       <div>
@@ -100,7 +174,7 @@ class CreateEvent extends Component {
             <TextField
               floatingLabelText="Event Title"
               fullWidth={true}
-              value={this.state.title}
+              value={this.state.title || ''}
               onChange={this.handleTextChange.bind(null, 'title')}
             />
           </ListItem>
@@ -121,7 +195,7 @@ class CreateEvent extends Component {
             <TextField
               fullWidth={true}
               floatingLabelText="Location"
-              value={this.state.location}
+              value={this.state.location || ''}
               onChange={this.handleTextChange.bind(null, 'location')}
             />
           </ListItem>
@@ -131,7 +205,7 @@ class CreateEvent extends Component {
               floatingLabelText="Max guests"
               fullWidth={true}
               type="number"
-              value={this.state.guestLimit}
+              value={this.state.guestLimit || ''}
               onChange={this.handleTextChange.bind(null, 'guestLimit')}
             />
           </ListItem>
@@ -154,43 +228,21 @@ class CreateEvent extends Component {
             />
           </ListItem>
 
-          <ListItem leftIcon={<InsertPhoto />}>
-            {this.props.uploadUrl ? (
-              <div>Image uploaded successfully!</div>
-            ) : (
-              <RaisedButton
-                label="Upload a banner"
-                labelPosition="before"
-                primary={true}
-                containerElement="label"
-              >
-                <input
-                  type="file"
-                  onChange={this.handleFileUpload}
-                  style={{
-                    cursor: 'pointer',
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    width: '100%',
-                    opacity: 0
-                  }}
-                />
-              </RaisedButton>
-            )}
-          </ListItem>
+          <ListItem leftIcon={<InsertPhoto />}>{this.renderUpload()}</ListItem>
 
           <ListItem leftIcon={<ImportContacts />}>
-            <DropDownMenu value={1}>
+            <DropDownMenu
+              value={this.state.importFrom}
+              onChange={this.handleMenuChange}
+            >
               <MenuItem
-                value={1}
+                value={NONE}
                 label="Import guests from previous event"
                 primaryText="None"
               />
-              <MenuItem value={2} primaryText="Bake Sale" />
-              <MenuItem value={3} primaryText="Ultimate Game" />
+              {this.props.events.map(e => (
+                <MenuItem key={e.id} value={e.id} primaryText={e.title} />
+              ))}
             </DropDownMenu>
           </ListItem>
 
@@ -216,11 +268,15 @@ class CreateEvent extends Component {
 const mapStoreToProps = store => {
   return {
     user: store.auth.userObject,
-    uploadUrl: store.uploadUrl
+    uploadUrl: store.uploadUrl,
+    events: store.events
   };
 };
 
 // subscribe to updates in teh store with `connect`
-export default connect(mapStoreToProps, { addEvent, setHeader, uploadBanner })(
-  CreateEvent
-);
+export default connect(mapStoreToProps, {
+  addEvent,
+  setHeader,
+  uploadBanner,
+  loadEvents
+})(CreateEvent);

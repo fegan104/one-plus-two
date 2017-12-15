@@ -28,6 +28,13 @@ const muiTheme = getMuiTheme({
   palette: {
     primary1Color: '#222',
     accent1Color: '#00e676'
+  },
+  datePicker: {
+    headerColor: '#222',
+    selectColor: '#00e676'
+  },
+  timePicker: {
+    headerColor: '#222'
   }
 });
 

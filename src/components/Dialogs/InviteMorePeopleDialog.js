@@ -11,6 +11,15 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { generateNewInvite } from '../../actions/InvitesActions';
 
+const style = {
+  buttonWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+};
+
 class InviteMorePeopleDialog extends Component {
   constructor(props) {
     super(props);
@@ -71,7 +80,7 @@ class InviteMorePeopleDialog extends Component {
         open={this.props.show}
         onRequestClose={this.props.onClose}
       >
-        {content}
+        <div style={style.buttonWrapper}>{content}</div>
       </Dialog>
     );
   }

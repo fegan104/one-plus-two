@@ -9,14 +9,12 @@ export default (state = [], action) => {
       return action.payload;
     }
     case actionType.ADD_EVENT_FULFILLED: {
-      console.log('payload:', actionType.payload);
       return [...state, action.payload];
     }
     case actionType.GET_EVENT_FULFILLED: {
-      return [action.payload];
+      return [...state, action.payload];
     }
     case actionType.ADD_MESSAGE_FULFILLED: {
-      console.log('payload:', actionType.payload);
       return [
         { ...state[0], newsFeed: [...state[0].newsFeed, action.payload] }
       ];

@@ -5,6 +5,7 @@ import {
   pushMessageToDB,
   uploadBannerToDB
 } from '../services/FirebaseService';
+import { addUserEvent } from './AuthActions';
 import actionType from '../constants';
 import { push } from 'react-router-redux';
 
@@ -35,7 +36,11 @@ export const addEvent = event => {
       type: actionType.ADD_EVENT,
       payload: pushEventToDB(event)
         .then(newEvent => {
-          dispatch(push(`/event/${newEvent.id}`)); //TODO: actions should not do routing
+          dispatch(push(`/event/${newEvent.id}`));
+          return newEvent;
+        })
+        .then(newEvent => {
+          dispatch(addUserEvent(newEvent.id));
           return newEvent;
         })
         .catch(error => {

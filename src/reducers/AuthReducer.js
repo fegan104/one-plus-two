@@ -55,6 +55,21 @@ export default (state = initialState, action) => {
       };
     }
 
+    case actionType.ADD_EVENT_TO_USER: {
+      const newEvent = {};
+      newEvent[action.payload] = { isOwner: true };
+      return {
+        ...state,
+        userObject: {
+          ...state.userObject,
+          events: {
+            ...state.userObject.events,
+            ...newEvent
+          }
+        }
+      };
+    }
+
     default:
       return state;
   }

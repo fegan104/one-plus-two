@@ -6,7 +6,7 @@ const EventMessages = ({ newsFeed }) => {
       {newsFeed
         .map((m, i) => (
           <div className="message-bubble" key={i}>
-            {m.body}
+            <pre>{m.body}</pre>
           </div>
         ))
         .reverse()}
