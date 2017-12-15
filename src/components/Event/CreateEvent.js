@@ -74,7 +74,7 @@ class CreateEvent extends Component {
 
   handleCreateEvent = () => {
     let { user, addEvent, uploadUrl } = this.props;
-    const guestLimit = parseInt(this.state.guestLimit);
+    const guestLimit = parseInt(this.state.guestLimit, 10);
 
     let owners = {};
     owners[user.id] = true;
