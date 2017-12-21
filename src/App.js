@@ -3,6 +3,7 @@ import Home from './components/Home/Home';
 import CreateEvent from './components/Event/CreateEvent';
 import EventList from './components/Event/EventList';
 import EventDetail from './components/Event/EventDetail';
+import NotFound from './components/NotFound.js';
 import InviteForEvent from './components/Event/InviteForEvent';
 import Scanner from './components/Scanner/Scanner';
 
@@ -84,6 +85,7 @@ class App extends Component {
                     <Route path="/event/:id/scanner" component={Scanner} />
                     <Route path="/event/:id" component={EventDetail} />
                     <Route path="/invite/:id" component={InviteForEvent} />
+                    <Route path="*" component={NotFound} />
                   </Switch>
                 </div>
               </div>

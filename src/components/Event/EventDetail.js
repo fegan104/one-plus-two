@@ -121,8 +121,6 @@ class EventDetail extends React.Component {
     let { event, pass, user, invite } = this.props;
 
     if (!event || !user || user.events === null) {
-      // console.log("event:", event)
-      // console.log("user:", user)
       return <Loader />;
     }
 
@@ -232,7 +230,7 @@ const mapStateToProps = (state, ownProps) => {
     eventId,
     user: state.auth.userObject,
     pass: state.pass,
-    invite: state.invite
+    invite: state.invite //TODO this is sometimes in the userData but not in the invite store
   };
 };
 
