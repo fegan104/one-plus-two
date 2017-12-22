@@ -243,7 +243,7 @@ const mapStateToProps = (state, ownProps) => {
     eventId,
     user: state.auth.userObject,
     pass: state.pass,
-    invite: state.invite //TODO this is sometimes in the userData but not in the invite store
+    invite: state.invite
   };
 };
 

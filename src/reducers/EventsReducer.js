@@ -13,7 +13,7 @@ export default (state = [], action) => {
     }
     case actionType.GET_EVENT_FULFILLED: {
       //TODO update newly fetched event in store
-      return [...state, action.payload];
+      return [...state.filter(e => e.id !== action.payload.id), action.payload];
     }
     case actionType.ADD_MESSAGE_FULFILLED: {
       return [
