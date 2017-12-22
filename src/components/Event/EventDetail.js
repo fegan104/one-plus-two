@@ -67,15 +67,26 @@ class EventDetail extends React.Component {
   };
 
   componentDidMount() {
-    const { eventId } = this.props;
+    const { eventId, event, user } = this.props;
     this.props.getEvent(eventId);
 
     this.configureAppHeader();
+    if (
+      user &&
+      user.events &&
+      !this.props.invite &&
+      user.events[event.id] &&
+      user.events[event.id].invite
+    ) {
+      this.props.getInvite(user.events[event.id].invite);
+    } else {
+      console.log('user:', user);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     let { event, user } = nextProps;
-
+    console.log('will receive props');
     if (event) {
       this.configureAppHeader(nextProps);
     } else {
@@ -90,6 +101,8 @@ class EventDetail extends React.Component {
       user.events[event.id].invite
     ) {
       this.props.getInvite(user.events[event.id].invite);
+    } else {
+      console.log('user:', user);
     }
     if (
       user &&

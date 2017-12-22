@@ -39,6 +39,7 @@ export const getInviteInfoWithoutPermissions = id => {
           type: actionType.GET_INVITE_SUCCESS,
           payload: invite
         });
+        return invite;
       })
       .catch(error => {
         dispatch({

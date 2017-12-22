@@ -12,6 +12,7 @@ export default (state = [], action) => {
       return [...state, action.payload];
     }
     case actionType.GET_EVENT_FULFILLED: {
+      //TODO update newly fetched event in store
       return [...state, action.payload];
     }
     case actionType.ADD_MESSAGE_FULFILLED: {

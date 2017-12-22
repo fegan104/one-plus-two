@@ -73,14 +73,7 @@ class InviteForEvent extends React.Component {
       this.props.user.events &&
       this.props.user.events[event.id] &&
       this.props.user.events[event.id].invite ? null : (
-        <FlatButton
-          label={
-            this.props.user
-              ? 'Accept Invite Now!!!'
-              : 'Register to accept invite'
-          }
-          onClick={this.handleAcceptInvite}
-        />
+        <FlatButton label="Accept Invite" onClick={this.handleAcceptInvite} />
       );
 
     return (
