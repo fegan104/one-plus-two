@@ -10,7 +10,7 @@ const mailTransport = (functions) => {
   });
 };
 
-const emailUserMessage = ( user, event, message ) => {
+const emailUserMessage = ( user, event, message, functions ) => {
   const APP_NAME = "OnePlusTwo"
 
   const mailOptions = {
@@ -57,7 +57,7 @@ const SendEmail = (functions, admin) => {
         //promise all emails
         const emailPromises = []
         guests.forEach(g => {
-          emailPromises.push(emailUserMessage(g, eventData, messageData))
+          emailPromises.push(emailUserMessage(g, eventData, messageData, functions))
         })
 
         return Promise.all(emailPromises)

@@ -10,6 +10,7 @@ const SendMessage = require('./src/SendMessage');
 const SendEmail = require('./src/SendEmail');
 const GetEventStats = require('./src/GetEventStats');
 const CheckInPass = require('./src/CheckInPass')
+const ImportGuests = require('./src/ImportGuests')
 
 admin.initializeApp(functions.config().firebase);
 
@@ -22,3 +23,4 @@ exports.generateNewInvite = GenerateNewInvite(functions, admin);
 exports.sendEmail = SendEmail(functions, admin);
 exports.getEventStats = GetEventStats(functions, admin);
 exports.checkInPass = CheckInPass(functions, admin);
+exports.importGuests = ImportGuests(functions, admin);
