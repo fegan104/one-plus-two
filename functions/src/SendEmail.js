@@ -1,16 +1,6 @@
-const nodemailer = require('nodemailer');
+const EmailUtil = require('./EmailUtil');
 
-const mailTransport = (functions) => {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: functions.config().gmail.email,
-      pass: functions.config().gmail.password
-    }
-  });
-};
-
-const emailUserMessage = ( user, event, message ) => {
+const emailUserMessage = ( user, event, message, functions ) => {
   const APP_NAME = "OnePlusTwo"
 
   const mailOptions = {
@@ -20,7 +10,7 @@ const emailUserMessage = ( user, event, message ) => {
   // The user subscribed to the newsletter.
   mailOptions.subject = `New message posted in ${event.title}`;
   mailOptions.text = message.body;
-  return mailTransport(functions).sendMail(mailOptions).then(_ => {
+  return EmailUtil(functions).sendMail(mailOptions).then(_ => {
     console.log('New welcome email sent to:', user.email);
   });
 };
@@ -57,7 +47,7 @@ const SendEmail = (functions, admin) => {
         //promise all emails
         const emailPromises = []
         guests.forEach(g => {
-          emailPromises.push(emailUserMessage(g, eventData, messageData))
+          emailPromises.push(emailUserMessage(g, eventData, messageData, functions))
         })
 
         return Promise.all(emailPromises)
