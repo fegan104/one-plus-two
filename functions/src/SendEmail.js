@@ -1,4 +1,4 @@
-const EmailUtil = require('./src/EmailUtil');
+const EmailUtil = require('./EmailUtil');
 
 const emailUserMessage = ( user, event, message, functions ) => {
   const APP_NAME = "OnePlusTwo"

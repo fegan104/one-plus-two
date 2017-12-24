@@ -33,7 +33,6 @@ const buildInvite = (rootDb, isOwner, eventObject) => {
       .push(invite)
       .then(snap => snap.once('value'))
       .then(snap => {
-        console.log('aaa', snap);
         let newInvite = snap.val();
         newInvite.id = snap.key;
 

@@ -10,4 +10,4 @@ const EmailUtil = (functions) => {
   });
 };
 
-module.export = EmailUtil;
+module.exports = EmailUtil;

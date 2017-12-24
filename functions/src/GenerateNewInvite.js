@@ -1,4 +1,4 @@
-const InviteUtil = require('./src/InviteUtil');
+const InviteUtil = require('./InviteUtil');
 
 const cors = require('cors')({ origin: true });
 

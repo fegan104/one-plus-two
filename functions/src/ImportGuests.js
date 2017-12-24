@@ -1,5 +1,5 @@
-const InviteUtil = require('./src/InviteUtil');
-const EmailUtil = require('./src/EmailUtil');
+const InviteUtil = require('./InviteUtil.js');
+const EmailUtil = require('./EmailUtil.js');
 
 const ImportGuests = (functions, admin) => {
   return functions.database.ref('/events/{eventId}').onCreate(fbEvent => {
@@ -10,24 +10,30 @@ const ImportGuests = (functions, admin) => {
   })
 }
 
-const emailInviteToGuests = (event, admin, functions) => {
+const emailInviteToGuests = (eventId, admin, functions) => {
   const rootDb = admin.database().ref();
 
-  let guestsData = [];
-  return queryGuestsForEvent(event.id, admin)
+  let data = {};
+  return admin.database()
+    .ref(`/events/${eventId}`)
+    .once('value')
+    // .then(snap => snap.val())
+    .then(e => { data["event"] = e })
+    .then(_ => queryGuestsForEvent(eventId, admin))
     .then(guests => {
-      guestsData = guests;
+      data["guests"] = guests;
       const invitePromises = [];
       guests.forEach(g => {
-        invitePromises.push(InviteUtil.buildInviteAndUpdateEventAsOwner(rootDb, event))
+        invitePromises.push(InviteUtil.buildInviteAndUpdateEventAsOwner(rootDb, data.event))
       })
       return Promise.all(invitePromises)
     })
     .then(invites => {
       invites.forEach((invite, index) => {
-        sendEmailToGuest(invite, guestsData[index], event, functions)
+        sendEmailToGuest(invite, data.guests[index].val(), data.event.val(), functions)
       })
     })
+    .catch(console.error)
 }
 
 const queryGuestsForEvent = (eventId, admin) => {
@@ -39,14 +45,16 @@ const queryGuestsForEvent = (eventId, admin) => {
       const passes = passesSnap.val();
       return Object.keys(passes).map(k => passes[k].user);
     })
+    .then(guests => Array.from(new Set(guests)))
     .then(guests => {
-      console.log("guests:", guests);
-      let guestPromises = []
+      let guestPromises = [];
       guests.forEach(g => {
+        console.log("filtered guest:", g)
         guestPromises.push(admin.database().ref(`/users/${g}`).once('value'));
       });
       return Promise.all(guestPromises);
     })
+    .catch(console.error)
 }
 
 const sendEmailToGuest = (invite, guest, event, functions) => {
@@ -61,7 +69,7 @@ const sendEmailToGuest = (invite, guest, event, functions) => {
   mailOptions.text = `Claim you invitation at https://www.one-plus-two.com/invite/${invite.id}`;
   return EmailUtil(functions).sendMail(mailOptions).then(_ => {
     console.log('New invite email sent to:', guest.email);
-  });
+  }).catch(console.error);
 }
 
 module.exports = ImportGuests;
