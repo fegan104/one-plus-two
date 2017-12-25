@@ -69,6 +69,9 @@ class EventDetail extends React.Component {
   componentDidMount() {
     const { eventId, event, user } = this.props;
     this.props.getEvent(eventId);
+    if (!event) {
+      return;
+    }
 
     this.configureAppHeader();
     if (
@@ -101,9 +104,8 @@ class EventDetail extends React.Component {
       user.events[event.id].invite
     ) {
       this.props.getInvite(user.events[event.id].invite);
-    } else {
-      console.log('user:', user);
     }
+
     if (
       user &&
       user.events &&
@@ -115,7 +117,6 @@ class EventDetail extends React.Component {
     }
 
     if (this.props.pass) {
-      console.log('qqq', this.props.pass, this.props.pass.id);
       this.props.monitorPass(this.props.pass.id);
     }
   }

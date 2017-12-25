@@ -51,8 +51,8 @@ class InviteForEvent extends React.Component {
       this.props.showLoginModal();
       return;
     }
-
     if (!invite || !invite.event) {
+      console.log("something's wrong with your invite 😬");
       return;
     }
 
