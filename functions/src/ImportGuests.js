@@ -61,7 +61,7 @@ const sendEmailToGuest = (invite, guest, event, functions) => {
   const APP_NAME = "OnePlusTwo"
 
   const mailOptions = {
-    from: `${APP_NAME} <OnePlusTwoMQP@gmail.com.com>`,
+    from: `${APP_NAME} <OnePlusTwoMQP@gmail.com>`,
     to: guest.email
   };
   // The user subscribed to the newsletter.

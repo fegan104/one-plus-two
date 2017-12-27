@@ -14,6 +14,9 @@ export default (state = null, action) => {
     case actionType.REFRESH_PASS_FULFILLED: {
       return action.payload;
     }
+    case actionType.SIGNOUT_SUCCESS: {
+      return null;
+    }
     default:
       return state;
   }
