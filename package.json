@@ -62,7 +62,11 @@
     "webpack": "3.5.1",
     "webpack-dev-server": "2.8.2",
     "webpack-manifest-plugin": "1.2.1",
-    "whatwg-fetch": "2.0.3"
+    "whatwg-fetch": "2.0.3",
+    "cors": "^2.8.4",
+    "firebase-admin": "~5.2.1",
+    "firebase-functions": "^0.6.3",
+    "nodemailer": "^4.4.0"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css}": [
