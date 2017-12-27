@@ -53,7 +53,7 @@ module.exports = (options) => {
   };
 
   const childUserInvitesFn = {
-    once: jest.fn((q) => Promise.resolve({
+    once: jest.fn((q) => Promise.resolve((!fakeInviteId) ? null : {
       val: jest.fn(q => fakeInviteId)
     })),
   };

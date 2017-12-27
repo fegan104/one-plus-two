@@ -26,11 +26,11 @@ describe('Cloud function', () => {
     const fakeInviteId = 'testInviteId';
 
 
-    const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
+    const fakeRootDb = RootDbFactory({fakeEvent});
 
 
     Object.defineProperty(admin, 'database', {
-      get: () => (() => ({ ref: () => {return fakeRootDb;} }))
+      get: () => (() => ({ ref: () => { return fakeRootDb; } }))
     });
   });
 
@@ -57,6 +57,11 @@ describe('Cloud function', () => {
           json: (msg) => {
             expect(msg.event).toEqual('fakeEvent1');
             console.log(msg);
+            done();
+          },
+          end: () => {
+            console.log(code);
+            //expect(true).toEqual(false);
             done();
           }
         };
