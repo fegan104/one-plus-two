@@ -13,7 +13,7 @@ export const acceptInvite = (inviteId, eventId, userId) => {
       type: actionType.ACCEPT_INVITE,
       payload: acceptInviteInDB(inviteId, eventId, userId)
         .then(passObj => {
-          dispatch(push(`/event/${eventId}`)); //TODO don't push here?
+          dispatch(push(`/event/${eventId}`));
           return passObj;
         })
         .catch(error => {

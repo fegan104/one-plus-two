@@ -261,7 +261,7 @@ export const acceptInviteInDB = (inviteId, eventId, userId) => {
       .update({ claimedByUser: userId })
       .then(dbObj => {
         if (!dbObj) {
-          return reject('cannot claim');
+          return reject(`cannot claim ${dbObj}`);
         }
 
         database

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './Home.css';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { setHeader } from '../../actions/HeaderActions';
@@ -37,8 +37,9 @@ class Home extends Component {
           <div className="Home-button-container">
             <div>
               <Link to="/events/new">
-                <RaisedButton
-                  backgroundColor="#fff"
+                <FlatButton
+                  labelStyle={{ color: '#fff' }}
+                  labelColor="#fff"
                   className="Home-button"
                   label="Host an event"
                 />
@@ -47,9 +48,9 @@ class Home extends Component {
 
             <div>
               <Link to="/events">
-                <RaisedButton
-                  backgroundColor="#fff"
-                  labelColor="#000"
+                <FlatButton
+                  labelStyle={{ color: '#fff' }}
+                  primary={true}
                   className="Home-button"
                   label="Show My Events"
                 />

@@ -27,9 +27,21 @@ class InviteForEvent extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     let { invite } = nextProps;
+    const event = invite && invite.event;
 
     if (invite && invite.event) {
       this.configureAppHeader(nextProps);
+    }
+
+    if (
+      event &&
+      this.props.user &&
+      this.props.user.events &&
+      this.props.user.events[event.id] &&
+      this.props.user.events[event.id].pass
+    ) {
+      console.log('props:', this.props);
+      this.props.push(`/event/${event.id}`);
     }
   }
 
@@ -75,6 +87,17 @@ class InviteForEvent extends React.Component {
       this.props.user.events[event.id].invite ? null : (
         <FlatButton label="Accept Invite" onClick={this.handleAcceptInvite} />
       );
+
+    if (
+      event &&
+      this.props.user &&
+      this.props.user.events &&
+      this.props.user.events[event.id] &&
+      this.props.user.events[event.id].pass
+    ) {
+      console.log('navigating to event');
+      this.props.push(`/event/${event.id}`);
+    }
 
     return (
       <div className="EventDetail">
