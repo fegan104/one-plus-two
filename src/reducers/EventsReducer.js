@@ -20,6 +20,9 @@ export default (state = [], action) => {
         { ...state[0], newsFeed: [...state[0].newsFeed, action.payload] }
       ];
     }
+    case actionType.SIGNOUT_SUCCESS: {
+      return [];
+    }
 
     default:
       return state;

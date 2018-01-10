@@ -13,14 +13,12 @@ const GenerateNewInvite = (functions, admin) => {
           const eventId = req.query.eventId;
           const rootDb = admin.database().ref();
 
-          console.log(uid, eventId);
-
           rootDb
             .child(`/events/${eventId}`)
             .once('value')
             .then(eventObj => {
               if (!eventObj) {
-                res.status(200).end();
+                res.status(404).end();
                 return;
               }
 
@@ -51,7 +49,6 @@ const GenerateNewInvite = (functions, admin) => {
               }
             })
             .catch(error => {
-              console.log(error);
               res.status(404).send(error);
             });
         })

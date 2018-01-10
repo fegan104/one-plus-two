@@ -19,6 +19,9 @@ export default (state = initState, action) => {
     case actionType.CHECK_IN_PASS_REJECTED: {
       return { ...initState, loading: false, error: action.payload.text };
     }
+    case actionType.SIGNOUT_SUCCESS: {
+      return initState;
+    }
     default:
       return state;
   }

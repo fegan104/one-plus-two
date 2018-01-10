@@ -13,6 +13,10 @@ export default (state = null, action) => {
       return action.payload;
     }
 
+    case actionType.SIGNOUT_SUCCESS: {
+      return null;
+    }
+
     default:
       return state;
   }

@@ -12,12 +12,15 @@ import { login as loginAction } from '../../actions/AuthActions';
 const style = {
   buttonWrapper: {
     display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
   },
   signInButton: {
     marginBottom: '4px'
+  },
+  signInGoogle: {
+    marginBottom: '4px',
+    marginLeft: '20px'
   }
 };
 
@@ -52,7 +55,7 @@ class LoginDialog extends Component {
             onClick={this.loginViaFb}
           />
           <RaisedButton
-            style={style.signInButton}
+            style={style.signInGoogle}
             label="Login via Google"
             backgroundColor="#4885ed"
             labelColor="#fff"
