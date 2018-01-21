@@ -15,6 +15,8 @@ admin.auth = jest.fn(() => ({
   	  return Promise.resolve({
   	  	uid: 'randomUserId'
   	  });
-  	}
+  	} else {
+      return Promise.reject('Unauthorized');
+    }
   })
 }));

@@ -1,6 +1,7 @@
 const myFunctions = require('../src/InviteUtil');
 const RootDbFactory = require('./factories/RootDbFactory');
-const EventFactory = require('./factories/EventFactory');
+const ModelFactory = require('./factories/ModelFactory');
+const EventFactory = ModelFactory('event');
 const FirebaseFactory = require('./factories/FirebaseFactory');
 
 

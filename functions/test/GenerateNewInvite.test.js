@@ -1,78 +1,204 @@
 const RootDbFactory = require('./factories/RootDbFactory');
-const EventFactory = require('./factories/EventFactory');
+const ModelFactory = require('./factories/ModelFactory');
+const EventFactory = ModelFactory('event');
 const CorsFactory = require('./factories/CorsFactory');
 const FirebaseFactory = require('./factories/FirebaseFactory');
 
 const myFunctions = require('../index.js');
 const admin = require('firebase-admin');
 
-describe('Cloud function', () => {
-  beforeEach(() => {
-    const fakeEvent = EventFactory({
-      key: 'fakeEvent1',
-      _obj: {
-        desc: 'test',
-        guestLimit: 50,
-        spotsLeft: 49,
-        isSelfEnrollable: false,
-        canBringXPeople: 2,
-        owners: [] // randomUserId
-      }
+describe('Cloud function GenerateNewInvite', () => {
+  describe('Basic validation', () => {
+    beforeEach(() => {
+      const fakeEvent = EventFactory({
+        key: 'fakeEvent1',
+        _obj: {
+          desc: 'test',
+          guestLimit: 50,
+          spotsLeft: 49,
+          isSelfEnrollable: false,
+          canBringXPeople: 2,
+          owners: {} // randomUserId
+        }
+      });
+
+      const fakeRootDb = RootDbFactory({fakeEvent});
+
+      Object.defineProperty(admin, 'database', {
+        get: () => (() => ({ ref: () => { return fakeRootDb; } }))
+      });
     });
 
-    const fakeInvite = {
-      additionalInvitesLeft: 10
-    };
-    const fakeInviteId = 'testInviteId';
+    test('Invalid bearer token => Unauthorized user', done => {
+      const mockRequest = {
+        query: {
+          eventId: 'fakeEvent1'
+        },
+        get: jest.fn(param => {
+          if (param == 'Authorization') {
+            return 'Bearer wrongToken';
+          }
+        })
+      };
 
+      const mockResponse = {
+        status: (code) => {
+          return {
+            send: (msg) => {
+              expect(code).toEqual(401);
+              expect(msg).toEqual('Unauthorized');
+              done();
+            }
+          };
+        }
+      };
 
-    const fakeRootDb = RootDbFactory({fakeEvent});
+      myFunctions.generateNewInvite(mockRequest, mockResponse);
+    });
 
+    test('Event not found', done => {
+      const mockRequest = {
+        query: {
+          eventId: 'wrongFakeEvent1'
+        },
+        get: jest.fn(param => {
+          if (param == 'Authorization') {
+            return 'Bearer fAkEttttoken';
+          }
+        })
+      };
 
-    Object.defineProperty(admin, 'database', {
-      get: () => (() => ({ ref: () => { return fakeRootDb; } }))
+      const mockResponse = {
+        status: (code) => {
+          return {
+            end: (msg) => {
+              expect(code).toEqual(404);
+              done();
+            },
+            send: (msg) => {
+              console.log('aaa', msg);
+              console.log('qqqq');
+              expect(code).toEqual(404);
+              done();
+            }
+          };
+        }
+      };
+
+      myFunctions.generateNewInvite(mockRequest, mockResponse);
+    });
+
+    test('Invitee cannot generate an invite without being invited', done => {
+      const mockRequest = {
+        query: {
+          eventId: 'fakeEvent1'
+        },
+        get: jest.fn(param => {
+          if (param == 'Authorization') {
+            return 'Bearer fAkEttttoken';
+          }
+        })
+      };
+
+      const mockResponse = {
+        status: (code) => {
+          return {
+            end: () => {
+              expect(code).toEqual(401);
+              done();
+            }
+          };
+        }
+      };
+
+      myFunctions.generateNewInvite(mockRequest, mockResponse);
     });
   });
 
-  // TODO: test owner, no owner with invite, no owner without an invite, no owner with invalid invite
-  test('returns a 303 redirect', done => {
-    // Use mock requests and mock responses to assert the function works as expected
-    const mockRequest = {
-      query: {
-        eventId: 'fakeEvent1'
-      },
-      get: jest.fn(param => {
-        if (param == 'Authorization') {
-          return 'Bearer fAkEttttoken';
+  describe('Proper data', () => {
+    beforeEach(() => {
+      const fakeEvent = EventFactory({
+        key: 'fakeEvent1',
+        _obj: {
+          desc: 'test',
+          guestLimit: 50,
+          spotsLeft: 49,
+          isSelfEnrollable: false,
+          canBringXPeople: 2,
+          owners: {} // randomUserId
         }
-      })
-    };
-    const mockResponse = {
-      status: (code) => {
-        return {
-          send: (msg) => {
-            console.log(msg);
-            done();
-          },
-          json: (msg) => {
-            expect(msg.event).toEqual('fakeEvent1');
-            console.log(msg);
-            done();
-          },
-          end: () => {
-            console.log(code);
-            //expect(true).toEqual(false);
-            done();
+      });
+
+      const fakeInvite = {
+        additionalInvitesLeft: 1
+      };
+
+      const fakeInviteId = 'testInviteId';
+
+      const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
+
+      Object.defineProperty(admin, 'database', {
+        get: () => (() => ({ ref: () => { return fakeRootDb; } }))
+      });
+    });
+
+    // TODO: test owner, no owner with invite, no owner with invalid invite
+    test('Create a new invite', done => {
+      const mockRequest = {
+        query: {
+          eventId: 'fakeEvent1'
+        },
+        get: jest.fn(param => {
+          if (param == 'Authorization') {
+            return 'Bearer fAkEttttoken';
           }
-        };
-      },
-      redirect: (code, path) => {
-        console.log(`redirect(${code}, ${path}) was called`);
-        expect(code).toEqual(303);
-        expect(path).toEqual('/messages');
-        done();
-      }
-    };
-    myFunctions.generateNewInvite(mockRequest, mockResponse);
+        })
+      };
+
+      const mockResponse = {
+        status: (code) => {
+          return {
+            json: (msg) => {
+              expect(msg.event).toEqual('fakeEvent1');
+              done();
+            },
+          };
+        }
+      };
+
+      myFunctions.generateNewInvite(mockRequest, mockResponse);
+    });
+
+    test('Fail to create two new invites (when only one is permitted)', async (done) => {
+      const mockRequest = {
+        query: {
+          eventId: 'fakeEvent1'
+        },
+        get: jest.fn(param => {
+          if (param == 'Authorization') {
+            return 'Bearer fAkEttttoken';
+          }
+        })
+      };
+
+      const mockResponse = {
+        status: (code) => {
+          return {
+            send: (msg) => {
+              expect(code).toEqual(401);
+              expect(msg).toEqual('no more invites');
+              done();
+            },
+            json: (msg) => {
+              expect(msg.event).toEqual('fakeEvent1');
+            }
+          };
+        }
+      };
+
+      myFunctions.generateNewInvite(mockRequest, mockResponse);
+      myFunctions.generateNewInvite(mockRequest, mockResponse)
+    });
+
   });
 });

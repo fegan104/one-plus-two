@@ -1,21 +1,27 @@
-const EventFactory = require('./EventFactory');
+const ModelFactory = require('./ModelFactory');
+const EventFactory = ModelFactory('event');
+const PassFactory = ModelFactory('pass');
+const UserFactory = ModelFactory('user');
 
 const fakeUserId = 'randomUserId';
 
 const defaultValues = () => {
   return {
-    fakeEvent: EventFactory({key: null, _obj: {}}),
+    fakeEvent: EventFactory(),
+    fakePass: PassFactory(),
+    fakeUser: UserFactory(),
     fakeInviteId: null,
     fakeInvite: {}
   };
 };
 
 module.exports = (options) => {
-  let { fakeInviteId, fakeInvite, fakeEvent } = {...defaultValues(), ...options};
+  let { fakeInviteId, fakeInvite, fakeEvent, fakePass, fakeUser } = {...defaultValues(), ...options};
 
-  const childInviteIdFn = {
+  const childInviteFn = {
     once: jest.fn((q) => Promise.resolve({
-      val: jest.fn(() => fakeInvite)
+      val: jest.fn(() => fakeInvite),
+      key: fakeInviteId
     })),
     update: jest.fn(val => {
       Object.keys(val).forEach(key => {
@@ -33,7 +39,7 @@ module.exports = (options) => {
     })
   };
 
-  const childInviteFn = {
+  const childInvitesFn = {
     push: jest.fn(val => {
       return Promise.resolve({
         once: jest.fn(q => {
@@ -52,6 +58,21 @@ module.exports = (options) => {
     once: jest.fn((q) => Promise.resolve(fakeEvent)),
   };
 
+  const childOnceUserFn = {
+    once: jest.fn((q) => Promise.resolve(fakeUser)),
+  };
+
+  const childOncePassFn = {
+    once: jest.fn((q) => Promise.resolve(fakePass)),
+    update: jest.fn(val => {
+      Object.keys(val).forEach(key => {
+        fakePass._obj[key] = val[key];
+      });
+
+      return Promise.resolve();
+    })
+  };
+
   const childUserInvitesFn = {
     once: jest.fn((q) => Promise.resolve((!fakeInviteId) ? null : {
       val: jest.fn(q => fakeInviteId)
@@ -60,18 +81,34 @@ module.exports = (options) => {
 
   const fakeRootDb = {
     child: jest.fn(childName => {
+      let testVar;
+
       if (childName === `/invites/${fakeInviteId}`) {
-        return childInviteIdFn;
+        return childInviteFn;
       } else if (childName === `/events/${fakeEvent.key}/spotsLeft`) {
         return childSpotsLeftFn;
+      } else if ((testVar = childName.match(/^\/events\/(.*)\/owners\/(.*)$/g))) {
+        if (childName.match(fakeEvent.key) && fakeEvent._obj.owners && fakeEvent._obj.owners[childName.split('owners/')[1]]) {
+          return { once: jest.fn((q) => Promise.resolve({val: jest.fn(() => true)})) };
+        } else {
+          return { once: jest.fn((q) => Promise.resolve(null)) };
+        }
       } else if (childName === '/invites') {
-        return childInviteFn;
+        return childInvitesFn;
       } else if (childName === `/events/${fakeEvent.key}`) {
         return childOnceEventFn;
+      } else if (childName === `/users/${fakeUser.key}`) {
+        return childOnceUserFn;
       } else if (childName === `/users/${fakeUserId}/events/${fakeEvent.key}/invite`) {
         return childUserInvitesFn;
+      } else if ((testVar = childName.match(/^\/passes\/(.*)$/g))) {
+        if (childName.split('passes/')[1] === fakePass.key) {
+          return childOncePassFn;
+        } else {
+          return { once: jest.fn((q) => Promise.resolve(PassFactory())) };
+        }
       } else {
-        return null;
+        return { once: jest.fn((q) => Promise.resolve(null)) };
       }
     })
   };

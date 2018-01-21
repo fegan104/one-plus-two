@@ -29,6 +29,10 @@ const GenerateNewInvite = (functions, admin) => {
                   .then(invite => {
                     res.status(200).json(invite);
                     return;
+                  })
+                  .catch(error => {
+                    res.status(401).send(error);
+                    return;
                   });
               } else {
                 rootDb
@@ -43,6 +47,10 @@ const GenerateNewInvite = (functions, admin) => {
                     InviteUtil.buildInviteAndUpdateEventAsInvitee(rootDb, eventObj, oldInviteDbObj.val())
                       .then(invite => {
                         res.status(200).json(invite);
+                        return;
+                      })
+                      .catch(error => {
+                        res.status(401).send(error);
                         return;
                       });
                   });
