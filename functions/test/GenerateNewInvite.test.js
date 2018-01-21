@@ -1,6 +1,7 @@
 const RootDbFactory = require('./factories/RootDbFactory');
 const ModelFactory = require('./factories/ModelFactory');
 const EventFactory = ModelFactory('event');
+const InviteFactory = ModelFactory('invite');
 const CorsFactory = require('./factories/CorsFactory');
 const FirebaseFactory = require('./factories/FirebaseFactory');
 
@@ -129,13 +130,14 @@ describe('Cloud function GenerateNewInvite', () => {
         }
       });
 
-      const fakeInvite = {
-        additionalInvitesLeft: 1
-      };
+      const fakeInvite = InviteFactory({
+        key: 'testInviteId',
+        _obj: {
+          additionalInvitesLeft: 1
+        }
+      });
 
-      const fakeInviteId = 'testInviteId';
-
-      const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
+      const fakeRootDb = RootDbFactory({fakeEvent, fakeInvite});
 
       Object.defineProperty(admin, 'database', {
         get: () => (() => ({ ref: () => { return fakeRootDb; } }))

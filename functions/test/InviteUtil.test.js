@@ -2,6 +2,7 @@ const myFunctions = require('../src/InviteUtil');
 const RootDbFactory = require('./factories/RootDbFactory');
 const ModelFactory = require('./factories/ModelFactory');
 const EventFactory = ModelFactory('event');
+const InviteFactory = ModelFactory('invite');
 const FirebaseFactory = require('./factories/FirebaseFactory');
 
 
@@ -19,20 +20,21 @@ describe('buildInviteAndUpdateEventAsInvitee', () => {
       }
     });
 
-    const fakeInvite = {
-      additionalInvitesLeft: 10
-    };
-    const fakeInviteId = 'testInviteId';
+    const fakeInvite = InviteFactory({
+      key: 'testInviteId',
+      _obj: {
+        additionalInvitesLeft: 10
+      }
+    });
 
+    const fakeRootDb = RootDbFactory({fakeEvent, fakeInvite});
 
-    const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
-
-    return myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInviteId).then(result => {
+    return myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInvite.key).then(result => {
       expect(result.id).toEqual('randomInviteKey');
       expect(result.event).toEqual(fakeEvent.key);
       expect(result.additionalInvitesLeft).toEqual(0); 
       expect(fakeEvent._obj.spotsLeft).toEqual(48);
-      expect(fakeInvite.additionalInvitesLeft).toEqual(9);
+      expect(fakeInvite._obj.additionalInvitesLeft).toEqual(9);
     });
   });
 
@@ -48,15 +50,17 @@ describe('buildInviteAndUpdateEventAsInvitee', () => {
       }
     });
 
-    const fakeInvite = {
-      additionalInvitesLeft: 0
-    };
-    const fakeInviteId = 'testInviteId';
+    const fakeInvite = InviteFactory({
+      key: 'testInviteId',
+      _obj: {
+        additionalInvitesLeft: 0
+      }
+    });
 
 
-    const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
+    const fakeRootDb = RootDbFactory({fakeEvent, fakeInvite});
 
-    await expect(myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInviteId)).rejects.toMatch('no more invites');
+    await expect(myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInvite.key)).rejects.toMatch('no more invites');
   });
 
   test('fails to creates an invite with spotsLeft=0', async () => {
@@ -71,15 +75,17 @@ describe('buildInviteAndUpdateEventAsInvitee', () => {
       }
     });
 
-    const fakeInvite = {
-      additionalInvitesLeft: 2
-    };
-    const fakeInviteId = 'testInviteId';
+    const fakeInvite = InviteFactory({
+      key: 'testInviteId',
+      _obj: {
+        additionalInvitesLeft: 2
+      }
+    });
 
 
-    const fakeRootDb = RootDbFactory({fakeEvent, fakeInviteId, fakeInvite});
+    const fakeRootDb = RootDbFactory({fakeEvent, fakeInvite});
 
-    await expect(myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInviteId)).rejects.toMatch('no more space');
+    await expect(myFunctions.buildInviteAndUpdateEventAsInvitee(fakeRootDb, fakeEvent, fakeInvite.key)).rejects.toMatch('no more space');
   });
 });
 

@@ -2,6 +2,7 @@ const ModelFactory = require('./ModelFactory');
 const EventFactory = ModelFactory('event');
 const PassFactory = ModelFactory('pass');
 const UserFactory = ModelFactory('user');
+const InviteFactory = ModelFactory('invite');
 
 const fakeUserId = 'randomUserId';
 
@@ -10,22 +11,18 @@ const defaultValues = () => {
     fakeEvent: EventFactory(),
     fakePass: PassFactory(),
     fakeUser: UserFactory(),
-    fakeInviteId: null,
-    fakeInvite: {}
+    fakeInvite: InviteFactory()
   };
 };
 
 module.exports = (options) => {
-  let { fakeInviteId, fakeInvite, fakeEvent, fakePass, fakeUser } = {...defaultValues(), ...options};
+  let { fakeInvite, fakeEvent, fakePass, fakeUser } = {...defaultValues(), ...options};
 
   const childInviteFn = {
-    once: jest.fn((q) => Promise.resolve({
-      val: jest.fn(() => fakeInvite),
-      key: fakeInviteId
-    })),
+    once: jest.fn((q) => Promise.resolve(fakeInvite)),
     update: jest.fn(val => {
       Object.keys(val).forEach(key => {
-        fakeInvite[key] = val[key];
+        fakeInvite._obj[key] = val[key];
       });
 
       return Promise.resolve();
@@ -74,8 +71,8 @@ module.exports = (options) => {
   };
 
   const childUserInvitesFn = {
-    once: jest.fn((q) => Promise.resolve((!fakeInviteId) ? null : {
-      val: jest.fn(q => fakeInviteId)
+    once: jest.fn((q) => Promise.resolve((!fakeInvite.key) ? null : {
+      val: jest.fn(q => fakeInvite.key)
     })),
   };
 
@@ -83,7 +80,7 @@ module.exports = (options) => {
     child: jest.fn(childName => {
       let testVar;
 
-      if (childName === `/invites/${fakeInviteId}`) {
+      if (childName === `/invites/${fakeInvite.key}`) {
         return childInviteFn;
       } else if (childName === `/events/${fakeEvent.key}/spotsLeft`) {
         return childSpotsLeftFn;
