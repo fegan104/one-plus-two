@@ -8,6 +8,7 @@ import Dialog from 'material-ui/Dialog';
 import Loader from '../Common/Loader';
 
 import { Pie, Line } from 'react-chartjs-2';
+// eslint-disable-next-line
 import AnnotationPlugin from 'chartjs-plugin-annotation';
 import _ from 'lodash';
 
