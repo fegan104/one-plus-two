@@ -25,9 +25,10 @@ const getAge = dateString => {
 
 const cloudEndpoint = url => {
   return new Promise((resolve, reject) => {
-    auth.currentUser.getToken().then(token => {
-      let endpoint = `${process.env
-        .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/${url}`;
+    let callback = token => {
+      let endpoint = `${
+        process.env.REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT
+      }/${url}`;
 
       fetch(endpoint, {
         headers: {
@@ -46,7 +47,13 @@ const cloudEndpoint = url => {
         const json = response.json();
         resolve(json);
       });
-    });
+    };
+
+    if (auth.currentUser) {
+      auth.currentUser.getToken().then(callback);
+    } else {
+      callback('fake-token');
+    }
   });
 };
 
@@ -226,11 +233,7 @@ export const getInviteFromDB = inviteId => {
 
 export const getInviteInfoFromCloudFunction = inviteId => {
   return new Promise((resolve, reject) => {
-    let endpoint = `${process.env
-      .REACT_APP_FIREBASE_FUNCTIONS_ENDPOINT}/getInviteInfo?inviteId=${inviteId}`;
-
-    fetch(endpoint, { headers: { 'Content-Type': 'application/json' } })
-      .then(res => res.json())
+    cloudEndpoint(`getInviteInfo?inviteId=${inviteId}`)
       .then(json => {
         let invite = InviteModel({ ...json, event: json.event.id });
         resolve(invite.setEvent(json.event));
@@ -247,6 +250,18 @@ export const generateInviteCloudFunction = eventId => {
       .then(json => {
         let invite = InviteModel({ ...json, event: json.event.id });
         resolve(invite.setEvent(json.event));
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+export const getEventStatsFromCloudFunction = eventId => {
+  return new Promise((resolve, reject) => {
+    cloudEndpoint(`getEventStats?eventId=${eventId}`)
+      .then(json => {
+        resolve(json);
       })
       .catch(error => {
         reject(error);

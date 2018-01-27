@@ -1,0 +1,17 @@
+.AttendanceBox,
+.GenderBox,
+.TimelineBox {
+  text-align: center;
+}
+
+.AttendanceBox h2,
+.GenderBox h2,
+.TimelineBox h2 {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.ShowStatsDialog {
+  overflow-y: scroll !important;
+  height: 190px;
+}

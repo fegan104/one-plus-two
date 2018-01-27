@@ -2,7 +2,7 @@ import React from 'react';
 import './EventDetail.css';
 import { connect } from 'react-redux';
 
-import { getEvent, sendMessage } from '../../actions/EventsActions';
+import { getEvent } from '../../actions/EventsActions';
 import { getInvite, clearInvite } from '../../actions/InvitesActions';
 import { setHeader } from '../../actions/HeaderActions';
 import { loadPass, monitorPass } from '../../actions/PassActions';
@@ -10,14 +10,14 @@ import { loadPass, monitorPass } from '../../actions/PassActions';
 import Fab from 'material-ui/FloatingActionButton';
 import CropFree from 'material-ui/svg-icons/image/crop-free';
 
-import Dialog from 'material-ui/Dialog';
 import ShowPassDialog from '../Dialogs/ShowPassDialog';
+import ShowStatsDialog from '../Dialogs/ShowStatsDialog';
 import InviteMorePeopleDialog from '../Dialogs/InviteMorePeopleDialog';
+import SendMessageDialog from '../Dialogs/SendMessageDialog';
 import EventMessages from './EventMessages';
 
 import EventCard from './EventCard';
 import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
 import { push } from 'react-router-redux';
 
 import Loader from '../Common/Loader';
@@ -33,37 +33,26 @@ class EventDetail extends React.Component {
       shareOpen: false,
       sendOpen: false,
       passOpen: false,
+      statsOpen: false,
       messageText: ''
     };
   }
 
-  openShare = () => {
-    this.setState({ shareOpen: true });
+  openDialog = dialogType => {
+    return () => {
+      this.setState({ [dialogType + 'Open']: true });
+    };
+  };
+
+  closeDialog = dialogType => {
+    return () => {
+      this.setState({ [dialogType + 'Open']: false });
+    };
   };
 
   closeShare = () => {
-    this.setState({ shareOpen: false });
+    this.closeDialog('share')();
     this.props.clearInvite();
-  };
-
-  openSend = () => {
-    this.setState({ sendOpen: true });
-  };
-
-  closeSend = () => {
-    this.setState({ sendOpen: false });
-  };
-
-  openPass = () => {
-    this.setState({ passOpen: true });
-  };
-
-  closePass = () => {
-    this.setState({ passOpen: false });
-  };
-
-  handleMessage = event => {
-    this.setState({ messageText: event.target.value });
   };
 
   componentDidMount() {
@@ -147,18 +136,6 @@ class EventDetail extends React.Component {
       (event.spotsLeft === null || event.spotsLeft > 0) &&
       (isOwner || (invite && invite.additionalInvitesLeft > 0));
 
-    const sendActions = [
-      <FlatButton label="Cancel" primary={true} onClick={this.closeSend} />,
-      <FlatButton
-        label="Send"
-        primary={true}
-        onClick={_ => {
-          this.props.sendMessage(event.id, this.state.messageText);
-          this.closeSend();
-        }}
-      />
-    ];
-
     const scanButton = (
       <Fab
         className="fab"
@@ -172,16 +149,28 @@ class EventDetail extends React.Component {
     return (
       <div className="EventDetail">
         <EventCard event={event}>
-          {isOwner ? (
-            <FlatButton label="Send Message" onClick={this.openSend} />
-          ) : null}
+          {isOwner
+            ? [
+                <FlatButton
+                  label="Send Message"
+                  onClick={this.openDialog('send')}
+                />,
+                <FlatButton
+                  label="Show Stats"
+                  onClick={this.openDialog('stats')}
+                />
+              ]
+            : null}
           {canInviteMore ? (
-            <FlatButton label="Invite Guests" onClick={this.openShare} />
+            <FlatButton
+              label="Invite Guests"
+              onClick={this.openDialog('share')}
+            />
           ) : (
             <FlatButton label="Cannot Invite More Guests" disabled={true} />
           )}
           {pass ? (
-            <FlatButton label="Show Pass" onClick={this.openPass} />
+            <FlatButton label="Show Pass" onClick={this.openDialog('pass')} />
           ) : null}
         </EventCard>
 
@@ -193,30 +182,28 @@ class EventDetail extends React.Component {
           />
         ) : null}
 
-        <Dialog
-          title="Compose message"
-          actions={sendActions}
-          modal={false}
-          open={this.state.sendOpen}
-          onRequestClose={this.closeSend}
-        >
-          <TextField
-            name="message-field"
-            label="Message Text"
-            multiLine={true}
-            fullWidth={true}
-            value={this.state.messageText}
-            onChange={this.handleMessage}
-          />
-        </Dialog>
-
         {pass ? (
           <ShowPassDialog
             pass={pass}
             show={this.state.passOpen}
-            onClose={this.closePass}
+            onClose={this.closeDialog('pass')}
           />
         ) : null}
+
+        {isOwner
+          ? [
+              <SendMessageDialog
+                event={event}
+                show={this.state.sendOpen}
+                onClose={this.closeDialog('send')}
+              />,
+              <ShowStatsDialog
+                event={event}
+                show={this.state.statsOpen}
+                onClose={this.closeDialog('stats')}
+              />
+            ]
+          : null}
 
         <h3 className="feed-header">News Feed:</h3>
         <EventMessages newsFeed={event.newsFeed} />
@@ -253,7 +240,6 @@ export default connect(mapStateToProps, {
   push,
   getInvite,
   setHeader,
-  sendMessage,
   loadPass,
   monitorPass,
   clearInvite

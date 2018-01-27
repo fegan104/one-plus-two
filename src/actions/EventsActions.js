@@ -3,7 +3,8 @@ import {
   pushEventToDB,
   getEventFromDB,
   pushMessageToDB,
-  uploadBannerToDB
+  uploadBannerToDB,
+  getEventStatsFromCloudFunction
 } from '../services/FirebaseService';
 import { addUserEvent } from './AuthActions';
 import actionType from '../constants';
@@ -68,5 +69,27 @@ export const uploadBanner = file => {
   return {
     type: actionType.UPLOAD_BANNER,
     payload: uploadBannerToDB(file)
+  };
+};
+
+export const getEventStats = eventId => {
+  return dispatch => {
+    dispatch({
+      type: actionType.GET_EVENT_STATS_REQUEST
+    });
+
+    getEventStatsFromCloudFunction(eventId)
+      .then(data => {
+        dispatch({
+          type: actionType.GET_EVENT_STATS_SUCCESS,
+          payload: data
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: actionType.GET_EVENT_STATS_FAILED,
+          payload: error
+        });
+      });
   };
 };

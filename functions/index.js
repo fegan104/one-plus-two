@@ -9,8 +9,8 @@ const GenerateNewInvite = require('./src/GenerateNewInvite');
 const SendMessage = require('./src/SendMessage');
 const SendEmail = require('./src/SendEmail');
 const GetEventStats = require('./src/GetEventStats');
-const CheckInPass = require('./src/CheckInPass')
-const ImportGuests = require('./src/ImportGuests')
+const CheckInPass = require('./src/CheckInPass');
+const ImportGuests = require('./src/ImportGuests');
 
 admin.initializeApp(functions.config().firebase);
 
