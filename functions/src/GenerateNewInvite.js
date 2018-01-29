@@ -17,7 +17,7 @@ const GenerateNewInvite = (functions, admin) => {
             .child(`/events/${eventId}`)
             .once('value')
             .then(eventObj => {
-              if (!eventObj) {
+              if (!eventObj || !eventObj.val()) {
                 res.status(404).end();
                 return;
               }

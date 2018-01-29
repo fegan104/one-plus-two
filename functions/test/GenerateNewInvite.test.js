@@ -78,7 +78,6 @@ describe('Cloud function GenerateNewInvite', () => {
             },
             send: (msg) => {
               console.log('aaa', msg);
-              console.log('qqqq');
               expect(code).toEqual(404);
               done();
             }

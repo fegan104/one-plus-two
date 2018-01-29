@@ -3,6 +3,7 @@ const EventFactory = ModelFactory('event');
 const PassFactory = ModelFactory('pass');
 const UserFactory = ModelFactory('user');
 const InviteFactory = ModelFactory('invite');
+const ObjectListFactory = require('./ObjectListFactory');
 
 const fakeUserId = 'randomUserId';
 
@@ -11,7 +12,9 @@ const defaultValues = () => {
     fakeEvent: EventFactory(),
     fakePass: PassFactory(),
     fakeUser: UserFactory(),
-    fakeInvite: InviteFactory()
+    fakeInvite: InviteFactory(),
+    fakeInvitesList: ObjectListFactory(),
+    fakePassesList: ObjectListFactory()
   };
 };
 
@@ -28,8 +31,27 @@ const updatableChild = (fakeObj) => {
   };
 };
 
+const filteringChild = (originalCollection) => {
+  return {
+    orderByChild: jest.fn(param => {
+      return {
+        equalTo: jest.fn(valueToEqual => {
+          return {
+            once: jest.fn(q => {
+              let filteredCollection = originalCollection.filter(elem => elem._obj[param] === valueToEqual);
+              let newList = ObjectListFactory(filteredCollection);
+
+              return Promise.resolve(newList);
+            })
+          };
+        })
+      };
+    })
+  };
+}
+
 module.exports = (options) => {
-  let { fakeInvite, fakeEvent, fakePass, fakeUser } = {...defaultValues(), ...options};
+  let { fakeInvite, fakeEvent, fakePass, fakeUser, fakeInvitesList, fakePassesList } = {...defaultValues(), ...options};
 
   const childSpotsLeftFn = {
     set: jest.fn(val => {
@@ -39,6 +61,7 @@ module.exports = (options) => {
   };
 
   const childInvitesFn = {
+    ...filteringChild(fakeInvitesList),
     push: jest.fn(val => {
       return Promise.resolve({
         once: jest.fn(q => {
@@ -49,6 +72,10 @@ module.exports = (options) => {
         })
       })
     })
+  };
+
+  const childPassesFn = {
+    ...filteringChild(fakePassesList)
   };
 
   const childUserInvitesFn = {
@@ -73,8 +100,12 @@ module.exports = (options) => {
         }
       } else if (childName === '/invites') {
         return childInvitesFn;
-      } else if (childName === `/events/${fakeEvent.key}`) {
-        return updatableChild(fakeEvent);
+      } else if ((testVar = childName.match(/^\/events\/(.*)$/g))) {
+        if (childName.split('events/')[1] === fakeEvent.key) {
+          return updatableChild(fakeEvent);
+        } else {
+          return { once: jest.fn((q) => Promise.resolve(EventFactory())) };
+        }
       } else if (childName === `/users/${fakeUser.key}`) {
         return updatableChild(fakeUser);
       } else if (childName === `/users/${fakeUserId}/events/${fakeEvent.key}/invite`) {
@@ -85,6 +116,8 @@ module.exports = (options) => {
         } else {
           return { once: jest.fn((q) => Promise.resolve(PassFactory())) };
         }
+      } else if (childName === '/passes') {
+        return childPassesFn;
       } else {
         return { once: jest.fn((q) => Promise.resolve(null)) };
       }
