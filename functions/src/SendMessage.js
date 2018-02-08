@@ -25,7 +25,7 @@ const SendMessage = (functions, admin) => {
         return Promise.all(guestPromises);
       })
       .then(tokensSnap => {
-        const tokens = tokensSnap.map(s => s.val());
+        const tokens = tokensSnap.map(s => s.val()).filter(s => !!s);
         console.log("data:", data);
         data.tokens = tokens;
       })
