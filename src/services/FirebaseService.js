@@ -318,7 +318,7 @@ export const checkInPassInDB = passId => {
   return new Promise((resolve, reject) => {
     cloudEndpoint(`checkInPass?passId=${passId}`)
       .then(json => {
-        let user = UserModel({ ...json });
+        let user = UserModel({ ...json.user });
         resolve(user);
       })
       .catch(error => {
